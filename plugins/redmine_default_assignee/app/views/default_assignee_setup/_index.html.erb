@@ -1,0 +1,57 @@
+<%= stylesheet_link_tag 'default_assignee', :plugin => "redmine_default_assignee" %>
+<%= javascript_include_tag 'default_assignee', :plugin => "redmine_default_assignee" %>
+<% if @default_assignee.present? && @default_assignee.errors.any? %>
+    <div id="errorExplanation">
+     <ul>
+        <% @default_assignee.errors.each_with_index do |msg, i| %>
+            <li><%= msg[1] %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>
+
+<br>
+<%#= @trackers.inspect %>
+<%= title l(:lable_default_assignee) %>
+    <% default_assignee_helper = Object.new.extend(DefaultAssigneeSetupHelper) %>
+    <% default_assignee_helper.destory_trackers_and_members(@trackers,@project.assignable_users) %>
+<div class="box tabular">
+  <div id="all_attributes">
+<%= form_tag({:controller => 'default_assignee_setup',:action => 'result'}, {:multipart => true}) do %>
+    <%= hidden_field_tag 'project_id', @project.id %>
+    <label for="tracker_id" class="tracker_lable" ><%= l(:lable_for_select_tracker) %></label><br>
+    <%= select_tag "tracker_id", options_from_collection_for_select(@trackers, "id", "name") %>
+    <br>
+        <label for="assigneed_to_id" class="assigneed_to_lable"><%= l(:lable_for_select_assignee) %></label>
+    <%= select_tag "assigneed_to_id",principals_options_for_select_default(@project.assignable_users, User.current),class: "assignee_select" %>
+    <%#= select_tag "assigned_to_id", principals_options_for_select(@project.assignable_users, User.current),class: "assignee_select",:include_blank => true %>
+       <br>
+    <%= submit_tag l(:button_submit),:class=>"assign_submit" %>
+</div>
+        <div style="width:95%;margin-top: 6%;">
+          <div style="float:left;padding:0%;width:29%">
+            <h3>Default Assignees List</h3>
+            <table class="list">
+              <thead ><tr>
+                <th><%= l(:lable_field_tracker) %></th>
+                <th><%= l(:lable_field_default_assignee) %></th>
+              </tr></thead>
+              <%#= @project.id %>
+              <% @default_assignees = DefaultAssigneeSetup.where(:project_id=>@project.id) %>
+              <% @default_assignees.each do |default_assignee| -%>
+                  <tr class="<%= cycle('odd', 'even') %>">
+                    <td>
+                      <%= Tracker.where(:id=>default_assignee.tracker_id).last.name rescue nil%>
+                    </td>
+                    <td>
+                      <%= default_assignee.assigned_princepal.firstname.present? ? default_assignee.assigned_princepal.firstname : default_assignee.assigned_princepal.lastname %>
+                    </td>
+                  </tr>
+              <% end %>
+            </table>
+            <hr>
+          </div>
+        </div>
+      </div>
+<% end %>
+

@@ -1,0 +1,7 @@
+gem 'spreadsheet', '~> 1.0.0'
+# gem 'writeexcel'
+#  gem 'rubyXL' ,github: 'spree/spree_auth_devise'
+# gem 'rubyXL', :https => "https://github.com/weshatheleopard/rubyXL"
+# gem 'rubyXL', :git => 'https://github.com/weshatheleopard/rubyXL'
+#  gem 'wrap_excel'
+gem 'rubyXL'

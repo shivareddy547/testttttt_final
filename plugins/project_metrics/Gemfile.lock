@@ -1,0 +1,19 @@
+GEM
+  specs:
+    mini_portile (0.6.0)
+    nokogiri (1.6.3.1)
+      mini_portile (= 0.6.0)
+    ruby-ole (1.2.11.7)
+    rubyXL (3.3.2)
+      nokogiri (>= 1.4.4)
+      rubyzip (>= 1.1.6)
+    rubyzip (1.1.6)
+    spreadsheet (1.0.0)
+      ruby-ole (>= 1.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  rubyXL
+  spreadsheet (~> 1.0.0)
