@@ -1,0 +1,109 @@
+=== v0.3.0
+* New minor release towards full litmus pass
+* Litmus passing: basic, copymove, props
+* Litmus in progress: locks
+* Internal reorganization of file structures
+* Propfind updates to provide proper returns (thanks {schmurfy}[https://github.com/schmurfy])
+* Properly detect malformed propfind requests
+* Updated custom attribute storage
+* Allow customized DAV headers (thanks {schmurfy}[https://github.com/schmurfy])
+* Extract parent collection detection to resource (thanks {schmurfy}[https://github.com/schmurfy])
+* Start of new locking implementation
+* Fix rack #serving usage in DAV4Rack::File (thanks {pifleo}[https://github.com/pifleo])
+* Force file namespacing in file resource to prevent conflicts with DAV4Rack::File (thanks {pifleo}[https://github.com/pifleo])
+* Add ability to build xml from within a resource (thanks {mlmorg}[https://github.com/mlmorg])
+
+=== v0.2.11
+* URL escaping updates (thanks {exabugs}[https://github.com/exabugs])
+* Return status updates to match RFC (thanks {exabugs}[https://github.com/exabugs])
+* Add option to provide httpdate formatted creation date to MS clients (thanks {doxavore}[https://github.com/doxavore])
+* New MongoDB resource (thanks {exabugs}[https://github.com/exabugs])
+* Controller subclass support (thanks {inferiorhumanorgans}[https://github.com/inferiorhumanorgans])
+* Root XML attributes (thanks {inferiorhumanorgans}[https://github.com/inferiorhumanorgans])
+* Allow propstat to return relative paths (apple carddav hack) (thanks {inferiorhumanorgans}[https://github.com/inferiorhumanorgans])
+
+=== v0.2.10
+* Fix unicorn starting from exec script (thanks {spicyj}[https://github.com/spicyj])
+* Return correct size using #bytesize instead of #size (thanks {TurchenkoAlex}[https://github.com/TurchenkoAlex])
+
+=== v0.2.9
+* Be less restrictive of Nokogiri dependency
+
+=== v0.2.8
+* Allow custom logger types to be used
+* Allow resource to handle existence on locking (fixes issue {#21}[https://github.com/chrisroberts/dav4rack/issues/21] thanks {doxavore}[https://github.com/doxavore])
+* Removed exception based control flow in favor of logic based control flow
+
+=== v0.2.7
+* Include location content within PUT response body (fixes issue described in {#20}[https://github.com/chrisroberts/dav4rack/issues/20])
+
+=== v0.2.6
+* Update response header from PUT to use Location
+
+=== v0.2.5
+* Return Created response in favor of current multi status response on PUT (thanks {buffym}[https://github.com/buffym])
+* Show class 1 compliance to be in accordance with WebDAV spec (thanks {buffym}[https://github.com/buffym])
+* Adds setup method to skip alias list for resources (thanks {jbangert}[https://github.com/jbangert])
+* Allow existing logger instance to be provided
+
+=== v0.2.4
+* Return absolute URI from #mkcol and #put (thanks {teefax}[http://github.com/teefax])
+* Nodes with text children properly serialized (pointed out by {jeffhos}[http://github.com/jeffhos])
+* Fixed bug in file locking (pointed out by {clyfe}[http://github.com/clyfe] with fix provided by {teefax}[http://github.com/teefax])
+
+=== v0.2.3
+* Completing missed step in last packaging
+
+=== v0.2.2
+* Fix for port numbers in host (thanks {krug}[http://github.com/krug])
+
+=== v0.2.1
+* Fix for better handling of MOVEs with badly encoded URLS
+
+=== v0.2.0
+* Update to remote URL is passed to NGINX for proxying. Use headers instead of request
+
+=== v0.1.8
+* Better exception handling for error logging
+* Send overwrite flag to Resource#move
+
+=== v0.1.7
+* Fix in interceptor to use correct File
+
+=== v0.1.6
+* Add DAV4Rack::File that overloads just enough of Rack::File to allow explicit path setting
+
+=== v0.1.5
+* Remove support for options[:delete_dotfiles]
+* Allow HTTP methods to be ignored within interceptor
+* Add owner information to lock response
+* Initial update of spec to work with DAV4Rack
+* Copy and delete recursively
+* Add expected overwrite for copy/move on resource (thanks {clyfe}[http://github.com/clyfe])
+* Add overwrite logic for copy/move on FileResource
+* Removed callback authentication from FileResource (uses simple controller based auth)
+
+=== v0.1.4
+* Fix for Rack::File issue (thanks {clyfe}[http://github.com/clyfe])
+* Logging now optional on executable
+* Include propstats even if empty (this resolves an issue in cyberduck not displaying files)
+
+=== v0.1.3
+* Fix for Hash modification issues in Ruby 1.9.2 (thanks {antiloopgmbh}[http://github.com/antiloopgmbh])
+* Fix executable to properly fallback
+* Use callback authentication in FileResource to allow for no auth
+
+=== v0.1.2
+* Add sendfile support (currently only tested on nginx)
+
+=== v0.1.1
+* Add logging capability
+* Simplify Interceptor mappings (provide options in hash instead of explicit :options)
+
+=== v0.1.0
+* Callbacks available for resources
+* RemoteFile more aligned with Rack::File
+* Return multistatus responses PUT MKCOL and COPY/MOVE
+* Executable now uses Unicorn, Mongrel and WEBrick in that order
+* Simple resource locking enabled by default
+* Updated FileResource to work properly with new architecture

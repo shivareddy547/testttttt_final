@@ -1,0 +1,43 @@
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+creating Makefile
+
+make "DESTDIR=" clean
+
+make "DESTDIR="
+compiling buffer.c
+compiling houdini_href_e.c
+compiling rc_render.c
+rc_render.c: In function ‘rndr_link_attributes’:
+rc_render.c:257:28: warning: variable ‘rndr’ set but not used [-Wunused-but-set-variable]
+  struct rb_redcarpet_rndr *rndr;
+                            ^
+compiling html_smartypants.c
+html_smartypants.c: In function ‘squote_len’:
+html_smartypants.c:92:2: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]
+  static char* single_quote_list[] = { "'", "&#39;", "&#x27;", "&apos;", NULL };
+  ^
+html_smartypants.c:92:2: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]
+html_smartypants.c:92:2: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]
+html_smartypants.c:92:2: warning: initialization discards ‘const’ qualifier from pointer target type [enabled by default]
+html_smartypants.c: In function ‘smartypants_squote’:
+html_smartypants.c:137:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+    uint8_t next_char = (size > 1+next_squote_len) ? text[1+next_squote_len] : 0;
+                              ^
+html_smartypants.c: In function ‘smartypants_cb__amp’:
+html_smartypants.c:232:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+  int len = squote_len(text, size);
+  ^
+compiling autolink.c
+compiling rc_markdown.c
+compiling houdini_html_e.c
+compiling html.c
+compiling stack.c
+compiling markdown.c
+markdown.c:67:15: warning: ‘char_underline’ declared ‘static’ but never defined [-Wunused-function]
+ static size_t char_underline(struct buf *ob, struct sd_markdown *rndr, uint8_t *data, size_t offset, size_t size);
+               ^
+linking shared-object redcarpet.so
+
+make "DESTDIR=" install
+/usr/bin/install -m 0755 redcarpet.so ./.gem.20150618-32652-a5pleb
+installing default redcarpet libraries
