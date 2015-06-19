@@ -112,4 +112,3 @@ Dir.glob File.expand_path("../plugins/*/{Gemfile,PluginGemfile}", __FILE__) do |
   instance_eval File.read(file), file
 end
 gem 'rack-mini-profiler'
-gem 'passenger'
