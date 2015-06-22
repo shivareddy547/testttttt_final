@@ -1,5 +1,0 @@
-hideOnLoad();
-$(".icon-unlock-<%= params[:user_id] %>").hide();
-<% if @lock_status.present? %>
-$(".icon-lock-<%= params[:user_id] %>").show();
-<% end %>
