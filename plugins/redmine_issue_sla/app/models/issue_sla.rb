@@ -71,7 +71,11 @@ class IssueSla < ActiveRecord::Base
       if issue.expiration_date != date
         issue.init_journal(User.current)
         issue.attributes_before_change['expiration_date'] = date
-        issue.update_attributes(:expiration_date => date, :issue_sla => allowed_delay) 
+        Issue.skip_callbacks = true
+        issue.expiration_date = date
+        issue.issue_sla = allowed_delay
+        issue.save
+        Issue.skip_callbacks = false
       end
     end
   end

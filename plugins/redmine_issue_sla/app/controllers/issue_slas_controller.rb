@@ -7,12 +7,16 @@ class IssueSlasController < ApplicationController
 
   def update
     #call method to add severioty to project
-
+p '================ am sla update =================='
     @tracker = Tracker.find(params[:tracker_id])
     IssueSlaStatus.create_or_update_status(@project, params)
+p '==== 1 ----'
     SlaWorkingDay.update_working_hr_day(@project, params)
+p '==== 2 ----'
     IssueSla.create_slas(@project, params)
+p '==== 3 ----'
     IssueSla.create_or_update_response_time(@project,params)
+p '==== 4 ----'
     flash[:notice] = l(:notice_successful_update)
     redirect_to settings_project_path(@project, :tab => 'issue_sla',:tracker_id=>params[:tracker_id])
   end

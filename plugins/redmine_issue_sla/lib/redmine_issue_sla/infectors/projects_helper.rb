@@ -7,10 +7,15 @@ module RedmineIssueSla
         def project_settings_tabs_with_issue_sla
           tabs = project_settings_tabs_without_issue_sla
           return tabs unless @project.module_enabled?('redmine_issue_sla')
-          
+
           if User.current.allowed_to?(:manage_issue_sla, @project)
             tabs << {:name => 'issue_sla', :action  => :manage_issue_sla, :partial => 'projects/settings/issue_sla', :label => :label_issue_sla}
           end
+          return tabs unless @project.module_enabled?('ticketing_approval_system')
+          if User.current.allowed_to?(:manage_ticketing_approval, @project)
+            tabs << {:name => 'ticketing_approval_system', :action  => :manage_ticketing_approval, :partial => 'projects/settings/ticketing_approval_system', :label => :label_ticketing_approval_system}
+          end
+          
           tabs
         end
         

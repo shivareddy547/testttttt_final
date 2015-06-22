@@ -2,8 +2,62 @@ module IssuesControllerPatch
   def self.included(base)
     base.class_eval do
       # Insert overrides here, for example:
+      def create
+        subject = params[:issue][:subject]
+        p '========= am ticket --------------'
+        call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
+        @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
 
+        if @issue.save
+          if @issue.tracker.core_fields.include? 'approval_workflow'
+
+            ticket = params[:ticket]
+            project = Project.find_by_identifier(params[:project_id])
+            project_id = ticket[:project_id].present? ? ticket[:project_id] : project.id
+            if ProjectCategory.find(ticket[:category_id]).need_approval
+              e = CategoryApprovalConfig.find(subject)
+              if e.present?
+                text = (e.value1.nil? ? '': e.value1)+" "+(e.value2.nil? ? '': e.value2)+" "+(e.value3.nil? ? '': e.value3)+" "+(e.value4.nil? ? '': e.value4)+" "+(e.value5.nil? ? '': e.value5)
+                @issue.update_attributes(subject: text)
+
+                request = TicketingApproval.new(issue_id: @issue.id, project_id: project_id, category_approval_config_id: e.id)
+                request.save
+              end
+              @issue.make_sure_tickets?
+            else
+              default_assignee =  DefaultAssigneeSetup.find_or_initialize_by_project_id_and_tracker_id(:project_id=> @issue.project_id ,:tracker_id=>@issue.tracker_id)
+              NonApprovalTicket.create(issue_id: @issue.id, project_id: project_id, project_category_id: ticket[:category_id])
+              @issue.assigned_to_id = default_assignee.default_assignee_to
+              status = IssueStatus.find_by_name('open')
+              @issue.status_id = status.id
+              @issue.save
+            end
+
+          end
+          call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+          respond_to do |format|
+            format.html {
+              render_attachment_warning_if_needed(@issue)
+              flash[:notice] = l(:notice_issue_successful_create, :id => view_context.link_to("##{@issue.id}", issue_path(@issue), :title => @issue.subject))
+              if params[:continue]
+                attrs = {:tracker_id => @issue.tracker, :parent_issue_id => @issue.parent_issue_id}.reject {|k,v| v.nil?}
+                redirect_to new_project_issue_path(@issue.project, :issue => attrs)
+              else
+                redirect_to issue_path(@issue)
+              end
+            }
+            format.api  { render :action => 'show', :status => :created, :location => issue_url(@issue) }
+          end
+          return
+        else
+          respond_to do |format|
+            format.html { render :action => 'new' }
+            format.api  { render_validation_errors(@issue) }
+          end
+        end
+      end
       def update
+
         sla_time_helper = Object.new.extend(SlaTimeHelper)
         change_status = false
         if sla_time_helper.redmine_issue_sla_enabled(@issue)

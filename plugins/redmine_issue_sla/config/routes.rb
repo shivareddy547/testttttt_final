@@ -4,5 +4,4 @@ RedmineApp::Application.routes.draw do
   get '/projects/:project_id/issues/update_form', :to => 'issues#update_form'
   post '/projects/:project_id/issue_slas' => 'issue_slas#update'
   get '/projects/:project_id/issue_slas' => 'issue_slas#update'
-  get '/issues/:issue_id/time_entries' => 'timelog#index'
 end

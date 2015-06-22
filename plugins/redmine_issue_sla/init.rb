@@ -15,9 +15,9 @@ Redmine::Plugin.register :redmine_issue_sla do
   requires_redmine :version_or_higher => '2.2.0'
 
   project_module :redmine_issue_sla do
-    permission :view_issue_sla, {:issues => [:index, :show]}, :require => :member
+    # permission :view_issue_sla, {:issues => [:index, :show]}, :require => :member
     permission :manage_issue_sla, {:issue_slas => [:update]}, :require => :member
-    permission :be_project_manager, {}, :require => :member
+    # permission :be_project_manager, {}, :require => :member
     permission :response_sla,  {:issue_slas => [:response_sla]}, :require => :member
 
   end

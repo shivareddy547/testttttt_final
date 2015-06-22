@@ -27,7 +27,7 @@ $(document).ready(function() {
         }
         p_id = $('#response_btn').attr('data-project_id')
         $.ajax({
-            url: "/redmine/issue_slas/add_response_sla",
+            url: "/issue_slas/add_response_sla",
             type: 'get',
             data: {project_id: p_id, issue_id: $('#response_btn').attr('data-issue_id'), comment: $('#comment').val()},
             success: function (data) {
@@ -131,7 +131,7 @@ function send_tracker(id,tab) {
         tab=arry_of_url[arry_of_url.length - 1];
     }
     var tracker_id = $('#tracker_id').val();
-    url = "/redmine/projects/"+id+"/settings/"+tab+"?tracker_id="+tracker_id
+    url = "/projects/"+id+"/settings/"+tab+"?tracker_id="+tracker_id
     $.ajax({type: "get",url: url, success: function (result) {
         window.location.href = url;
     }
@@ -139,7 +139,7 @@ function send_tracker(id,tab) {
 }
 function send_tracker_back(id,tab)
 {
-    window.location.href="/redmine/projects/"+id+"/settings/"+tab;
+    window.location.href="/projects/"+id+"/settings/"+tab;
 }
 
 
