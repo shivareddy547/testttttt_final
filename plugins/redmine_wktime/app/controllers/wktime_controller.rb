@@ -16,7 +16,8 @@ class WktimeController < ApplicationController
 
   def index
     Rails.logger.info "++index start ++++++"
-    # p params
+     p params
+    p '--------'
     start_time = Time.now
     retrieve_date_range
     @from = getStartDay(@from)
@@ -140,18 +141,12 @@ class WktimeController < ApplicationController
        wktime_helper = Object.new.extend(WktimeHelper)
        @total_days = (@endday - @startday).to_i
        days_count = (@startday..@endday).to_a.count
-       users_id_list = @project.users
-       #if users_ids.count > 100
-       user_group = []
-       @user_hours = {}
-       users_id_list.in_groups_of(50) {|group| user_group << group.compact }
-       user_group.each do |users_ids|
-         bio_wk = wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"from_to_end")
-         if days_count == 7
-           @user_hours.merge!(bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : "")
-         else
-           @user_hours.merge!(bio_wk.present? ? bio_wk : "")
-         end
+       users_ids = @project.users
+       bio_wk = wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"from_to_end")
+       if days_count == 7
+         @user_hours =  bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : ""
+       else
+         @user_hours = bio_wk.present? ? bio_wk : ""
        end
        @project.users.collect do |user|
          time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
@@ -728,7 +723,7 @@ class WktimeController < ApplicationController
           issStr =""
           issues.each do |issue|
             issStr << issue.project_id.to_s() + '|' + issue.id.to_s() + '|' + issue.tracker.to_s() +  '|' +
-                issue.subject  + "\n" if issue.visible?(user)
+                issue.subject.truncate(150)  + "\n" if issue.visible?(user)
           end
           render :text => issStr
         }
@@ -736,7 +731,7 @@ class WktimeController < ApplicationController
     else
       issStr=[]
       issues.each do |issue|
-        issStr << {:value => issue.id.to_s(), :label => issue.tracker.to_s() +  " #" + issue.id.to_s() + ": " + issue.subject }  if issue.visible?(user)
+        issStr << {:value => issue.id.to_s(), :label => issue.tracker.to_s() +  " #" + issue.id.to_s() + ": " + issue.subject.truncate(150) }  if issue.visible?(user)
       end
 
       render :json => issStr
@@ -1674,7 +1669,7 @@ class WktimeController < ApplicationController
     setLimitAndOffset()
     rangeStr = formPaginationCondition()
     @entries = TimeEntry.find_by_sql(wkSelectStr + sqlStr + wkSqlStr + rangeStr)
-     @entries = @entries.uniq{|x| [x.spent_on,x.user_id] } if @entries.present?
+    @entries = @entries.uniq{|x| [x.spent_on,x.user_id] } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
 
     @unit = nil

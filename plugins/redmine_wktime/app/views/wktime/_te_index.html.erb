@@ -46,15 +46,13 @@
   <% check_user =  (@new_entries.present? && @new_entries.length > 1) ? 0 : ( @user.nil? ? params[:user_id] : @user.id)  %>
 <%=h select_tag('user_id',
 	options_for_select( [["All Users","0"]] + (@members.blank? ? [] : @members),
-		:selected =>  @user.nil? ? (params[:user_id].nil? ? User.current.id : params[:user_id]) : check_user),
-	:onchange => 'this.form.submit();') %></td>
+		:selected =>  @user.nil? ? (params[:user_id].nil? ? User.current.id : params[:user_id]) : check_user)) %></td>
 </tr>
 <tr>
 <th><%=l(:field_status)%></th>
 <td class="status" align="left"><%=h select_tag('status',
 	options_for_select(options_wk_status_select(params[:status]),
-	:selected => params[:status].nil? ? 0 : params[:status] ),
-	:onchange => "this.form.submit();") %></td>
+	:selected => params[:status].nil? ? 0 : params[:status] )) %></td>
 </tr>
 </table>
 
