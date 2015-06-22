@@ -20,8 +20,7 @@
     margin-top: 4% !important;
     font-size: 12px !important;
 }
-
-.default_assignee label {
+.tabular label {
     font-weight: bold !important;
     float: left !important;
     text-align: right !important;
