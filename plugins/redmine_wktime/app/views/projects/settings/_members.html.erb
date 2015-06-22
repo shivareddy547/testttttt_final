@@ -52,15 +52,6 @@
                                 :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
                       ) do |f| %>
                       <p>
-                        <% url = 'http://192.168.11.116:3000/services/get_permissions_list' %>
-                        <% response = JSON.parse((RestClient::Request.new(:method => :get,:url => url,:user => 'ramkumarr',:password => 'password').execute)) %>
-                        <% response.each do |rec| %>
-                            <label>
-                              <%= check_box_tag('membership[nanba_role_ids][]',
-                                                rec['role']['id'], member.roles.include?(nil),
-                                                :id => nil) %> <%= rec['role']['name'] %>
-                            </label><br />
-                        <%end%>
                         <% roles.each do |role| %>
                             <label>
                               <%= check_box_tag('membership[role_ids][]',
