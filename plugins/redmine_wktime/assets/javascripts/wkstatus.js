@@ -63,7 +63,7 @@ function validate_unlock_comment(member)
 
 function lock_user(member)
 {
-    $.ajax({url:"/redmine/wktime/lock_users?user_id="+member,success:function(result){
+    $.ajax({url:"/wktime/lock_users?user_id="+member,success:function(result){
         lock_icon =  ".icon-lock-"+member
         unlock_icon =  ".icon-unlock-"+member
         $(lock_icon).hide();
@@ -84,7 +84,7 @@ function unlock_permanent(member)
     var unlock_icon = ".icon-unlock-" + member
     if ($(unlock_icon).css("display") == "inline") {
         if ($.trim($(comment_id).val()).length > 0) {
-            $.ajax({url: "/redmine/wktime/unlock_permanent?user_id=" + member+"&comments="+$(comment_id).val(), success: function (result) {
+            $.ajax({url: "/wktime/unlock_permanent?user_id=" + member+"&comments="+$(comment_id).val(), success: function (result) {
                 var lock_icon = ".icon-lock-" + member
                 unlock_icon = ".icon-unlock-" + member
                 console.log($(this).text())
@@ -112,7 +112,7 @@ function unlock_permanent(member)
     else
 
     {
-        $.ajax({url: "/redmine/wktime/unlock_permanent?user_id=" + member, success: function (result) {
+        $.ajax({url: "/wktime/unlock_permanent?user_id=" + member, success: function (result) {
             var lock_icon = ".icon-lock-" + member
             var unlock_icon = ".icon-unlock-" + member
             console.log($(this).text())
