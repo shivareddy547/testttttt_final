@@ -14,7 +14,7 @@
 <%= title l(:lable_default_assignee) %>
     <% default_assignee_helper = Object.new.extend(DefaultAssigneeSetupHelper) %>
     <% default_assignee_helper.destory_trackers_and_members(@trackers,@project.assignable_users) %>
-<div class="box tabular_default_assignee">
+<div class="default_assignee box tabular_default_assignee">
   <div id="all_attributes">
 <%= form_tag({:controller => 'default_assignee_setup',:action => 'result'}, {:multipart => true}) do %>
     <%= hidden_field_tag 'project_id', @project.id %>

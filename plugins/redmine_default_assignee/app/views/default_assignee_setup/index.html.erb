@@ -13,7 +13,7 @@
 
 <br>
 <%= title l(:lable_default_assignee) %>
-<div class="box tabular">
+<div class="default_assignee box tabular_default_assignee">
   <div id="all_attributes">
 <%= form_tag({:action => 'result'}, {:multipart => true}) do %>
     <%= hidden_field_tag 'project_id', @project.id %>

@@ -21,7 +21,7 @@
     font-size: 12px !important;
 }
 
-.tabular_default_assignee label {
+.default_assignee label {
     font-weight: bold !important;
     float: left !important;
     text-align: right !important;
