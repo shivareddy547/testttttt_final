@@ -171,6 +171,7 @@ def bulk_update
 #     Rails.logger.info final_sql
 #     connection.execute(final_sql.to_s)
 #   end
+  Issue.set_callback("create",:after,:send_notification)
   if unsaved_issues.empty?
     flash[:notice] = l(:notice_successful_update) unless saved_issues.empty?
     if params[:follow]
