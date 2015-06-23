@@ -24,12 +24,12 @@ production:
    email_delivery:
      delivery_method: :smtp
      smtp_settings:
-      address:  smtp.gmail.com 
-      port:  581
+      address:  mail1.object-frontier.com 
+      port:  25
       authentication:  :login
-      domain:  example.net
-      user_name:  shivareddys
-      password:  New15domain
+      domain:  itp.objectfrontier.com
+      user_name:  shiva.srinivasreddy@object-frontier.com
+      password:  New16domain
 
 
 # === More configuration options
@@ -45,12 +45,12 @@ default:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      address:  smtp.gmail.com 
-      port:  581
-      domain:  example.net
+      address:  mail1.object-frontier.com 
+      port:  25
+      domain:  itp.objectfrontier.com
       authentication:  :login
-      user_name:  shivareddys
-      password:  New15domain
+      user_name:  shiva.srinivasreddy@object-frontier.com
+      password:  New16domain
       enable_starttls_auto: true
 
   # Absolute path to the directory where attachments are stored.
