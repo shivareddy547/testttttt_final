@@ -73,7 +73,7 @@ table.list th{
 .add_padding{
     padding-left: 50px;
 }
-.list thead{
+#tab-issue_sla .list thead{
     display: block;
 }
 .day_sla{
