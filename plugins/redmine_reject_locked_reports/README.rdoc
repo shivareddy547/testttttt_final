@@ -1,3 +1,0 @@
-= redmine_reject_locked_reports
-
-Description goes here
