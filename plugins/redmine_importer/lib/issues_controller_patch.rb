@@ -102,8 +102,8 @@ def bulk_update
       #description
       #issue.description = issue.description.scan(/'(.+?)'|"(.+?)"|"(=)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
       #issue.subject = issue.subject.scan(/'(.+?)'|"(.+?)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
-      issue.description = issue.description.gsub!(/[^0-9A-z .,->:;<()]/,'') if issue.description.present?
-      issue.subject = issue.subject.gsub!(/[^0-9A-z .,->:;<()]/,'') if issue.subject.present?
+      issue.description = issue.description.gsub(/[^0-9A-z .,->:;<()]/,'') if issue.description.present?
+      issue.subject = issue.subject.gsub(/[^0-9A-z .,->:;<()]/,'') if issue.subject.present?
       issue.updated_on = Time.now
       issue.created_on = Time.now
       saved_issues << issue
