@@ -96,10 +96,10 @@ def bulk_update
     # else
     #   unsaved_issues << orig_issue
     # end
-    Rails.logger.info "++++++++++++++++++++++++test++"
+    
     if issue.valid?
       # saved_issues << issue
-      description
+      #description
       #issue.description = issue.description.scan(/'(.+?)'|"(.+?)"|"(=)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
       #issue.subject = issue.subject.scan(/'(.+?)'|"(.+?)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
       issue.description = issue.description.gsub!(/[^0-9A-z .,->:;<()]/,'') if issue.description.present?
