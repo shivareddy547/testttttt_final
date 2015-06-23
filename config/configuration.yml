@@ -60,7 +60,7 @@ default:
   # Examples:
   # attachments_storage_path: /var/redmine/files
   # attachments_storage_path: D:/redmine/files
-  attachments_storage_path: "/home/superadmin/redmine/files"
+  attachments_storage_path: "/home/superadmin/redmine_new/files"
 
   # Configuration of the autologin cookie.
   # autologin_cookie_name: the name of the cookie (default: autologin)
