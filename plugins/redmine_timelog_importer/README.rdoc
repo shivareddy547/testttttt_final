@@ -1,3 +1,0 @@
-= redmine_timelog_importer
-
-Description goes here
