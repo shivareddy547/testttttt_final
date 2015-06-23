@@ -16,15 +16,7 @@
 production:
    email_delivery:
      delivery_method: :sendmail
-#
-# ==== Simple SMTP server at localhost
-#
-# production:
-#   email_delivery:
-#     delivery_method: :smtp
-#     smtp_settings:
-#       address: "192.168.0.70"
-#       port: 25
+
 #
 # ==== SMTP server at example.com using LOGIN authentication and checking HELO for foo.com
 #
@@ -32,44 +24,14 @@ production:
    email_delivery:
      delivery_method: :smtp
      smtp_settings:
-       address: "shiva.srinivasreddy@object-frontier.com"
-       port: 25
-       authentication: :login
-       domain: 'itp.object-frontier.com'
-       user_name: 'shiva.srinivasreddy@object-frontier.com'
-       password: 'New6domain'
-#
-# ==== SMTP server at example.com using PLAIN authentication
-#
-# production:
-#   email_delivery:
-#     delivery_method: :smtp
-#     smtp_settings:
-#       address: "example.com"
-#       port: 25
-#       authentication: :plain
-#       domain: 'example.com'
-#       user_name: 'myaccount'
-#       password: 'password'
-#
-# ==== SMTP server at using TLS (GMail)
-#
-# This might require some additional configuration. See the guides at:
-# http://www.redmine.org/projects/redmine/wiki/EmailConfiguration
-#
-# production:
-#   email_delivery:
-#     delivery_method: :smtp
-#     smtp_settings:
-#       enable_starttls_auto: true
-#       address: "smtp.gmail.com"
-#       port: 587
-#       domain: "smtp.gmail.com" # 'your.domain.com' for GoogleApps
-#       authentication: :plain
-#       user_name: "your_email@gmail.com"
-#       password: "your_password"
-#
-#
+      address:  smtp.gmail.com 
+      port:  581
+      authentication:  :login
+      domain:  example.net
+      user_name:  shivareddys
+      password:  New15domain
+
+
 # === More configuration options
 #
 # See following page:
@@ -83,12 +45,12 @@ default:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      address: mail1.object-frontier.com
-      port: 25
-      domain: itp.objectfrontier.com
-      authentication: :login
-      user_name: 'shiva.srinivasreddy@object-frontier.com'
-      password: 'New6domain'
+      address:  smtp.gmail.com 
+      port:  581
+      domain:  example.net
+      authentication:  :login
+      user_name:  shivareddys
+      password:  New15domain
       enable_starttls_auto: true
 
   # Absolute path to the directory where attachments are stored.

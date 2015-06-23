@@ -110,7 +110,6 @@ function unlock_permanent(member)
 
     }
     else
-
     {
         $.ajax({url: "/wktime/unlock_permanent?user_id=" + member, success: function (result) {
             var lock_icon = ".icon-lock-" + member
