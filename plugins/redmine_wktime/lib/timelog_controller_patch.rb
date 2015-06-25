@@ -4,10 +4,8 @@ module TimelogControllerPatch
       # Insert overrides here, for example:
       before_filter :find_time_entry, :only => [:show, :edit, :update]
       before_filter :authorize, :except => [:new, :index, :report,:edit,:update]
-
       before_filter :find_time_entries, :only => [:bulk_edit, :bulk_update, :destroy]
       before_filter :authorize, :only => [:show, :edit, :update, :bulk_edit, :bulk_update, :destroy]
-
       before_filter :find_optional_project, :only => [:new, :create, :index, :report]
       before_filter :authorize_global, :only => [:new, :create, :index, :report]
       def create
