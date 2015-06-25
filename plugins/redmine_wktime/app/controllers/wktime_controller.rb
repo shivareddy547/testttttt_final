@@ -84,9 +84,6 @@ class WktimeController < ApplicationController
       end
     end
 
-    p '---- change usr od --1---'
-    p user_id
-    p '------'
     findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr)
     if params[:project_id].present? && params[:user_id].to_i > 0
       @total_days=0
@@ -140,29 +137,36 @@ class WktimeController < ApplicationController
            wktime_helper = Object.new.extend(WktimeHelper)
            @total_days = (@endday - @startday).to_i
            days_count = (@startday..@endday).to_a.count
-           users_id_list = @project.users
+
+           project_users = []
+           @project.users.collect do |user|
+             time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
+             if time_entries.present?
+               project_users << user
+               wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
+               l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
+               l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
+               l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
+               reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
+               lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
+               @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+             end
+           end
+
+           #users_id_list = @project.users
            #if users_ids.count > 100
            user_group = []
            @user_hours = {}
-           users_id_list.in_groups_of(50) {|group| user_group << group.compact }
+           project_users.in_groups_of(50) {|group| user_group << group.compact }
            user_group.each do |users_ids|
              bio_wk = wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"from_to_end")
              if days_count == 7
                @user_hours.merge!(bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : "")
              else
-               @user_hours.merge!(bio_wk.present? ? bio_wk : "")
+               @user_hours.merge!(bio_wk.present? ? bio_wk : {})
              end
            end
-           @project.users.collect do |user|
-             time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
-             wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
-             l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
-             l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
-             l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
-             reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
-             lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
-             @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
-           end
+
            if @new_entries.blank? && !params[:prev_template].blank?
              @prev_entries = prevTemplate(@user.id)
              if !@prev_entries.blank?

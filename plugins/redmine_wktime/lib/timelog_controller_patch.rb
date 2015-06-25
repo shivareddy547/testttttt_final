@@ -4,8 +4,14 @@ module TimelogControllerPatch
       # Insert overrides here, for example:
       before_filter :find_time_entry, :only => [:show, :edit, :update]
       before_filter :authorize, :except => [:new, :index, :report,:edit,:update]
+
+      before_filter :find_time_entries, :only => [:bulk_edit, :bulk_update, :destroy]
+      before_filter :authorize, :only => [:show, :edit, :update, :bulk_edit, :bulk_update, :destroy]
+
+      before_filter :find_optional_project, :only => [:new, :create, :index, :report]
+      before_filter :authorize_global, :only => [:new, :create, :index, :report]
       def create
-start_time = Time.now
+        start_time = Time.now
         @time_entry ||= TimeEntry.new(:project => @project, :issue => @issue, :user => User.current, :spent_on => User.current.today)
         @time_entry.safe_attributes = params[:time_entry]
         log_status = call_hook(:controller_timelog_edit_before_save, { :params => params, :time_entry => @time_entry })
