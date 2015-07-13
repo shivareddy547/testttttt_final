@@ -17,6 +17,7 @@ $(document).ready(function(){
     }
 });
 
+
 function showEntryWarning(entrydate){
     var $this = $(this);
     var divID =document.getElementById('divError');
