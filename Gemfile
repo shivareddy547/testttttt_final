@@ -111,4 +111,5 @@ Dir.glob File.expand_path("../plugins/*/{Gemfile,PluginGemfile}", __FILE__) do |
   #TODO: switch to "eval_gemfile file" when bundler >= 1.2.0 will be required (rails 4)
   instance_eval File.read(file), file
 end
-gem 'rack-mini-profiler'
+#gem 'rack-mini-profiler'
+#gem 'rubycas-client'
