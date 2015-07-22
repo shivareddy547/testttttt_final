@@ -9,7 +9,7 @@ module ApplicationControllerPatch
       def update_cas_configuration
          root_url = request.fullpath
         if !root_url.include?('ticket=')
-          url = "http://#{request.host_with_port}#{root_url}"
+          url = "http://192.168.4.74/#{root_url}"
           CASClient::Frameworks::Rails::Filter.configure(
               :cas_base_url  => "https://192.168.8.103:8443/cas",
               :authenticate_on_every_request=>true,
