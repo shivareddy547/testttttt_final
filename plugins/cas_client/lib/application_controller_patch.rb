@@ -20,6 +20,7 @@ module ApplicationControllerPatch
       end
 
       def find_current_user
+        p 111111111111111111111111111111111111111111111111111111111111111
         user = nil
         unless api_request?
           if session[:user_id]

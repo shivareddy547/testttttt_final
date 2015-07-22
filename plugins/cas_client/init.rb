@@ -23,12 +23,12 @@ cas_logger.level = Logger::DEBUG
 CASClient::Frameworks::Rails::Filter.configure(
     :cas_base_url  => "https://192.168.8.103:8443/cas",
     :login_url     => "https://192.168.8.103:8443/cas/login",
-    :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://192.168.4.74:3001",
+    :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://192.168.4.74:3000",
     :username_session_key => :cas_user,
     :extra_attributes_session_key => :cas_extra_attributes,
     :logger => cas_logger,
     :enable_single_sign_out => true,
     :authenticate_on_every_request=>true,
-    :service_url => "http://192.168.4.74:3001/"
+    :service_url => "http://192.168.4.74:3000/"
 )
   end
