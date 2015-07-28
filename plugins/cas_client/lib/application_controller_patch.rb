@@ -2,10 +2,11 @@ module ApplicationControllerPatch
   def self.included(base)
     base.class_eval do
      
-      before_filter RubyCAS::Filter ,:unless => :format_js?
-
+      #before_filter RubyCAS::Filter ,:unless => :format_js?
+      before_filter RubyCAS::Filter ,:except => [:create,:update,:error,:notice,:destroy],:unless => :format_js?
+      #before_filter RubyCAS::Filter ,:unless => :format_js?
        def format_js?
-         request.format.js? || request.format.text?
+         request.format.js? || request.format.text? || request.format.json?
        end
       def find_current_user
         user = nil
