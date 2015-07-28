@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   s.email = ["bernard.potocki@imanel.org"]
   s.homepage = "http://github.com/imanel/websocket-ruby"
   s.licenses = ["MIT"]
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.4.8"
   s.summary = "Universal Ruby library to handle WebSocket protocol"
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.4.8" if s.respond_to? :installed_by_version
 end

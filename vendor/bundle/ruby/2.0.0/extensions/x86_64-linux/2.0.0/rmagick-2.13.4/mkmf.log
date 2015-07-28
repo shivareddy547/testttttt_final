@@ -1101,7 +1101,7 @@ checked program was:
 /* end */
 
 "gcc -o conftest -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0/x86_64-linux -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0/ruby/backward -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0 -I.  -fopenmp -I/usr/include/ImageMagick    -fopenmp -I/usr/include/ImageMagick   conftest.c  -L. -L/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -Wl,-R/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib  -lMagickCore      -lMagickCore    '-Wl,-rpath,/../lib' -Wl,-R -Wl,/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -L/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -lruby  -lpthread -lrt -ldl -lcrypt -lm   -lc"
-/tmp/ccZq3W0A.o: In function `t':
+/tmp/cczDDznC.o: In function `t':
 conftest.c:(.text+0xa): undefined reference to `RotationalBlurImage'
 collect2: error: ld returned 1 exit status
 checked program was:
@@ -1169,7 +1169,7 @@ checked program was:
 /* end */
 
 "gcc -o conftest -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0/x86_64-linux -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0/ruby/backward -I/home/developer/.rvm/rubies/ruby-2.0.0-p481/include/ruby-2.0.0 -I.  -fopenmp -I/usr/include/ImageMagick    -fopenmp -I/usr/include/ImageMagick   conftest.c  -L. -L/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -Wl,-R/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib  -lMagickCore      -lMagickCore    '-Wl,-rpath,/../lib' -Wl,-R -Wl,/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -L/home/developer/.rvm/rubies/ruby-2.0.0-p481/lib -lruby  -lpthread -lrt -ldl -lcrypt -lm   -lc"
-/tmp/ccu9nRdL.o: In function `t':
+/tmp/cccD2XGP.o: In function `t':
 conftest.c:(.text+0xa): undefined reference to `RotationalBlurImageChannel'
 collect2: error: ld returned 1 exit status
 checked program was:
@@ -3468,7 +3468,7 @@ extconf.h is:
 
 
 ======================================================================
-Thu 18Jun15 19:38:26
+Tue 28Jul15 15:18:37
 This installation of RMagick 2.13.4 is configured for
 Ruby 2.0.0 (x86_64-linux) and ImageMagick 
 ======================================================================

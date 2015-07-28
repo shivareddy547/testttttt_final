@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-1lzlc4m.rb extconf.rb
 creating Makefile
 
 make "DESTDIR=" clean

@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-og33zy.rb extconf.rb
 checking for ffi_call() in -lffi... yes
 checking for ffi_prep_closure()... yes
 checking for ffi_raw_call()... yes
@@ -41,5 +41,5 @@ compiling LongDouble.c
 linking shared-object ffi_c.so
 
 make "DESTDIR=" install
-/usr/bin/install -m 0755 ffi_c.so ./.gem.20150618-32652-l17big
+/usr/bin/install -m 0755 ffi_c.so ./.gem.20150728-8670-5vs1hj
 installing default ffi_c libraries

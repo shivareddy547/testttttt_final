@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-17d0f56.rb extconf.rb
 checking for Ruby version >= 1.8.5... yes
 checking for gcc... yes
 checking for Magick-config... yes
@@ -126,7 +126,7 @@ creating Makefile
 
 
 ======================================================================
-Thu 18Jun15 19:38:26
+Tue 28Jul15 15:18:37
 This installation of RMagick 2.13.4 is configured for
 Ruby 2.0.0 (x86_64-linux) and ImageMagick 
 ======================================================================
@@ -163,5 +163,5 @@ rmimage.c:10731:7: warning: return makes integer from pointer without a cast [en
 linking shared-object RMagick2.so
 
 make "DESTDIR=" install
-/usr/bin/install -m 0755 RMagick2.so ./.gem.20150618-32652-w1nb05
+/usr/bin/install -m 0755 RMagick2.so ./.gem.20150728-8670-qqlhcv
 installing default RMagick2 libraries

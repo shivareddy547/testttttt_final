@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-12ux4uw.rb extconf.rb
 checking for ruby/thread.h... yes
 checking for rb_thread_call_without_gvl() in ruby/thread.h... yes
 checking for rb_thread_blocking_region()... yes
@@ -30,5 +30,5 @@ compiling infile.c
 linking shared-object mysql2/mysql2.so
 
 make "DESTDIR=" install
-/usr/bin/install -m 0755 mysql2.so ./.gem.20150618-32652-1xr4kui/mysql2
+/usr/bin/install -m 0755 mysql2.so ./.gem.20150728-8670-kkiqx2/mysql2
 installing default mysql2 libraries

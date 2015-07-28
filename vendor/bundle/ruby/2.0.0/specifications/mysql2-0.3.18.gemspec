@@ -16,10 +16,10 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/brianmario/mysql2"
   s.licenses = ["MIT"]
   s.rdoc_options = ["--charset=UTF-8"]
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.4.8"
   s.summary = "A simple, fast Mysql library for Ruby, binding to libmysql"
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.4.8" if s.respond_to? :installed_by_version
 
   if s.respond_to? :specification_version then
     s.specification_version = 4

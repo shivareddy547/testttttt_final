@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-126s1yf.rb extconf.rb
 checking for main() in -lstdc++... yes
 creating Makefile
 
@@ -9,5 +9,5 @@ compiling unf.cc
 linking shared-object unf_ext.so
 
 make "DESTDIR=" install
-/usr/bin/install -m 0755 unf_ext.so ./.gem.20150618-32652-1jclz11
+/usr/bin/install -m 0755 unf_ext.so ./.gem.20150728-8670-pq8ps7
 installing default unf_ext libraries

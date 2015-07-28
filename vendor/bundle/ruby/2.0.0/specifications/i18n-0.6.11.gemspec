@@ -14,8 +14,8 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/svenfuchs/i18n"
   s.licenses = ["MIT"]
   s.rubyforge_project = "[none]"
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.4.8"
   s.summary = "New wave Internationalization support for Ruby"
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.4.8" if s.respond_to? :installed_by_version
 end

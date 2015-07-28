@@ -1,4 +1,4 @@
-/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby extconf.rb
+/home/developer/.rvm/rubies/ruby-2.0.0-p481/bin/ruby -r ./siteconf20150728-8670-4rs3yd.rb extconf.rb
 creating Makefile
 
 make "DESTDIR=" clean
@@ -39,5 +39,5 @@ markdown.c:67:15: warning: ‘char_underline’ declared ‘static’ but never 
 linking shared-object redcarpet.so
 
 make "DESTDIR=" install
-/usr/bin/install -m 0755 redcarpet.so ./.gem.20150618-32652-a5pleb
+/usr/bin/install -m 0755 redcarpet.so ./.gem.20150728-8670-1wnqd6q
 installing default redcarpet libraries

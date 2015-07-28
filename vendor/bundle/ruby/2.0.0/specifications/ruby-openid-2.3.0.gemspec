@@ -16,8 +16,8 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/openid/ruby-openid"
   s.licenses = ["Ruby", "Apache Software License 2.0"]
   s.rdoc_options = ["--main", "README.md"]
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.4.8"
   s.summary = "A library for consuming and serving OpenID identities."
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.4.8" if s.respond_to? :installed_by_version
 end

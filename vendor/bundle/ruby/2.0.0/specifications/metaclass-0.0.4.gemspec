@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/floehopper/metaclass"
   s.licenses = ["MIT"]
   s.rubyforge_project = "metaclass"
-  s.rubygems_version = "2.2.2"
+  s.rubygems_version = "2.4.8"
   s.summary = "Adds a metaclass method to all Ruby objects"
 
-  s.installed_by_version = "2.2.2" if s.respond_to? :installed_by_version
+  s.installed_by_version = "2.4.8" if s.respond_to? :installed_by_version
 end
