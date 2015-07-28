@@ -2,4 +2,5 @@ source 'https://rubygems.org'
 
 
 #gem 'rubycas-client'
-gem "rubycas-client-rails", :git => "http://github.com/rubycas/rubycas-client-rails.git"
+#gem "rubycas-client-rails", :git => "http://github.com/rubycas/rubycas-client-rails.git"
+gem "rubycas-client-rails", :path => "plugins/rubycas-client-rails"
