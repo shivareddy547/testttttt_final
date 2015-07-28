@@ -113,3 +113,5 @@ Dir.glob File.expand_path("../plugins/*/{Gemfile,PluginGemfile}", __FILE__) do |
 end
 #gem 'rack-mini-profiler'
 #gem 'rubycas-client'
+
+gem 'passenger'
