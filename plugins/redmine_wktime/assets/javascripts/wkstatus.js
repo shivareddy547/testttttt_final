@@ -17,11 +17,11 @@ $(document).ready(function(){
     }
 });
 
-
 function showEntryWarning(entrydate){
     var $this = $(this);
     var divID =document.getElementById('divError');
     var statusUrl = document.getElementById('getstatus_url').value;
+    statusUrl = statusUrl.replace(/^http:/, 'https:');
     divID.style.display ='none';
     $.ajax({
         url: statusUrl,
