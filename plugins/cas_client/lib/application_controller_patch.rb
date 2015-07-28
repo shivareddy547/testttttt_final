@@ -5,7 +5,7 @@ module ApplicationControllerPatch
       before_filter RubyCAS::Filter ,:unless => :format_js?
 
        def format_js?
-         request.format.js?
+         request.format.js? || request.format.text?
        end
       def find_current_user
         user = nil
