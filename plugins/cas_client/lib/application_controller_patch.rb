@@ -3,7 +3,7 @@ module ApplicationControllerPatch
     base.class_eval do
      
       #before_filter RubyCAS::Filter ,:unless => :format_js?
-      before_filter RubyCAS::Filter ,:except => [:create,:update,:error,:notice,:destroy,:bulk_update,:plugin,:modules,:user_pref_save,:match,:result,:upload_files,:commit_files,:entries_operation,:save_root,:delete],:unless => :format_js?
+      before_filter RubyCAS::Filter ,:except => [:create,:update,:error,:notice,:destroy,:bulk_update,:plugin,:modules,:user_pref_save,:match,:result,:upload_files,:commit_files,:entries_operation,:save_root,:delete,:edit],:unless => :format_js?
       #before_filter RubyCAS::Filter ,:unless => :format_js?
        def format_js?
           request.format.js? || request.format.text? || request.format.json? || (request.format.to_s == "*/*")
