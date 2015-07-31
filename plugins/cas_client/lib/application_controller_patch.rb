@@ -2,12 +2,21 @@ module ApplicationControllerPatch
   def self.included(base)
     base.class_eval do
      
+<<<<<<< HEAD
       #before_filter RubyCAS::Filter ,:unless => :format_js?
       before_filter RubyCAS::Filter ,:except => [:create,:update,:error,:notice,:destroy,:bulk_update,:plugin,:modules,:user_pref_save,:match,:result,:upload_files,:commit_files,:entries_operation,:save_root,:delete,:edit],:unless => :format_js?
       #before_filter RubyCAS::Filter ,:unless => :format_js?
        def format_js?
           request.format.js? || request.format.text? || request.format.json? || (request.format.to_s == "*/*")
        end
+=======
+
+      before_filter CASClient::Frameworks::Rails::Filter
+      before_filter CASClient::Frameworks::Rails::GatewayFilter, :only => :index
+      before_filter CASClient::Frameworks::Rails::Filter, :except => :index
+
+
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
       def find_current_user
         user = nil
         unless api_request?

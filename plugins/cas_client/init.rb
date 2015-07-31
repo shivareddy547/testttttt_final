@@ -17,6 +17,7 @@ end
 
 
 RedmineApp::Application.config.before_initialize do
+<<<<<<< HEAD
 cas_logger = CASClient::Logger.new('log/cas.log')
 cas_logger.level = Logger::DEBUG
 
@@ -30,4 +31,21 @@ CASClient::Frameworks::Rails::Filter.configure(
     :authenticate_on_every_request=>true,
     :service_url => "https://192.168.4.74/"
 )
+=======
+  cas_logger = CASClient::Logger.new('log/cas.log')
+  cas_logger.level = Logger::DEBUG
+
+
+
+  CASClient::Frameworks::Rails::Filter.configure(
+      :cas_base_url  => "https://192.168.8.103:8443/cas/",
+      :login_url     => "https://192.168.8.103:8443/cas/login",
+      :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://192.168.4.74/",
+      :username_session_key => :cas_user,
+      :extra_attributes_session_key => :cas_extra_attributes,
+      :logger => cas_logger,
+      :enable_single_sign_out => true,
+      :service_url => "http://192.168.4.74/"
+  )
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
   end

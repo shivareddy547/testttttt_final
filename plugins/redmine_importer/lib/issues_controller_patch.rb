@@ -96,11 +96,14 @@ def bulk_update
     # else
     #   unsaved_issues << orig_issue
     # end
-    Rails.logger.info "++++++++++++++++++++++++test++"
+    
     if issue.valid?
       # saved_issues << issue
-      issue.description = issue.description.scan(/'(.+?)'|"(.+?)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
-      issue.subject = issue.subject.scan(/'(.+?)'|"(.+?)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
+      #description
+      #issue.description = issue.description.scan(/'(.+?)'|"(.+?)"|"(=)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
+      #issue.subject = issue.subject.scan(/'(.+?)'|"(.+?)"|([^ ]+)/).flatten.compact.join(',') if issue.description.present?
+      issue.description = issue.description.gsub(/[^0-9A-z .,->:;<()]/,'') if issue.description.present?
+      issue.subject = issue.subject.gsub(/[^0-9A-z .,->:;<()]/,'') if issue.subject.present?
       issue.updated_on = Time.now
       issue.created_on = Time.now
       saved_issues << issue
@@ -144,7 +147,8 @@ def bulk_update
         sql_for_inserted_id="SELECT LAST_INSERT_ID() from issues LIMIT 1"
         find_inserted_record =connection.execute(sql_for_inserted_id)
         if find_inserted_record.present? && find_inserted_record.first[0] != 0
-           issue = Issue.find(find_inserted_record.first[0])
+          p 55555555555555555555555555555555555555555555555555555
+          issue = Issue.find(find_inserted_record.first[0])
           sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
           connection.execute(sql_query_for_parent.to_s)
         end
@@ -167,6 +171,7 @@ def bulk_update
 #     Rails.logger.info final_sql
 #     connection.execute(final_sql.to_s)
 #   end
+  Issue.set_callback("create",:after,:send_notification)
   if unsaved_issues.empty?
     flash[:notice] = l(:notice_successful_update) unless saved_issues.empty?
     if params[:follow]

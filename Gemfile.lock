@@ -1,9 +1,16 @@
 PATH
+<<<<<<< HEAD
   remote: plugins/rubycas-client-rails
   specs:
     rubycas-client-rails (0.1.1)
       rails (>= 3.0.0)
       rubycas-client (~> 2.3.9.rc1)
+=======
+  remote: plugins/cas_client/lib/rubycas-client
+  specs:
+    rubycas-client (2.3.10.rc1)
+      activesupport
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
 
 GEM
   remote: https://rubygems.org/
@@ -223,7 +230,11 @@ DEPENDENCIES
   rspec-rails (~> 3.0.0)
   ruby-openid (~> 2.3.0)
   rubyXL
+<<<<<<< HEAD
   rubycas-client-rails!
+=======
+  rubycas-client!
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
   rubyzip (>= 1.0.0)
   rufus-scheduler (= 3.0.3)
   selenium-webdriver

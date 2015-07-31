@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+<<<<<<< HEAD
   <component name="DataSourceManagerImpl" format="xml" hash="705637336">
+=======
+  <component name="DataSourceManagerImpl" format="xml" hash="2234895936">
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
     <data-source source="LOCAL" name="Rails new_code2: production" uuid="66f85321-ddf0-4130-b09c-1cadac8bf738">
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
@@ -25,6 +29,33 @@
       <user-password>dfd8dfc5dfc5dfde</user-password>
       <libraries />
     </data-source>
+<<<<<<< HEAD
+=======
+    <data-source source="LOCAL" name="Rails new_code7: production" uuid="6bbd6a36-8f9b-4a51-8947-2b6f4d92ed1e">
+      <driver-ref>mysql</driver-ref>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://192.168.4.74:3306/new_stage</jdbc-url>
+      <user-name>root</user-name>
+      <user-password>dfd8dfc5dfc5dfde</user-password>
+      <libraries />
+    </data-source>
+    <data-source source="LOCAL" name="Rails new_code7: development" uuid="4cf696bf-5941-49f3-9c77-fae0cb56c490">
+      <driver-ref>mysql</driver-ref>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://192.168.4.74:3306/new_stage</jdbc-url>
+      <user-name>root</user-name>
+      <user-password>dfd8dfc5dfc5dfde</user-password>
+      <libraries />
+    </data-source>
+    <data-source source="LOCAL" name="Rails new_code7: test" uuid="fcda79e8-868a-4c66-a139-73390153667c">
+      <driver-ref>mysql</driver-ref>
+      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://127.0.0.1/redmine_test</jdbc-url>
+      <user-name>root</user-name>
+      <user-password>dfd8dfc5dfc5dfde</user-password>
+      <libraries />
+    </data-source>
+>>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore
   </component>
 </project>
 

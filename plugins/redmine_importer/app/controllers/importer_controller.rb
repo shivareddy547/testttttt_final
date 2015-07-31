@@ -562,10 +562,12 @@ class ImporterController < ApplicationController
       # required attributes
       issue.status_id = status != nil ? status.id : issue.status_id
       issue.priority_id = priority != nil ? priority.id : issue.priority_id
-      issue.subject = row[attrs_map["subject"]] || issue.subject
-      # issue.imported = true
-      # optional attributes
-      issue.description = row[attrs_map["description"]] || issue.description
+
+      subj = row[attrs_map["subject"]].present? ? row[attrs_map["subject"]].gsub(/"|'/,'') : nil
+      desc = row[attrs_map["description"]].present? ? row[attrs_map["description"]].gsub(/"|'/,'') : nil
+
+      issue.subject = subj || issue.subject
+      issue.description = desc || issue.description
       issue.category_id = category != nil ? category.id : issue.category_id
       issue.start_date = row[attrs_map["start_date"]].blank? ? nil : Date.parse(row[attrs_map["start_date"]])
       issue.due_date = row[attrs_map["due_date"]].blank? ? nil : Date.parse(row[attrs_map["due_date"]])
