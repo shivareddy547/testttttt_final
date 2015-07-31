@@ -5,7 +5,8 @@
 /config/additional_environment.rb
 
 /config/email.yml
-
+/config/initializers/session_store.rb
+/config/initializers/secret_token.rb
 /coverage
 /db/*.db
 /db/*.sqlite3
@@ -23,7 +24,7 @@
 !/public/themes/alternate
 !/public/themes/classic
 !/public/themes/README
-/tmp/*
+
 /tmp/cache/*
 /tmp/pdf/*
 
