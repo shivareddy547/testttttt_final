@@ -4,9 +4,7 @@ module ApplicationControllerPatch
      
 
       before_filter CASClient::Frameworks::Rails::Filter
-      before_filter CASClient::Frameworks::Rails::GatewayFilter, :only => :index
-      before_filter CASClient::Frameworks::Rails::Filter, :except => :index
-
+      
 
       def find_current_user
         user = nil
