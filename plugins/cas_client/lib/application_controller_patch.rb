@@ -4,7 +4,7 @@ module ApplicationControllerPatch
      
 
       before_filter CASClient::Frameworks::Rails::Filter
-      
+
 
       def find_current_user
         user = nil
