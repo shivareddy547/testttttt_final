@@ -2,9 +2,4 @@ source 'https://rubygems.org'
 
 
 #gem 'rubycas-client'
-<<<<<<< HEAD
-#gem "rubycas-client-rails", :git => "http://github.com/rubycas/rubycas-client-rails.git"
-gem "rubycas-client-rails", :path => "plugins/rubycas-client-rails"
-=======
 gem 'rubycas-client', :path => "plugins/cas_client/lib/rubycas-client"
->>>>>>> v2.26_ruby_cas_client_with_http_add_temp_git_ignore

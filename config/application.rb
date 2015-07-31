@@ -53,9 +53,6 @@ module RedmineApp
     config.action_controller.include_all_helpers = false
 
     config.session_store :cookie_store, :key => '_redmine_session'
-    config.rubycas.cas_base_url = 'https://192.168.8.103:8443/cas'
-    config.rubycas.authenticate_on_every_request=true
-    config.rubycas.logger = Rails.logger
 
     config.session_store = :active_record_store
     config.action_controller.allow_forgery_protection    = false
