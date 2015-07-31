@@ -10,11 +10,12 @@ module CASClient
 
         def process_single_sign_out(st)
 p 888888888888888888888888888888888888888
+p connection = ActiveRecord::Base.connection
+p connection.execute("truncate sessions")
           session_id, session = get_session_for_service_ticket(st)
           if session
             session.destroy
-            connection = ActiveRecord::Base.connection
-            connection.execute("truncate sessions")
+
             log.debug("Destroyed #{session.inspect} for session #{session_id.inspect} corresponding to service ticket #{st.inspect}.")
           else
             log.debug("Data for session #{session_id.inspect} was not found. It may have already been cleared by a local CAS logout request.")
