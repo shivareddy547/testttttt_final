@@ -25,11 +25,11 @@ RedmineApp::Application.config.before_initialize do
   CASClient::Frameworks::Rails::Filter.configure(
       :cas_base_url  => "https://192.168.8.103:8443/cas/",
       :login_url     => "https://192.168.8.103:8443/cas/login",
-      :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://vm1033.objectfrontier.com/",
+      :logout_url    => "https://192.168.8.103:8443/cas/logout?service=https://vm1033.objectfrontier.com/",
       :username_session_key => :cas_user,
       :extra_attributes_session_key => :cas_extra_attributes,
       :logger => cas_logger,
       :enable_single_sign_out => true,
-      :service_url => "http://vm1033.objectfrontier.com/"
+      :service_url => "https://vm1033.objectfrontier.com/"
   )
   end
