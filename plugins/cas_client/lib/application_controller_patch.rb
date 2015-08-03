@@ -1,12 +1,10 @@
 module ApplicationControllerPatch
   def self.included(base)
     base.class_eval do
-     
+
 
       before_filter CASClient::Frameworks::Rails::Filter
-      before_filter CASClient::Frameworks::Rails::GatewayFilter, :only => :index
-      before_filter CASClient::Frameworks::Rails::Filter, :except => :index
-
+      before_filter :validate_cas_session
 
       def find_current_user
         user = nil
@@ -50,6 +48,12 @@ module ApplicationControllerPatch
         end
         user
       end
+
+      def validate_cas_session
+        connection = ActiveRecord::Base.connection
+        connection.execute("truncate sessions")
+      end
+
 
     end
     end
