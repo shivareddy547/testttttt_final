@@ -24,11 +24,7 @@
 !/public/themes/classic
 !/public/themes/README
 
-/tmp/cache/*
-/tmp/pdf/*
 
-/tmp/test/*
-/tmp/thumbnails/*
 /vendor/cache
 /vendor/rails
 *.rbc
