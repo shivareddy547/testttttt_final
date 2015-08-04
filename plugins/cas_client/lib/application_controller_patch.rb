@@ -4,6 +4,7 @@ module ApplicationControllerPatch
      
 
       before_filter CASClient::Frameworks::Rails::Filter
+      before_filter :require_login
 
 
       def find_current_user
