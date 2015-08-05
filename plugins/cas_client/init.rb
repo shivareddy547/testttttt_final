@@ -1,10 +1,9 @@
 require 'redmine'
 require_dependency 'account_controller_patch'
 require_dependency 'application_controller_patch'
-require_dependency 'projects_controller_patch'
+
 
 AccountController.send(:include, AccountControllerPatch)
-ProjectsController.send(:include, ProjectsControllerPatch)
 ApplicationController.send(:include, ApplicationControllerPatch)
 
 Redmine::Plugin.register :cas_client do
@@ -26,11 +25,11 @@ RedmineApp::Application.config.before_initialize do
   CASClient::Frameworks::Rails::Filter.configure(
       :cas_base_url  => "https://192.168.8.103:8443/cas/",
       :login_url     => "https://192.168.8.103:8443/cas/login",
-      :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://192.168.4.74:5000/token",
+      :logout_url    => "https://192.168.8.103:8443/cas/logout?service=http://vm1033.objectfrontier.com/token",
       :username_session_key => :cas_user,
       :extra_attributes_session_key => :cas_extra_attributes,
       :logger => cas_logger,
       :enable_single_sign_out => true,
-      :service_url => "http://192.168.4.74:5000/token"
+      :service_url => "http://vm1033.objectfrontier.com/token"
   )
   end
