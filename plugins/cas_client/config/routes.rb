@@ -1,4 +1,4 @@
 # Plugin's routes
 # See: http://guides.rubyonrails.org/routing.html
-get 'token', :to => 'cas_token#index'
-post 'token', :to => 'cas_token#index'
+get 'check_token', :to => 'cas_token#check_token'
+post 'check_token', :to => 'cas_token#check_token'

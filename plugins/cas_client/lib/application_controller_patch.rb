@@ -1,10 +1,10 @@
 module ApplicationControllerPatch
   def self.included(base)
     base.class_eval do
-     
 
-      before_filter CASClient::Frameworks::Rails::Filter
-      before_filter :require_login
+     # before_filter CASClient::Frameworks::Rails::GatewayFilter, :only => :index
+      before_filter CASClient::Frameworks::Rails::Filter,:except=>:index
+      #before_filter :require_login
 
 
       def find_current_user
