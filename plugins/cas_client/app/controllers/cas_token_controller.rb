@@ -5,7 +5,7 @@ class CasTokenController < ApplicationController
     current_url = "http://#{request.host+request.fullpath}"
     if current_url.present? && current_url.include?('?ticket=')
       p session
-      redirect_to "/projects"
+      redirect_to "/"
     end
   end
 
