@@ -57,6 +57,8 @@ module RedmineApp
     config.session_store = :active_record_store
     config.action_controller.allow_forgery_protection    = false
 
+    config.force_ssl = true
+
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
     end
