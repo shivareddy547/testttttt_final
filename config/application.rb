@@ -58,7 +58,7 @@ module RedmineApp
     config.action_controller.allow_forgery_protection    = false
 
      # config.force_ssl = true
-    config.middleware.use Rack::SslEnforcer, :except => ['/check_token', %r{^/public/}]
+   
     if File.exists?(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
       instance_eval File.read(File.join(File.dirname(__FILE__), 'additional_environment.rb'))
     end
