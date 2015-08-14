@@ -1,2 +1,0 @@
-module CasTokenHelper
-end

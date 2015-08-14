@@ -1,5 +1,0 @@
-source 'https://rubygems.org'
-
-
-#gem 'rubycas-client'
-gem 'rubycas-client', :path => "plugins/cas_client/lib/rubycas-client"
