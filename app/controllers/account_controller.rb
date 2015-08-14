@@ -30,8 +30,86 @@ class AccountController < ApplicationController
     end
   end
 
+  def ajax_encript
+# render text: true
+
+
+    require 'openssl'
+
+    require 'base64'
+
+# For testing purposes only!
+    message = params[:test].to_s
+
+key = SecureRandom.hex
+iv= SecureRandom.hex
+#     cipher = OpenSSL::Cipher::Cipher.new("des3")
+    cipher = OpenSSL::Cipher::Cipher.new("des3")
+    cipher.encrypt # Call this before setting key or iv
+    # key = cipher.random_key
+    #  iv = cipher.random_iv
+
+    cipher.key = key
+    cipher.iv = iv
+    ciphertext = cipher.update(message)
+    ciphertext << cipher.final
+    @ciphertext=ciphertext
+    encodedCipherText = Base64.encode64(ciphertext)
+    puts "Encrypted \"#{message}\" with \"#{key}\" to:\n\"#{ciphertext}\"\n"
+
+    @yes="yes"
+    if request.xhr?
+      render :json => {
+          :encode_text => encodedCipherText,:message=>message,:key=> key,:vi=>iv
+      }
+    end
+
+  end
+
+
   # Login request and validation
   def login
+
+    require 'openssl'
+
+    require 'base64'
+if params.present? && params[:id].present?
+    # require 'openssl'
+    #
+    # require 'base64'
+
+  require 'openssl'
+
+  require 'base64'
+
+# For testing purposes only!
+  message = 'test'
+  key = params[:key]
+  iv = params[:vi]
+
+# Encrypt plaintext using Triple DES
+  cipher = OpenSSL::Cipher::Cipher.new("des3")
+  # cipher.encrypt # Call this before setting key or iv
+  cipher.key = key
+  cipher.iv = iv
+   ciphertext = cipher.update(message)
+  # ciphertext << cipher.final
+  # ciphertext=params[:pwd_encript]
+
+  encodedCipherText=params[:id]
+
+p "++++++++++encode password+++++++++++==="
+  p encodedCipherText
+# Base64-decode the ciphertext and decrypt it
+  cipher.decrypt
+  plaintext = cipher.update(Base64.decode64(encodedCipherText))
+  plaintext << cipher.final
+params[:password]=plaintext
+# Print decrypted plaintext; should match original message
+  puts "Decrypted \"#{ciphertext}\" with \"#{key}\" to:\n\"#{plaintext}\"\n\n"
+
+
+end
     if request.get?
       if User.current.logged?
         redirect_back_or_default home_url, :referer => true
@@ -43,6 +121,47 @@ class AccountController < ApplicationController
     logger.error "An error occured when authenticating #{params[:username]}: #{e.message}"
     render_error :message => e.message
   end
+
+  def login_ajax
+
+
+    require 'openssl'
+
+    require 'base64'
+
+# For testing purposes only!
+    message = 'password'
+    key = '000102030405060708090a0b0c0d0e0f'
+    iv = '101112131415161718191a1b1c1d1e1f'
+
+# Encrypt plaintext using Triple DES
+    cipher = OpenSSL::Cipher::Cipher.new("des3")
+    cipher.encrypt # Call this before setting key or iv
+    cipher.key = key
+    cipher.iv = iv
+    ciphertext = cipher.update(message)
+    ciphertext << cipher.final
+
+    ciphertext=""
+    ciphertext<< params[:pwd_encript]
+    puts "Encrypted \"#{message}\" with \"#{key}\" to:\n\"#{ciphertext}\"\n"
+
+# Base64-encode the ciphertext
+    encodedCipherText = Base64.encode64(ciphertext)
+
+# Base64-decode the ciphertext and decrypt it
+    cipher.decrypt
+    plaintext = cipher.update(Base64.decode64(encodedCipherText))
+    plaintext << cipher.final
+
+# Print decrypted plaintext; should match original message
+    puts "Decrypted \"#{ciphertext}\" with \"#{key}\" to:\n\"#{plaintext}\"\n\n"
+
+
+
+
+  end
+
 
   # Log out current user and redirect to welcome page
   def logout

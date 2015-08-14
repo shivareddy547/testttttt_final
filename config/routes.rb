@@ -19,6 +19,7 @@ RedmineApp::Application.routes.draw do
   root :to => 'welcome#index', :as => 'home'
 
   match 'login', :to => 'account#login', :as => 'signin', :via => [:get, :post]
+  match 'ajax_encript', :to => 'account#ajax_encript', :as => 'ajax_encript', :via => [:get, :post]
   match 'logout', :to => 'account#logout', :as => 'signout', :via => [:get, :post]
   match 'account/register', :to => 'account#register', :via => [:get, :post], :as => 'register'
   match 'account/lost_password', :to => 'account#lost_password', :via => [:get, :post], :as => 'lost_password'
