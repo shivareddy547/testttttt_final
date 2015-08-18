@@ -124,11 +124,99 @@ class UsersController < ApplicationController
     @membership ||= Member.new
   end
 
-  def update
+  # def update
+  #   @user.admin = params[:user][:admin] if params[:user][:admin]
+  #   @user.login = params[:user][:login] if params[:user][:login]
+  #   if params[:user][:password].present? && (@user.auth_source_id.nil? || params[:user][:auth_source_id].blank?)
+  #     @user.password, @user.password_confirmation = params[:user][:password], params[:user][:password_confirmation]
+  #   end
+  #   @user.safe_attributes = params[:user]
+  #   # Was the account actived ? (do it before User#save clears the change)
+  #   was_activated = (@user.status_change == [User::STATUS_REGISTERED, User::STATUS_ACTIVE])
+  #   # TODO: Similar to My#account
+  #   @user.pref.attributes = params[:pref]
+
+  #   if @user.save
+  #     @user.pref.save
+
+  #     if was_activated
+  #       Mailer.account_activated(@user).deliver
+  #     elsif @user.active? && params[:send_information] && @user.password.present? && @user.auth_source_id.nil?
+  #       Mailer.account_information(@user, @user.password).deliver
+  #     end
+
+  #     respond_to do |format|
+  #       format.html {
+  #         flash[:notice] = l(:notice_successful_update)
+  #         redirect_to_referer_or edit_user_path(@user)
+  #       }
+  #       format.api  { render_api_ok }
+  #     end
+  #   else
+  #     @auth_sources = AuthSource.all
+  #     @membership ||= Member.new
+  #     # Clear password input
+  #     @user.password = @user.password_confirmation = nil
+
+  #     respond_to do |format|
+  #       format.html { render :action => :edit }
+  #       format.api  { render_validation_errors(@user) }
+  #     end
+  #   end
+  # end
+
+  require 'openssl'
+   require 'base64'
+   
+ def update
     @user.admin = params[:user][:admin] if params[:user][:admin]
     @user.login = params[:user][:login] if params[:user][:login]
+ 
+    if params.present? && params[:pwd].present? || params[:pwd_conf].present?
+       
+      message = 'test'
+      key = params[:key]
+      iv = params[:vi]
+      pwd = params[:pwd]
+      pwd_conf = params[:pwd_conf]
+
+    # Encrypt plaintext using Triple DES
+      cipher = OpenSSL::Cipher::Cipher.new("des3")
+      # cipher.encrypt # Call this before setting key or iv
+      cipher.key = key
+      cipher.iv = iv
+      ciphertext = cipher.update(message)
+      # ciphertext << cipher.final
+      # ciphertext=params[:pwd_encript]
+      encodedCipherText_password=params[:pwd]
+      encodedCipherText_password_conf=params[:pwd_conf]
+      #encodedCipherText=params[:id]
+      cipher.decrypt
+      plaintext_pwd = cipher.update(Base64.decode64(encodedCipherText_password))
+      plaintext_pwd << cipher.final
+      params[:user][:password]=plaintext_pwd
+      
+      cipher = OpenSSL::Cipher::Cipher.new("des3")
+      # cipher.encrypt # Call this before setting key or iv
+      cipher.key = key
+      cipher.iv = iv
+      ciphertext = cipher.update(message)
+      # ciphertext << cipher.final
+      # ciphertext=params[:pwd_encript]
+     encodedCipherText_password_conf=params[:pwd_conf]
+      #encodedCipherText=params[:id]
+      cipher.decrypt
+      plaintext_pwd_conf = cipher.update(Base64.decode64(encodedCipherText_password_conf))
+      plaintext_pwd_conf << cipher.final
+      params[:user][:password_confirmation]=plaintext_pwd_conf
+     
+   end
+
+
+    # update_password_params
+
     if params[:user][:password].present? && (@user.auth_source_id.nil? || params[:user][:auth_source_id].blank?)
-      @user.password, @user.password_confirmation = params[:user][:password], params[:user][:password_confirmation]
+       @user.password, @user.password_confirmation = params[:user][:password], params[:user][:password_confirmation]
     end
     @user.safe_attributes = params[:user]
     # Was the account actived ? (do it before User#save clears the change)
@@ -182,7 +270,8 @@ class UsersController < ApplicationController
     end
   end
 
-  def destroy_membership
+  def de
+    stroy_membership
     @membership = Member.find(params[:membership_id])
     if @membership.deletable?
       @membership.destroy
