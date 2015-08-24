@@ -1,6 +1,6 @@
 require 'redmine'
 RedmineApp::Application.config.after_initialize do
-  require_dependency 'redmine_importer/infectors'
+   require_dependency 'redmine_importer/infectors'
 end
 
 # CustomFieldsHelper.send(:include, WktimeHelperPatch)

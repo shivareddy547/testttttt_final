@@ -258,7 +258,7 @@ class KanbansController < ApplicationController
            @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
 
           issues=[]
-          if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present?
+          if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
           issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id});");
           end
           # issues=[]
@@ -291,7 +291,7 @@ class KanbansController < ApplicationController
           @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
 
           issues=[]
-          if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present?
+          if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
             issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id});");
           end
 
