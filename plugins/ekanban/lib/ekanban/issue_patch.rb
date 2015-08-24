@@ -67,14 +67,11 @@ module EKanban
       module InstanceMethods
 
         def create_parent_project_Kanban
-
           @projects = self.project.ancestors
           @projects.each do |each_project|
-
-           if each_project.kanban.present? && each_project.kanban.last.subproject_enable == "1"
+           if each_project.kanban.present? && each_project.kanban.last.subproject_enable == true
              project_kanbans = each_project.kanban
              project_kanbans.each do |each_kanban|
-
              if each_kanban.is_valid == true
              each_kanban.kanban_pane.each do |each_pane|
                if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && each_pane.kanban_state.issue_status.last.id == self.status_id
