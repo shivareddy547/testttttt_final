@@ -20,11 +20,11 @@ Redmine::Plugin.register :AgileDwarf do
       :stcolumn5 => 2,
   }, :partial => 'shared/settings'
 
-  project_module :scrum do
-    permission :sprints, {:adsprints => [:list], :adtaskinl => [:update, :inplace, :create, :tooltip], :adsprintinl => [:create, :inplace]}
-    permission :sprints_tasks, {:adtasks => [:list], :adtaskinl => [:update, :inplace, :tooltip, :spent]}
-    permission :burndown_charts, {:adburndown => [:show]}
-  end
+  # project_module :scrum do
+  #   permission :sprints, {:adsprints => [:list], :adtaskinl => [:update, :inplace, :create, :tooltip], :adsprintinl => [:create, :inplace]}
+  #   permission :sprints_tasks, {:adtasks => [:list], :adtaskinl => [:update, :inplace, :tooltip, :spent]}
+  #   permission :burndown_charts, {:adburndown => [:show]}
+  # end
 
   menu :project_menu, :adtasks, { :controller => 'adtasks', :action => 'list' }, :caption => :label_menu_mytasks, :after => :activity, :param => :project_id
   menu :project_menu, :adsprints, { :controller => 'adsprints', :action => 'list' }, :caption => :label_menu_sprints, :after => :adtasks, :param => :project_id
