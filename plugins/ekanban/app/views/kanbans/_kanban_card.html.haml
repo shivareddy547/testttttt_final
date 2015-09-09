@@ -3,10 +3,14 @@
   %tbody
     %td.kanban-card-form
       = render :partial => "card_form"
-    %td.kanban-card-history
-      = render :partial => "card_history"
+    -#%td.kanban-card-history
+    -#  = render :partial => "card_history"
 :javascript
   $("#popupSubmit").click(function(){
     $('#ajax-indicator').css("z-index","1999").css("opacity","1").css("border","0px").show();
   });
 
+:css
+  .tabular input, .tabular select {
+  max-width: 40% !important;
+  }

@@ -71,6 +71,9 @@ class KanbanPanesController < ApplicationController
 
   def destroy
     @pane = KanbanPane.find(params[:id])
+    if @pane.kanban_card.present?
+      @pane.kanban_card.delete_all
+    end
     @pane.destroy
     redirect_to edit_project_kanban_path(params[:project_id],params[:kanban_id], {:tab => "Panes", :errors => @pane.errors.full_messages})
   end

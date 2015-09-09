@@ -8,6 +8,7 @@ module EKanban
 
         base.class_eval do
           has_many :kanban
+          has_one :issue_card_config
         end
       end
 

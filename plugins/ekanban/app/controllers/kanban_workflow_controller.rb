@@ -56,4 +56,7 @@ class KanbanWorkflowController < ApplicationController
   	end
   	redirect_to edit_project_kanban_path(params[:project_id],params[:kanban_id], :tab => 'Workflow')
   end
+
+
+
 end

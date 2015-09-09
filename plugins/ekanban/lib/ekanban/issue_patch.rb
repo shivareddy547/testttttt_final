@@ -51,12 +51,10 @@ module EKanban
             end
             {:conditions => conditions.join(' and ').to_a.concat(values)}
           }
-          after_save :create_parent_project_Kanban
+
           validate :validate_kanban_card_update, :if => Proc.new{!self.new_record?}
           validate :validate_kanban_card_new, :if => Proc.new{self.new_record?}
           validates_presence_of :assigned_to
-
-
         end
       end
 
@@ -65,31 +63,6 @@ module EKanban
       end
 
       module InstanceMethods
-
-        def create_parent_project_Kanban
-          @projects = self.project.ancestors
-          @projects.each do |each_project|
-           if each_project.kanban.present? && each_project.kanban.last.subproject_enable == true
-             project_kanbans = each_project.kanban
-             project_kanbans.each do |each_kanban|
-             if each_kanban.is_valid == true
-             each_kanban.kanban_pane.each do |each_pane|
-               if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && each_pane.kanban_state.issue_status.last.id == self.status_id
-               kanban_new = KanbanCard.where(:issue_id=>self.id,:kanban_pane_id=>each_pane.id).first_or_initialize
-               kanban_new.issue_id = self.id
-               kanban_new.developer_id= self.assigned_to_id
-               kanban_new.verifier_id=self.assigned_to_id
-               kanban_new.kanban_pane_id=each_pane.id
-               kanban_new.save
-             end
-             end
-          end
-          end
-          end
-          end
-
-
-          end
         def validate_kanban_card_new
           issue = self
           kanban = Kanban.find_by_project_id_and_tracker_id_and_is_valid(issue.project_id,issue.tracker_id,true)
@@ -143,6 +116,7 @@ module EKanban
           # 1. user's wip and permission(role).
           # 2. corresponding pane.
           # 3. ...
+          @attributes_before_change = attributes.dup
           issue = self.dup
           assignee = issue.assigned_to
 

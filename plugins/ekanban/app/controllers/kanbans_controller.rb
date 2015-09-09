@@ -2,11 +2,40 @@
 class KanbansController < ApplicationController
   unloadable
 
+  helper :issues
+  helper :users
+  helper :custom_fields
+  helper :kanbans
+  helper :journals
+  helper :projects
+  include ProjectsHelper
+  helper :custom_fields
+  include CustomFieldsHelper
+  helper :issue_relations
+  include IssueRelationsHelper
+  helper :watchers
+  include WatchersHelper
+  helper :attachments
+  include AttachmentsHelper
+  helper :queries
+  include QueriesHelper
+  helper :repositories
+  include RepositoriesHelper
+  helper :sort
+  include SortHelper
+  include IssuesHelper
+  helper :timelog
+  include Redmine::Export::PDF
+
+
   PROJECT_VIEW = 0  #Show selected Kanban in Project view
   GROUP_VIEW = 1    #Show selected Kanban in Group view
   MEMBER_VIEW = 2   #Show selected Kanban in Member view
 
   menu_item :Kanban
+
+  skip_before_filter :check_if_login_required
+  skip_before_filter :verify_authenticity_token
 
   def index
     @project = Project.find(params[:project_id])#Get member name of this project
@@ -32,9 +61,9 @@ class KanbansController < ApplicationController
     @kanbans = []
 
     if params[:kanban_id].to_i > 0
-        @kanbans << Kanban.find(params[:kanban_id])
+      @kanbans << Kanban.find(params[:kanban_id])
     else
-        @kanbans = Kanban.by_project(@project).where("is_valid = ?",true)
+      @kanbans = Kanban.by_project(@project).where("is_valid = ?",true)
     end
 
     if params[:member_id].to_i == 0 and params[:principal_id].to_i == 0
@@ -47,16 +76,51 @@ class KanbansController < ApplicationController
       @principal = Principal.find(params[:principal_id])
     end
 
+    #@project= Project.find(params[:id])
+    retrieve_dash_board_query
+    sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
+    sort_update(@query.sortable_columns)
+    @query.sort_criteria = sort_criteria.to_a
     #Get all kanbans's name
     @kanban_names = @kanbans.collect{|k| k.name}
     respond_to do |format|
       format.html
       format.js { render :partial => "index", :locals => {:view=>@view, :kanbans=>@Kanbans}}
-      format.json { render :json => {:kanbans => @kanbans, 
-                                     :teams => @principal, 
-                                     :member => @member, 
+      format.json { render :json => {:kanbans => @kanbans,
+                                     :teams => @principal,
+                                     :member => @member,
                                      :view => @view}}
     end
+  end
+
+
+
+  def retrieve_dash_board_query
+    @find_dashboard_query = EkanbanQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
+    # @query=nil
+    if @find_dashboard_query.present?
+      if api_request? || params[:set_filter]
+        @init_filters={ 'status_id' => {:operator => "o", :values => [""]} }
+        @find_dashboard_query.last.update_attributes(:filters=> @init_filters)
+      end
+      @query = @find_dashboard_query.last
+    else
+      @init_filters={ 'status_id' => {:operator => "o", :values => [""]} }
+      @query ||= EkanbanQuery.new(:name => "_", :filters => @init_filters)
+      @query.user_id=User.current.id
+      @query.project_id= @project.id
+    end
+
+  end
+
+
+  def filter_query
+    @project=Project.find(params[:project_id])
+    dashboard_query = EkanbanQuery.project_user_filter_init(User.current.id,@project.id)
+    dashboard_query.build_from_params(params)
+    dashboard_query.save
+    redirect_to project_kanbans_path(:project_id=>@project.id)
+
   end
 
   def panes(kanban)
@@ -65,82 +129,33 @@ class KanbansController < ApplicationController
   	panes = kanban.kanban_pane
   end
 
+
   def panes_num(kanban)
     panes(kanban).size
   end
 
   def cards(pane_id,project)
     cards=[]
-    pane = KanbanPane.find(pane_id)
 
+    pane = KanbanPane.find(pane_id)
+    # @kanban = pane.kanban
     if !@member.nil?
        cards = KanbanCard.by_member(@member).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
     elsif !@principal.nil?
         cards = KanbanCard.by_group(@principal).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
     else
-      # cards = KanbanCard.find_by_sql("SELECT kanban_cards.* FROM kanban_cards INNER JOIN issues ON issues.id = kanban_cards.issue_id INNER JOIN enumerations ON enumerations.id = issues.priority_id AND enumerations.type IN ('IssuePriority') where kanban_pane_id=#{pane.id} order by enumerations.position ASC ")
-       cards = KanbanCard.joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
+      # kanban_query_statement=""
+      kanban_query = EkanbanQuery.find_by_project_id(project)
+      kanban_query_statement = kanban_query.statement if kanban_query.present?
+      if kanban_query_statement.present?
+        # kanban_query_statement = "and" + "#{kanban_query_statement}"
+        kanban_query_statement = "and #{kanban_query_statement}"
+
+      end
+      cards = KanbanCard.find_by_sql("SELECT kanban_cards.* FROM kanban_cards INNER JOIN issues ON issues.id = kanban_cards.issue_id INNER JOIN enumerations ON enumerations.id = issues.priority_id AND enumerations.type IN ('IssuePriority') where kanban_pane_id=#{pane.id}  #{kanban_query_statement} order by enumerations.position ASC ")
+       # cards = KanbanCard.joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
     end
-    # if pane.present? && pane.kanban.present? && pane.kanban.subproject_enable == true && project.self_and_descendants.active.present?
-    # @subprojects = project.self_and_descendants.active
-    # pan_ids_array=[]
-    # @subprojects.each do |each_project|
-    #  if each_project.kanban.present?
-    #    kanbans = each_project.kanban.where(:is_valid=>true)
-    #    if kanbans.present? && kanbans.count > 0
-    #      kanbans.each do |each_kanban|
-    #   panes = each_kanban.kanban_pane.where(:name=>pane.name)
-    #   pan_ids = panes.map(&:id)
-    #   pan_ids_array << pan_ids
-    #   end
-    #    else
-    #      panes = each_project.kanban.last.kanban_pane.where(:name=>pane.name)
-    #      pan_ids = panes.map(&:id)
-    #      pan_ids_array << pan_ids
-    #    end
 
-    #  end
-    # end
-    # pan_ids_array.flatten!
-    # # pan_ids_array = pan_ids_array.flatten!
-    # p pan_ids_array
-    # if pan_ids_array.present?
-    # pan_ids_array.each  do |pane_id|
-    #   cards1=[]
-    #   pane = KanbanPane.find(pane_id)
-    #   # if !@member.nil?
-    #   #   cards = KanbanCard.by_member(@member).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    #   # elsif !@principal.nil?
-    #   #   cards = KanbanCard.by_group(@principal).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    #   # else
-    #   #   cards = KanbanCard.joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    #   # end
-
-    #   cards1 = KanbanCard.joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-
-    #   cards = cards + cards1 if cards1.present?
-
-    # end
-
-    # end
-
-    # else
-
-
-    # pane = KanbanPane.find(pane_id)
-    # if !@member.nil?
-    #    cards = KanbanCard.by_member(@member).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    # elsif !@principal.nil?
-    #    cards = KanbanCard.by_group(@principal).joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    # else
-    #    cards = KanbanCard.joins(:priority).find(:all, :conditions => ["kanban_pane_id = ?",pane.id], :order => "#{Enumeration.table_name}.position ASC")
-    # end
-
-    # end
-    # p "++++++++=cardscardscardscardscardscardscardscardscardscardscardscards+++"
-    # p cards
-    # p "++++++++++++end ++++++++="
-    # cards.flatten!
     cards = cards.uniq
   end
 
@@ -210,13 +225,16 @@ class KanbansController < ApplicationController
     end
   end
 
+
   def kanban_settings_tabs
     tabs = [{:name => 'General', :action => :kanban_general, :partial => 'general', :label => :label_kanban_general},
             {:name => 'Panes', :action => :kanban_pane, :partial => 'panes', :label => :label_kanban_panes},
             {:name => 'Workflow', :action => :kanban_workflow, :partial => 'workflow', :label => :label_kanban_workflow},
-            ]
+            {:name => 'Config', :action => :kanban_pane, :partial => 'card_fieldssetup', :label => :label_card_fields_setup}
+    ]
     #tabs.select {|tab| User.current.allowed_to?(tab[:action], @project)}
   end
+
 
   def update
     @project = Project.find(params[:project_id])
@@ -231,58 +249,49 @@ class KanbansController < ApplicationController
       @kanban.update_attributes(:is_valid => params[:kanban][:is_valid],:subproject_enable=>params[:kanban][:subproject_enable]);
       @kanban.save
     end
-
-
-      if @kanban.is_valid == true
-
+    if @kanban.is_valid == true
       if @project.issues.present?
-
         @kanban.kanban_pane.each do |each_pane|
-         issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
+          #issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
+          issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.map(&:id),:tracker_id=>@kanban.tracker_id) if each_pane.kanban_state.issue_status.present?
           if issues.present?
-          issues.each do |each_issue|
-             kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
-               kanban_new.issue_id = each_issue.id
-               kanban_new.developer_id= each_issue.assigned_to_id
-               kanban_new.verifier_id=each_issue.assigned_to_id
-               kanban_new.kanban_pane_id=each_pane.id
-               kanban_new.save
+            issues.each do |each_issue|
+              kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
+              kanban_new.issue_id = each_issue.id
+              kanban_new.developer_id= each_issue.assigned_to_id
+              kanban_new.verifier_id=each_issue.assigned_to_id
+              kanban_new.kanban_pane_id=each_pane.id
+              kanban_new.save
+            end
           end
-          end
-      end
+        end
       end
 
       if params[:kanban].present? && params[:kanban][:subproject_enable].present? && params[:kanban][:subproject_enable] == "1"
         @kanban.kanban_pane.each do |each_pane|
-           @subprojects = @project.descendants.active
-           @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
-
+          @subprojects = @project.descendants.active
+          @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
           issues=[]
           if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
-          issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id});");
+            issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.map(&:id).join(',')}) and tracker_id in (#{@kanban.tracker_id});");
           end
-          # issues=[]
-          # @subprojects.each do |each_project|
-          #
-          # issues << each_project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
-          # end
-          #  issues.flatten!
-           if issues.present?
-             issues.each do |each_issue|
-               # kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
-               kanban_new = KanbanCard.where(:issue_id=>each_issue.id,:kanban_pane_id=>each_pane.id).first_or_initialize
-                 kanban_new.issue_id = each_issue.id
-                 kanban_new.developer_id= each_issue.assigned_to_id
-                 kanban_new.verifier_id=each_issue.assigned_to_id
-                 kanban_new.kanban_pane_id=each_pane.id
-                 kanban_new.save
+
+          if issues.present?
+            issues.each do |each_issue|
+              # kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
+              kanban_new = KanbanCard.where(:issue_id=>each_issue.id,:kanban_pane_id=>each_pane.id).first_or_initialize
+              kanban_new.issue_id = each_issue.id
+              kanban_new.developer_id= each_issue.assigned_to_id
+              kanban_new.verifier_id=each_issue.assigned_to_id
+              kanban_new.kanban_pane_id=each_pane.id
+              kanban_new.save
             end
-           end
-           end
+          end
+        end
       end
       if  params[:kanban].present? && params[:kanban][:subproject_enable].present? && params[:kanban][:subproject_enable] == "0"
 
-         @kanban.kanban_pane.each do |each_pane|
+        @kanban.kanban_pane.each do |each_pane|
           @subprojects = @project.descendants.active
           # @subprojects_ids= @subprojects.map(&:id) if @subprojects.present?
           #
@@ -292,26 +301,22 @@ class KanbansController < ApplicationController
 
           issues=[]
           if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
-            issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id});");
-          end
-
-         # issues=[]
-          # @subprojects.each do |each_project|
-          # issues << each_project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
-          # end
-          #  issues.flatten!
-
-           if issues.present?
-             KanbanCard.where(:issue_id=>issues.map(&:id)).destroy_all
+            # issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id});");
+            # issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.last.id}) and tracker_id in (#{@kanban.tracker_id});");
+            issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.map(&:id).join(',')}) and tracker_id in (#{@kanban.tracker_id});");
 
           end
-           end
+
+
+          if issues.present?
+            KanbanCard.where(:issue_id=>issues.map(&:id)).destroy_all
+
+          end
+        end
 
       end
 
-      end
-
-
+    end
     respond_to do |format|
       format.json {render :nothing => true}
       format.html do
@@ -383,4 +388,177 @@ class KanbansController < ApplicationController
     pane = pane(pane_id)
     stage = Stage.find(pane.stage_id) if !pane.nil?
   end
+
+
+  def kanban_issue_show
+
+
+    @issue = Issue.find(params[:issue_id])
+    @project = @issue.project
+
+    @relations = @issue.relations.select {|r| r.other_issue(@issue) && r.other_issue(@issue).visible? }
+    @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
+    @edit_allowed = User.current.allowed_to?(:edit_issues, @project)
+    @priorities = IssuePriority.active
+    @time_entry = TimeEntry.new(:issue => @issue, :project => @issue.project)
+    @relation = IssueRelation.new
+
+
+
+    # @roles = @user.roles_for_project(@project)
+
+    @time_entry = TimeEntry.new
+
+    @project = @issue.project#Get member name of this project
+    @members= @project.members
+    @principals = @project.principals
+    @user = User.current
+    @versions = @project.versions
+
+    @roles = @user.roles_for_project(@project)
+
+    @member = nil
+    @principal = nil
+
+    @issue_statuss = IssueStatus.all
+    @kanban_states = KanbanState.all
+    @issue_status_kanban_state = IssueStatusKanbanState.all
+    @kanban_flows = KanbanWorkflow.all
+
+    params[:kanban_id] = 0 if params[:kanban_id].nil?
+    params[:member_id] = 0 if params[:member_id].nil?
+    params[:principal_id] = 0 if params[:principal_id].nil?
+
+    @kanbans = []
+
+    if params[:kanban_id].to_i > 0
+      @kanbans << Kanban.find(params[:kanban_id])
+    else
+      @kanbans = Kanban.by_project(@project).where("is_valid = ?",true)
+    end
+
+    if params[:member_id].to_i == 0 and params[:principal_id].to_i == 0
+      @view = PROJECT_VIEW
+    elsif params[:member_id].to_i > 0
+      @view = MEMBER_VIEW
+      @member = Member.find(params[:member_id])
+    else
+      @view = GROUP_VIEW
+      @principal = Principal.find(params[:principal_id])
+    end
+
+    @kanban_status_id = params[:kanban_status_id]
+    @issue_status_id = params[:issue_status_id]
+    @kanban_pane_id = params[:kanban_pane_id]
+
+     # issue = @issue
+    respond_to do |format|
+      format.html
+      format.js
+      format.json
+    end
+
+ end
+
+  def update_form
+    @issue = Issue.find(params[:id])
+    @project = @issue.project
+
+
+    @relations = @issue.relations.select {|r| r.other_issue(@issue) && r.other_issue(@issue).visible? }
+    @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
+    @edit_allowed = User.current.allowed_to?(:edit_issues, @project)
+    @priorities = IssuePriority.active
+    @time_entry = TimeEntry.new(:issue => @issue, :project => @issue.project)
+    @relation = IssueRelation.new
+
+
+    @time_entry = TimeEntry.new
+
+
+
+    @project = @issue.project#Get member name of this project
+    @members= @project.members
+    @principals = @project.principals
+    @user = User.current
+    @versions = @project.versions
+
+    @roles = @user.roles_for_project(@project)
+
+    @member = nil
+    @principal = nil
+
+    @issue_statuss = IssueStatus.all
+    @kanban_states = KanbanState.all
+    @issue_status_kanban_state = IssueStatusKanbanState.all
+    @kanban_flows = KanbanWorkflow.all
+
+    params[:kanban_id] = 0 if params[:kanban_id].nil?
+    params[:member_id] = 0 if params[:member_id].nil?
+    params[:principal_id] = 0 if params[:principal_id].nil?
+
+    @kanbans = []
+
+    if params[:kanban_id].to_i > 0
+      @kanbans << Kanban.find(params[:kanban_id])
+    else
+      @kanbans = Kanban.by_project(@project).where("is_valid = ?",true)
+    end
+
+    if params[:member_id].to_i == 0 and params[:principal_id].to_i == 0
+      @view = PROJECT_VIEW
+    elsif params[:member_id].to_i > 0
+      @view = MEMBER_VIEW
+      @member = Member.find(params[:member_id])
+    else
+      @view = GROUP_VIEW
+      @principal = Principal.find(params[:principal_id])
+    end
+
+    @kanban_status_id = params[:kanban_status_id]
+    @issue_status_id = params[:issue_status_id]
+    @kanban_pane_id = params[:kanban_pane_id]
+
+  end
+
+
+# Ajax find kanban state id
+
+  def find_kanban_state_id
+    issues_status_id = params[:issue_status_id]
+    issue_states = IssueStatusKanbanState.where(:issue_status_id=>issues_status_id)
+    if issue_states.present?
+      kanban_state_id = issue_states.map(&:kanban_state_id).first
+    end
+
+    if request.xhr?
+      render :json => {
+          :kanban_state_id=> kanban_state_id
+      }
+    end
+
+  end
+
+  # Ajax find issue state id.
+  def find_issue_status_id
+
+    # @issue_state = IssueStatusKanbanState.where(issue_statue_id: params[:issue_status_id])
+    # @kanban_status_id = params[:kanban_status_id]
+    kanban_state_id = params[:kanban_state_id]
+    kanban_states = IssueStatusKanbanState.where(:kanban_state_id=>kanban_state_id)
+
+    if kanban_states.present?
+      issue_status_id = kanban_states.map(&:issue_status_id).first
+    end
+
+    if request.xhr?
+      render :json => {
+          :issue_status_id=> issue_status_id
+      }
+    end
+
+  end
+
+
+
 end

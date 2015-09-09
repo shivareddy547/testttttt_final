@@ -22,10 +22,11 @@ Redmine::Plugin.register :ekanban do
   requires_redmine :version_or_higher => '2.1.2'
   project_module :Kanban do
    permission :view_kanban, :kanbans => :index
-  end
-  menu :project_menu, :Kanban, {:controller=>'kanbans', :action => 'index'}, :caption => 'Kanbans', :after => :activity, :param => :project_id
-  menu :admin_menu, :Kanban_States, {:controller=>'kanban_states', :action => 'setup'}, :caption => 'Kanban States'
+   permission :sprints, {:adsprints => [:list], :adtaskinl => [:update, :inplace, :create, :tooltip], :adsprintinl => [:create, :inplace]} rescue nil
 
+  end
+  menu :project_menu, :Kanban, {:controller=>'kanbans', :action => 'index'}, :caption => 'Agile Board', :after => :activity, :param => :project_id
+  menu :admin_menu, :Kanban_States, {:controller=>'kanban_states', :action => 'setup'}, :caption => 'Agile Board States'
 
   Rails.configuration.to_prepare do
     unless ProjectsHelper.included_modules.include?(EKanban::Patches::ProjectsHelperPatch)

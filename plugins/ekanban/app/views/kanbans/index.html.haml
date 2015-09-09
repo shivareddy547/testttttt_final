@@ -19,6 +19,26 @@
 = javascript_include_tag "kanban_api", :plugin => :ekanban
 = javascript_include_tag "sorttable.js", :plugin => :ekanban
 
+= form_tag({ :controller => 'kanbans', :action => 'filter_query', :project_id => @project.id }, |
+  :method => :get, :id => 'query_form') do                                                     |
+  #query_form_with_buttons.hide-when-print
+    = hidden_field_tag 'set_filter', '1'
+    = hidden_field_tag 'project_id', @project.id
+    #query_form_content
+      %fieldset#filters{:class => "collapsible #{@query && @query.filters.present? ? "" : "collapsed"}"}
+        %legend{:onclick => "toggleFieldset(this);"}= l(:label_filter_plural)
+        %div{:style => @query.filters.present? ? "" : "display: none;"}
+          = render :partial => 'kanbans/queries/filters', :locals => {:query => @query}
+    %p.buttons
+      = link_to_function l(:button_apply), "$('#query_form').submit()", :class => 'icon icon-checked'
+      = link_to l(:button_clear), { :set_filter => 1, :project_id => @project }, :class => 'icon icon-reload'
+      - if @query.new_record? && User.current.allowed_to?(:save_queries, @project, :global => true)
+        = link_to_function l(:button_save),                                                                                                        |
+          "$('#query_form').attr('action', '#{ @project ? new_project_query_path(@project) : new_query_path }'); submit_query_form('query_form')", |
+          :class => 'icon icon-save'
+
+
+
 :javascript
   function kanbanAjaxCall(type,url,params,callback){
     $.ajax({
@@ -37,15 +57,16 @@
   }
 
 #kanban_filter
-  = render :partial => "filter_board"
+  -#= render :partial => "filter_board"
 
 / = stylesheet_link_tag 'version', :plugin => 'kanbans'
 #kanban_boards{:style => "clear:both"}
   = render :partial => "kanban_board", :collection => @kanbans, :as => :kanban
+  = wikitoolbar_for 'issue_notes'
 
-#popupWindow{:title => "Edit kanban card"}
+#popupWindow{:title => "Edit Agile Board card"}
   #popupWindowBody
-    = render :partial => "kanban_card"
+    -#= render :partial => "kanban_card"
   #popupWindowFoot
 
 / Get rails variables from templates.
@@ -66,3 +87,4 @@
       kanban_init();
     });
   });
+

@@ -1,0 +1,149 @@
+<div id="issue_errors">
+  <div id="divError" style="display:none" >
+    <font color="red">
+
+    </font>
+
+  </div>
+</div>
+<h2><%= issue_heading(@issue) %></h2>
+
+<%= labelled_form_for @issue, :url => url_for(:controller => 'kanban_cards', :action => 'update'),:html => {:id => 'kanban_card_form', :multipart => true} do |f| %>
+
+    <%= error_messages_for 'issue', 'time_entry' %>
+    <%= render :partial => 'kanbans/issues/conflict' if @conflict %>
+    <%= hidden_field_tag :project_id, @project.id %>
+    <%= hidden_field_tag :issue_id, @issue.id %>
+    <%= hidden_field_tag :kanban_pane_id, 0 %>
+    <%#= hidden_field_tag :kanban_pane_id, params[:project_id] %>
+
+
+    <div class="box">
+      <% if @edit_allowed || !@allowed_statuses.empty? %>
+          <fieldset class="tabular"><legend><%= l(:label_change_properties) %></legend>
+            <div id="all_attributes">
+              <%= render :partial => 'kanbans/issues/form', :locals => {:f => f} %>
+            </div>
+          </fieldset>
+      <% end %>
+      <% if User.current.allowed_to?(:log_time, @project) %>
+          <fieldset class="tabular"><legend><%= l(:button_log_time) %></legend>
+            <%= labelled_fields_for :time_entry, @time_entry do |time_entry| %>
+                <div class="splitcontentleft">
+                  <p><%= time_entry.text_field :hours, :size => 6, :label => :label_spent_time %> <%= l(:field_hours) %></p>
+                </div>
+                <div class="splitcontentright">
+                  <p><%= time_entry.select :activity_id, activity_collection_for_select_options %></p>
+                </div>
+                <p><%= time_entry.text_field :comments, :size => 60 %></p>
+                <% @time_entry.custom_field_values.each do |value| %>
+                    <p><%= custom_field_tag_with_label :time_entry, value %></p>
+                <% end %>
+            <% end %>
+          </fieldset>
+      <% end %>
+
+
+
+      <fieldset><legend><%= l(:label_attachment_plural) %></legend>
+        <p><%= render :partial => 'kanbans/attachments/form', :locals => {:container => @issue} %></p>
+      </fieldset>
+    </div>
+
+
+    <fieldset><legend><%= l(:field_notes) %></legend>
+      <%= f.text_area :notes, :cols => 60, :rows => 10, :class => 'wiki-edit', :no_label => true %>
+       <%= wikitoolbar_for 'issue_notes' %>
+
+      <% if @issue.safe_attribute? 'private_notes' %>
+          <%= f.check_box :private_notes, :no_label => true %> <label for="issue_private_notes"><%= l(:field_private_notes) %></label>
+      <% end %>
+
+      <%#= call_hook(:view_issues_edit_notes_bottom, { :issue => @issue, :notes => @notes, :form => f }) %>
+    </fieldset>
+
+    <%= f.hidden_field :lock_version %>
+    <%= hidden_field_tag 'last_journal_id', params[:last_journal_id] || @issue.last_journal_id %>
+
+    <%#= button_tag("Save") %>
+    <button name="button" type="button" id="popupSubmit" >Save</button>
+
+    <%#= submit_tag l(:button_submit) %>
+    <%#= preview_link preview_edit_issue_path(:project_id => @project, :id => @issue), 'issue-form' %>
+    | <%#= link_to l(:button_cancel), {}, :onclick => "$('#update').hide(); return false;" %>
+<% end %>
+
+<script>
+
+    $("#kanban_card_form #popupSubmit").click(function(){
+        $.ajax({
+            url: "/kanban_card?" + $('#kanban_card_form').serialize(), // Route to the Script Controller method
+            type: "PUT",
+            dataType: "json",
+            // This goes to Controller in params hash, i.e. params[:file_name]
+            complete: function () {
+            },
+            success: function (data) {
+
+                console.log(data.errors);
+                if(data.errors) {
+                    $('#issue_errors #divError').css("display", "block");
+                    $('#issue_errors #divError').text(data.errors)
+                }
+                else
+                {
+                    if($("#popupWindow #popupWindowBody form.edit_issue").length > 0)
+                    {
+                        $("#popupWindow #popupWindowBody form.edit_issue").remove();
+                        window.location.reload();
+                    }
+                }
+
+
+            }
+
+        });
+
+
+    });
+
+
+function find_kanban_state_id()
+    {
+     var issue_status_id= $('form.edit_issue select#issue_status_id').val();
+         $.ajax({
+            url: "/kanbans/find_kanban_state_id", // Route to the Script Controller method
+            type: "GET",
+            dataType: "json",
+            // This goes to Controller in params hash, i.e. params[:file_name]
+            data: {issue_status_id: issue_status_id},
+
+            success: function (data) {
+
+                $('form.edit_issue select#kanban_state_id').val(data.kanban_state_id)
+              }
+        });
+
+
+    }
+
+    function find_issue_status_id()
+    {
+        var kanban_state_id= $('form.edit_issue select#kanban_state_id').val();
+        $.ajax({
+            url: "/kanbans/find_issue_status_id", // Route to the Script Controller method
+            type: "GET",
+            dataType: "json",
+            // This goes to Controller in params hash, i.e. params[:file_name]
+            data: {kanban_state_id: kanban_state_id},
+
+            success: function (data) {
+
+                $('form.edit_issue select#issue_status_id').val(data.issue_status_id)
+            }
+        });
+
+
+    }
+
+</script>

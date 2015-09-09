@@ -12,6 +12,9 @@ table.kanban td#backlog {}
 
 .link {color:blue}
 .icon-setup  { background-image: url(../images/icon-setup.png); margin-left:15px; }
+.icon-fullscreen  { background-image: url(../images/icon-fullscreen.png); margin-left:15px; }
+.agile_icon  { background-image: url(../images/agile_icon.png); margin-left:15px; }
+
 .icon-report { background-image: url(../images/icon-report.png); margin-left:15px;}
 
 .disabled { disabled:disable}

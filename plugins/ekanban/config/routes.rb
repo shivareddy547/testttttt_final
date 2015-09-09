@@ -29,4 +29,12 @@ RedmineApp::Application.routes.draw do
 	match 'kanbans/copy', :controller => 'kanbans', :action => "copy"
 	match 'kanban_reports/index', :controller => 'kanban_reports', :action => "index", :via => :get
 	match 'kanban_apis/issue_card_detail', :controller => 'kanban_apis', :action => 'issue_card_detail', :via => :get
+  get '/kanbans/filter_query', to: 'kanbans#filter_query'
+
+  # match 'kanban_workflow/issue_card_setup', :controller => 'kanban_workflow', :action => "issue_card_setup"
+  match 'kanban_cards/card_filelds_setup', :controller => 'kanban_cards', :action => "card_filelds_setup"
+  match 'kanbans/kanban_issue_show', :controller => 'kanbans', :action => "kanban_issue_show",:via => [:get,:put,:post]
+  match 'kanbans/find_kanban_state_id', :controller => 'kanbans', :action => "find_kanban_state_id",:via => [:get,:post]
+  match 'kanbans/find_issue_status_id', :controller => 'kanbans', :action => "find_issue_status_id",:via => [:get,:post]
+  match 'kanbans/update_form', :controller => 'kanbans', :action => "update_form",:as=>'kanban_issue_update_form',:via => [:get,:post]
 end

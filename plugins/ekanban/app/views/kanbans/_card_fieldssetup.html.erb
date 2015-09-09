@@ -1,0 +1,32 @@
+<div class="box tabular">
+  <%= form_tag({:action => 'card_filelds_setup', :controller =>'kanban_cards'},:onsubmit => 'selectAllOptions("selected_columns");selectAllOptions("tool_tip_selected_columns");') do %>
+     <fieldset class="box">
+        <legend><%= l(:card_tooltip_setting_issue_list_default_columns) %></legend>
+        <%= render_query_columns_selection(
+                   IssueQuery.new(:column_names => @kanban.present? && @kanban.card_selected_display_columns.present? ? @kanban.card_selected_display_columns : Setting.issue_list_default_columns),
+                    :name => 'settings[issue_list_default_columns]') %>
+      </fieldset>
+      <p>
+      <fieldset class="box">
+        <legend><%= l(:card_setting_issue_list_default_columns) %></legend>
+        <%= render_query_tool_tip_columns_selection(
+                    IssueQuery.new(:column_names => @kanban.present? && @kanban.card_selected_tooltip_columns.present? ? @kanban.card_selected_tooltip_columns : Setting.issue_list_default_columns),
+                    :name => 'settings[issue_list_tooltip_default_columns]') %>
+      </fieldset>
+        <%#= select_tag 'hover_values', options_for_select(KanbanQuery.new(:column_names => hover_value).available_columns.collect{|column| [column.caption, column.name]}, hover_value), :multiple => true, :include_blank => true, :size => 10, :style => "width:150px" %>
+      </p>
+      <%= hidden_field_tag "kanban_id", @kanban.id %>
+      <%= hidden_field_tag "project_id", params[:project_id] %>
+      <%= hidden_field_tag "id", params[:id] %>
+      </div>
+      <%= submit_tag l(:button_apply) %>
+  <%end%>
+  </div>
+
+<style>
+
+    .tabular label {
+        width: 303px !important;
+    }
+
+</style>

@@ -1,15 +1,22 @@
 .kanban-board
   = stylesheet_link_tag 'kanban', :plugin => 'ekanban'
+  -#= link_to l(:label_kanban_full_screen),:href=>"#", :onclick => "fullscreen();return false;", :class => 'icon icon-setup', :style => 'float:right'
+
   = link_to l(:label_kanban_setup), edit_project_kanban_path(@project.id,kanban.id), :class => 'icon icon-setup', :style => 'float:right'
   = link_to l(:label_kanban_report), {:controller => "kanban_reports", :action => "index", :project_id => @project.id}, :class => 'icon icon-report', :style => 'float:right'
+  %a.icon.icon-fullscreen{:href => "#", :style => "float:right",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
 
+  %a.icon.icon-add{:href => "/time_entries/new",:style => "float:right"} Log time
+  -#%input{:onclick => "fullscreen();", :type => "button",:id=>"fullscreen", :value => "fullscreen"}/
   = search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
   = label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
   = search_field_tag "kanban-search", "", :class => "small find-card", :style=>"float:right;width:150px",:selector=>"#kanban_#{kanban.id}"
   = label_tag "search card:", "Find:",:style => "float:right;margin-top:5px;margin-right:5px"
   %h3{:style => "margin-top:20px"}= kanban.name
+  %a.icon.agile_icon{:href => "/adsprints/list?project_id=#{@project}" } Sprint Planning
   - panes = controller.panes(kanban)
   - panes_num = panes.size
+
   %table.kanban{:id=>"kanban_#{kanban.id}"}
     - if panes_num > 0
       %tr{:style=>"height:30px"}
@@ -71,6 +78,7 @@
                 %input#backlog-search.small{:type=>"text",:style=>"display:none;width:90%;margin:0px;align:center"}
               = render :partial => "kanban_pane", :locals=>{:kanban_id => kanban.id, :pane_id => pane.id}
 
+
   = content_tag "div", "", :id => "kanban-panes-data", :data => {:panes => panes.to_json}
 
 
@@ -87,5 +95,56 @@
       }
     });
   });
+
 %style{:type => "text/css"}
+
+
+:javascript
+  var isFullscreen = false;
+
+  function fullscreen(){
+
+  //var  d = document.getElementById('controls').style;
+  var d = {};
+  var speed = 900;
+  if(!isFullscreen){ // MAXIMIZATION
+
+  /*comment to have smooth transition from centre but loose covering the header*/
+  document.getElementById('kanban_boards').style.position= "absolute";
+  d.width = "100%";
+  d.height="100%";
+  d.left="0%";
+  d.top="0%";
+  d.margin="0 0 0 0";
+  d.background="yellow";
+  $("#kanban_boards").animate(d,speed);
+  isFullscreen = true;
+  //alert("yes")
+  $('a#fullscreen').text("Exit full screen");
+  $('#kanban_boards').css({
+     background: '#FAEBD7'
+    });
+    $('.kanban').css({
+        background: '#FAEBD7'
+    });
+
+  }else{ // MINIMIZATION
+  /* comment to have smooth minimze transition but not be placed below header */
+  //alert("no")
+  //alert(document.getElementById('kanban_boards'))
+   document.getElementById('kanban_boards').style.position= "relative";
+   $("#kanban_boards").animate(d,speed);
+   isFullscreen = false;
+   $('#kanban_boards').css({
+       clear: 'both',
+       background: 'white',
+       position: 'relative'
+   });
+   $('.kanban').css({
+            background: 'white'
+    });
+   $('a#fullscreen').text("Full screen");
+  }
+  }
+
 
