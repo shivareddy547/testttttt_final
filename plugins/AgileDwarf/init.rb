@@ -1,6 +1,9 @@
 require 'redmine'
+require_dependency 'application_helper'
 
 require 'scrum_enabled_module_patch'
+
+ApplicationHelper.send(:include, ApplicationHelperPatch)
 
 Redmine::Plugin.register :AgileDwarf do
   name 'Agile dwarf plugin'

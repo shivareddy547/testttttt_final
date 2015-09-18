@@ -12,4 +12,7 @@ else
   match 'adsprints/(:action(/:id))', :controller => 'adsprints'
   match 'adtaskinl/(:action(/:id))', :controller => 'adtaskinl'
   match 'adtasks/(:action(/:id))', :controller => 'adtasks'
+
+  match 'adsprints/add_issue_to_sprint', :controller => 'adsprints', :action => "add_issue_to_sprint",:via => [:get,:post]
+  match 'adsprints/create_issue_to_sprint', :controller => 'adsprints', :action => "create_issue_to_sprint",:via => [:get,:post]
 end

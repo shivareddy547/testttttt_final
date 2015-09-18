@@ -1,0 +1,102 @@
+<%= title l(:label_issue_new) %>
+<div id="issue_errors">
+  <div id="divError" style="display:none" >
+    <font color="red">
+
+    </font>
+
+  </div>
+</div>
+<%= call_hook(:view_issues_new_top, {:issue => @issue}) %>
+
+<%= labelled_form_for @issue, :url => project_issues_path(@project),
+                      :html => {:id => 'issue-form', :multipart => true} do |f| %>
+    <%= error_messages_for 'issue' %>
+    <%= hidden_field_tag 'project_id',@project.id %>
+    <%= hidden_field_tag 'copy_from', params[:copy_from] if params[:copy_from] %>
+    <div class="box tabular">
+      <div id="all_attributes">
+        <%= render :partial => 'adsprints/issues/form', :locals => {:f => f} %>
+      </div>
+
+      <% if @copy_from && @copy_from.attachments.any? %>
+          <p>
+            <label for="copy_attachments"><%= l(:label_copy_attachments) %></label>
+            <%= check_box_tag 'copy_attachments', '1', @copy_attachments %>
+          </p>
+      <% end %>
+      <% if @copy_from && !@copy_from.leaf? %>
+          <p>
+            <label for="copy_subtasks"><%= l(:label_copy_subtasks) %></label>
+            <%= check_box_tag 'copy_subtasks', '1', @copy_subtasks %>
+          </p>
+      <% end %>
+
+      <p id="attachments_form"><label><%= l(:label_attachment_plural) %></label><%= render :partial => 'adsprints/attachments/form', :locals => {:container => @issue} %></p>
+
+      <% if @issue.safe_attribute? 'watcher_user_ids' -%>
+          <p id="watchers_form"><label><%= l(:label_issue_watchers) %></label>
+      <span id="watchers_inputs">
+        <%= watchers_checkboxes(@issue, @available_watchers) %>
+      </span>
+      <span class="search_for_watchers">
+      <%= link_to l(:label_search_for_watchers),
+                  {:controller => 'watchers', :action => 'new', :project_id => @issue.project},
+                  :remote => true,
+                  :method => 'get' %>
+      </span>
+          </p>
+      <% end %>
+    </div>
+    <button name="button" type="button" id="NewpopupSubmit" >Save</button>
+    <%#= submit_tag l(:button_create) %>
+    <%#= submit_tag l(:button_create_and_continue), :name => 'continue' %>
+    <%#= preview_link preview_new_issue_path(:project_id => @project), 'issue-form' %>
+<% end %>
+
+
+
+<% content_for :header_tags do %>
+    <%= robot_exclusion_tag %>
+<% end %>
+<script>
+
+    $("#issue-form #NewpopupSubmit").click(function(){
+        $.ajax({
+            url: "/adsprints/create_issue_to_sprint?" + $('#issue-form').serialize(), // Route to the Script Controller method
+            type: "POST",
+            dataType: "json",
+            // This goes to Controller in params hash, i.e. params[:file_name]
+            complete: function () {
+            },
+            success: function (data) {
+                console.log(data.errors);
+                if(data.errors) {
+                    $('#issue_errors #divError').css("display", "block");
+                    $('#issue_errors #divError').text(data.errors)
+                }
+                else
+                {
+                   console.log(data)
+
+                    if(data.sprint_id) {
+                        $("#sprints_sprints").find('.'+data.sprint_id).first().find(".task_list").first().find('.sc_task').first().prepend(data.attachmentPartial);
+                        $("#NewIssuepopupWindow").remove();
+                    }
+                    else
+                    {
+                        $(".sprints_column").first().find(".task_list").first().prepend(data.attachmentPartial);
+                        $("#NewIssuepopupWindow").remove();
+                    }
+
+               }
+
+
+            }
+
+        });
+
+
+    });
+
+</script>
