@@ -87,18 +87,18 @@
 = content_tag "div", "", :id => "project-profile", :data => {:project => @project}
 
 :javascript
-  $(function() {
-    // Ignore case in contains()
-    $.expr[":"].contains = $.expr.createPseudo(function(arg) {
-      return function( elem ) {
-        return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
-      };
-    });
-
-    $( document ).ready(function(){
-      kanban_init();
-    });
-  });
+  //$(function() {
+  //  // Ignore case in contains()
+  //  $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+  //    return function( elem ) {
+  //      return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+  //    };
+  //  });
+  //
+  //  $( document ).ready(function(){
+  //    kanban_init();
+  //  });
+  //});
   function kanbanAjaxCallWithTimeIntervel()
    {
      var project_id = $('#query_form #project_id').val();
@@ -129,4 +129,4 @@
         });
 
    }
-   setInterval(kanbanAjaxCallWithTimeIntervel, 30000);
+   setInterval(kanbanAjaxCallWithTimeIntervel, 300000);
