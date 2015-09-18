@@ -37,4 +37,7 @@ RedmineApp::Application.routes.draw do
   match 'kanbans/find_kanban_state_id', :controller => 'kanbans', :action => "find_kanban_state_id",:via => [:get,:post]
   match 'kanbans/find_issue_status_id', :controller => 'kanbans', :action => "find_issue_status_id",:via => [:get,:post]
   match 'kanbans/update_form', :controller => 'kanbans', :action => "update_form",:as=>'kanban_issue_update_form',:via => [:get,:post]
+  match 'kanban_cards/log_entry_new', :controller => 'kanban_cards', :action => "log_entry_new",:via => [:get,:post]
+  match 'kanban_cards/log_entry_create', :controller => 'kanban_cards', :action => "log_entry_create",:via => [:get,:post]
+
 end

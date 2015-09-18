@@ -1,7 +1,28 @@
 class KanbanCardsController < ApplicationController
   unloadable
+  helper :journals
+  helper :projects
+  include ProjectsHelper
+  helper :custom_fields
+  include CustomFieldsHelper
+  helper :issue_relations
+  include IssueRelationsHelper
+  helper :watchers
+  include WatchersHelper
+  helper :attachments
+  include AttachmentsHelper
+  helper :queries
+  include QueriesHelper
+  helper :repositories
+  include RepositoriesHelper
+  helper :sort
+  include SortHelper
+  include IssuesHelper
+  helper :timelog
+  include Redmine::Export::PDF
 
-
+  skip_before_filter :check_if_login_required
+  skip_before_filter :verify_authenticity_token
   def index
   	respond_to :json
   end
@@ -153,6 +174,62 @@ class KanbanCardsController < ApplicationController
     redirect_to edit_project_kanban_path(params[:project_id],params[:id], :tab => 'Config')
 
   end
+
+
+
+
+  def log_entry_new
+
+    @time_entry ||= TimeEntry.new(:project => @project, :issue => @issue, :user => User.current, :spent_on => User.current.today)
+    @time_entry.safe_attributes = params[:time_entry]
+    # @time_entry = TimeEntry.new
+
+
+  end
+
+  # def log_entry_create
+  #
+  #
+  # end
+
+
+  def log_entry_create
+    @time_entry ||= TimeEntry.new(:project => @project, :issue => @issue, :user => User.current, :spent_on => User.current.today)
+    @time_entry.safe_attributes = params[:time_entry]
+    if @time_entry.project && !User.current.allowed_to?(:log_time, @time_entry.project)
+      render_403
+      return
+    end
+
+    call_hook(:controller_timelog_edit_before_save, { :params => params, :time_entry => @time_entry })
+
+    if @time_entry.save
+      respond_to do |format|
+        format.html {
+          flash[:notice] = l(:notice_successful_create)
+        }
+        format.js {
+          #flash[:notice] = l(:notice_successful_create)
+          render :json => {
+              :time_entry_message=> "Success"
+          }
+
+        }
+
+      end
+    else
+      respond_to do |format|
+        format.html { render :action => 'new' }
+        format.js {
+          @errors = ""
+          render :json => {
+              :errors=> @time_entry.errors.full_messages.each {|s| @errors += (s + "</br>")}
+          }
+        }
+      end
+    end
+  end
+
 
 
 end

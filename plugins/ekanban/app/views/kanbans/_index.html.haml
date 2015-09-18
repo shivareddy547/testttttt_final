@@ -54,12 +54,7 @@
         callback(XMLHttpRequest,XMLHttpRequest.status);
       }
     });
-  };
-
-
-
-
-
+  }
 
 #kanban_filter
   -#= render :partial => "filter_board"
@@ -67,9 +62,8 @@
 / = stylesheet_link_tag 'version', :plugin => 'kanbans'
 #kanban_boards{:style => "clear:both"}
   %a.icon.agile_icon{:href => "/adsprints/list?project_id=#{@project.identifier}", :style => "float:right" } Sprint Planning
-  #kanban_render_boards
-    = render :partial => "kanban_board", :collection => @kanbans, :as => :kanban
-    = wikitoolbar_for 'issue_notes'
+  = render :partial => "kanban_board", :collection => @kanbans, :as => :kanban
+  = wikitoolbar_for 'issue_notes'
 
 #popupWindow{:title => "Edit Agile Board card"}
   #popupWindowBody
@@ -99,34 +93,4 @@
       kanban_init();
     });
   });
-  function kanbanAjaxCallWithTimeIntervel()
-   {
-     var project_id = $('#query_form #project_id').val();
-     $.ajax({
-            url: "/projects/"+project_id+"/kanbans", // Route to the Script Controller method
-            type: "GET",
-            dataType: "json",
-            // This goes to Controller in params hash, i.e. params[:file_name]
-            complete: function () {
-            },
-            success: function (data) {
-                console.log(data.errors);
-                if(data.errors) {
-                    $('#issue_errors #divError').css("display", "block");
-                    $('#issue_errors #divError').text(data.errors)
-                }
-                else
-                {
-                $('#kanban_render_boards').empty();
-                $('#kanban_render_boards').append(data.attachmentPartial);
-                console.log(data)
 
-                   //alert(data.attachmentPartial);
-               }
-
-            }
-
-        });
-
-   }
-   setInterval(kanbanAjaxCallWithTimeIntervel, 30000);

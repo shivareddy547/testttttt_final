@@ -1,3 +1,4 @@
+
 .kanban-board
   = stylesheet_link_tag 'kanban', :plugin => 'ekanban'
   -#= link_to l(:label_kanban_full_screen),:href=>"#", :onclick => "fullscreen();return false;", :class => 'icon icon-setup', :style => 'float:right'
@@ -6,14 +7,14 @@
   = link_to l(:label_kanban_report), {:controller => "kanban_reports", :action => "index", :project_id => @project.id}, :class => 'icon icon-report', :style => 'float:right'
   %a.icon.icon-fullscreen{:href => "#", :style => "float:right",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
 
-  %a.icon.icon-add{:href => "/time_entries/new",:style => "float:right"} Log time
+  %a.icon.icon-add{:href => "#",:style => "float:right",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time
   -#%input{:onclick => "fullscreen();", :type => "button",:id=>"fullscreen", :value => "fullscreen"}/
   = search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
   = label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
   = search_field_tag "kanban-search", "", :class => "small find-card", :style=>"float:right;width:150px",:selector=>"#kanban_#{kanban.id}"
   = label_tag "search card:", "Find:",:style => "float:right;margin-top:5px;margin-right:5px"
   %h3{:style => "margin-top:20px"}= kanban.name
-  %a.icon.agile_icon{:href => "/adsprints/list?project_id=#{@project}" } Sprint Planning
+
   - panes = controller.panes(kanban)
   - panes_num = panes.size
 
@@ -100,6 +101,18 @@
 
 
 :javascript
+   $(function() {
+          // Ignore case in contains()
+          $.expr[":"].contains = $.expr.createPseudo(function(arg) {
+            return function( elem ) {
+              return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+            };
+          });
+
+          $( document ).ready(function(){
+            kanban_init();
+          });
+   });
   var isFullscreen = false;
 
   function fullscreen(){
@@ -146,5 +159,36 @@
    $('a#fullscreen').text("Full screen");
   }
   }
+  function time_entry_popup()
+  {
+   var w = "512px";
+      $("#TimeEntrypopupWindow").dialog({
+          autoOpen: true,
+          //modal: isModal,
+          width: w,
+          //height: h,
+      });
+
+
+    $.ajax({
+             url: "/kanban_cards/log_entry_new", // Route to the Script Controller method
+             type: "POST",
+             dataType: "script",
+              // This goes to Controller in params hash, i.e. params[:file_name]
+             complete: function () {
+             },
+             success: function (e, xhr, settings) {
+                 //find_issue_status_id();
+
+             },
+             error: function () {
+                 alert("Error in authentication")
+             }
+         });
+
+
+  }
+
+
 
 

@@ -5,6 +5,11 @@ class KanbanCardJournal < ActiveRecord::Base
 	has_many :details, :foreign_key => "journal_id", :class_name => :KanbanCardJournalDetail, :dependent => :delete_all
 
 	def self.build(old_card,new_card,issue_journal)
+		p "++++++++++++++++++inside journal+++++++++++++++++="
+		p old_card
+		p new_card
+		p issue_journal
+
 		#new card
 		if old_card.nil?
 			old_card = KanbanCard.new(:developer_id => 0, :verifier_id => 0, :kanban_pane_id => 0)

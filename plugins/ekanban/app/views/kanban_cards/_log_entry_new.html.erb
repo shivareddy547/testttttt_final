@@ -1,0 +1,15 @@
+<h2><%= l(:label_spent_time) %></h2>
+<div id="issue_errors">
+  <div id="divError" style="display:none" >
+    <font color="red">
+
+    </font>
+
+  </div>
+</div>
+<%= labelled_form_for @time_entry, :url => time_entries_path do |f| %>
+    <%= render :partial => 'time_entry_form', :locals => {:f => f} %>
+    <%#= button_tag l(:button_create),:id=>"new_time_entry_submit" %>
+    <button name="button" type="button" id="new_time_entry_submit" >Save</button>
+    <%#= submit_tag l(:button_create_and_continue), :name => 'continue',:id=>"new_time_entry_submit" %>
+<% end %>

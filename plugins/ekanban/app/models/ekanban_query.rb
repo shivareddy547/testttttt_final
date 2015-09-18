@@ -781,6 +781,8 @@ class EkanbanQuery < ActiveRecord::Base
   private
 
   def sql_for_custom_field(field, operator, value, custom_field_id)
+    queried_class = Issue
+    available_filters
     db_table = CustomValue.table_name
     db_field = 'value'
     filter = @available_filters[field]
@@ -797,13 +799,11 @@ class EkanbanQuery < ActiveRecord::Base
       not_in = 'NOT'
     end
     customized_key = "id"
-    # customized_class = Issue.last
-    customized_class = Issue
+    customized_class = queried_class
     if field =~ /^(.+)\.cf_/
       assoc = $1
       customized_key = "#{assoc}_id"
-       queried_class=Issue
-      customized_class = Issue.reflect_on_association(assoc.to_sym).klass.base_class rescue nil
+      customized_class = queried_class.reflect_on_association(assoc.to_sym).klass.base_class rescue nil
       raise "Unknown #{queried_class.name} association #{assoc}" unless customized_class
     end
     where = sql_for_field(field, operator, value, db_table, db_field, true)
@@ -992,9 +992,10 @@ class EkanbanQuery < ActiveRecord::Base
 
   # Adds filters for the given associations custom fields
   def add_associations_custom_fields_filters(*associations)
+    queried_class= Issue
     fields_by_class = CustomField.visible.where(:is_filter => true).group_by(&:class)
     associations.each do |assoc|
-      association_klass = Issue.reflect_on_association(assoc).klass
+      association_klass = queried_class.reflect_on_association(assoc).klass
       fields_by_class.each do |field_class, fields|
         if field_class.customized_class <= association_klass
           fields.sort.each do |field|

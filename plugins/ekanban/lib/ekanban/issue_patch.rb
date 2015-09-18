@@ -55,6 +55,7 @@ module EKanban
           validate :validate_kanban_card_update, :if => Proc.new{!self.new_record?}
           validate :validate_kanban_card_new, :if => Proc.new{self.new_record?}
           validates_presence_of :assigned_to
+          before_update :kanban_update
         end
       end
 
@@ -63,6 +64,18 @@ module EKanban
       end
 
       module InstanceMethods
+
+        def kanban_update
+          # @kanban_project = self.kanban_card
+          # p self.kanban_card.delete
+          if self.kanban_card.present? && self.kanban_card.kanban_pane.present? && self.kanban_card.kanban_pane.kanban.present?
+            if self.kanban_card.kanban_pane.kanban.tracker_id == self.tracker_id
+            else
+              self.kanban_card.delete if self.kanban_card.present?
+            end
+          end
+        end
+
         def validate_kanban_card_new
           issue = self
           kanban = Kanban.find_by_project_id_and_tracker_id_and_is_valid(issue.project_id,issue.tracker_id,true)
