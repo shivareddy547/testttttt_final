@@ -38,3 +38,4 @@ en:
   card_setting_issue_list_default_columns: "Selected columns displays in issue card..!"
   card_tooltip_setting_issue_list_default_columns: "Selected columns displays in issue card tooltip..!"
   label_card_fields_setup: "Agile Board Card fields Setup"
+  label_add_new_issue: "Add New Task"

@@ -5,6 +5,7 @@
   = link_to "#{User.current.wip_limit} ", edit_user_path(User.current.id), :id => "my-wip-limit"
   = link_to l(:label_kanban_new), new_project_kanban_path(@project.id), :class => 'icon icon-add'
 %h2 Agile Board
+= link_to l(:label_add_new_issue), "#", :onclick=>"openIssuePopup();" ,:class => 'icon icon-add'
 
 / = javascript_include_tag 'kanban.js', :plugin => 'scrum2b' %>
 = stylesheet_link_tag 'kanban', :plugin => :ekanban
@@ -18,7 +19,10 @@
 = javascript_include_tag "kanban", :plugin => :ekanban
 = javascript_include_tag "kanban_api", :plugin => :ekanban
 = javascript_include_tag "sorttable.js", :plugin => :ekanban
-
+#NewIssuepopupWindow{:title => "New Issue"}
+  #NewIssuepopupWindowBody
+    - #= render :partial => "kanban_card"
+  #NewIssuepopupWindowFoot
 = form_tag({ :controller => 'kanbans', :action => 'filter_query', :project_id => @project.id }, |
   :method => :get, :id => 'query_form') do                                                     |
   #query_form_with_buttons.hide-when-print
@@ -56,16 +60,13 @@
     });
   };
 
-
-
-
-
-
 #kanban_filter
   -#= render :partial => "filter_board"
 
 / = stylesheet_link_tag 'version', :plugin => 'kanbans'
 #kanban_boards{:style => "clear:both"}
+  %a.icon.icon-fullscreen{:href => "#", :style => "float:right;",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
+  %a.icon.icon-add{:href => "#",:style => "float:right;margin-left:10px;margin-right:1px",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time
   %a.icon.agile_icon{:href => "/adsprints/list?project_id=#{@project.identifier}", :style => "float:right" } Sprint Planning
   #kanban_render_boards
     = render :partial => "kanban_board", :collection => @kanbans, :as => :kanban
@@ -130,3 +131,30 @@
 
    }
    setInterval(kanbanAjaxCallWithTimeIntervel, 300000);
+
+
+   function openIssuePopup(sprint_id) {
+            var project_id = $('#query_form #project_id').val();
+            var w = "1024px";
+            $("#NewIssuepopupWindow").dialog({
+                autoOpen: true,
+                //modal: isModal,
+                width: w,
+                //height: h,
+            });
+            //var project_id = "<%= @project_id %>"
+
+            $.ajax({
+                url: "/kanban_cards/add_new_issue", // Route to the Script Controller method
+                type: "POST",
+                dataType: "script",
+                data: {project_id: project_id}, // This goes to Controller in params hash, i.e. params[:file_name]
+                complete: function () {
+                },
+                success: function (e, xhr, settings) {
+                },
+                error: function (e) {
+                    console.log(e)
+                }
+            });
+   }

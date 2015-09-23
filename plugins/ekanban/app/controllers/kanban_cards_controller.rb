@@ -23,6 +23,7 @@ class KanbanCardsController < ApplicationController
 
   skip_before_filter :check_if_login_required
   skip_before_filter :verify_authenticity_token
+  before_filter :build_new_issue_from_params, :only => [:add_new_issue,:create_new_issue]
   def index
   	respond_to :json
   end
@@ -175,17 +176,99 @@ class KanbanCardsController < ApplicationController
 
   end
 
-
-
-
   def log_entry_new
 
     @time_entry ||= TimeEntry.new(:project => @project, :issue => @issue, :user => User.current, :spent_on => User.current.today)
     @time_entry.safe_attributes = params[:time_entry]
     # @time_entry = TimeEntry.new
+  end
 
+  def add_new_issue
+    # @project = Project.find(params[:project_id])
+    # respond_to do |format|
+    #   format.html { render :action => 'add_issue_to_sprint', :layout => !request.xhr? }
+    # end
+   @project = Project.find_by_id(params[:project_id])
+    respond_to do |format|
+      format.html
+      format.js
+      format.json
+    end
 
   end
+
+  # TODO: Changing tracker on an existing issue should not trigger this
+  def build_new_issue_from_params
+    @project = Project.find_by_id(params[:project_id])
+    if params[:id].blank?
+      @issue = Issue.new
+      if params[:copy_from]
+        begin
+          @copy_from = Issue.visible.find(params[:copy_from])
+          @copy_attachments = params[:copy_attachments].present? || request.get?
+          @copy_subtasks = params[:copy_subtasks].present? || request.get?
+          @issue.copy_from(@copy_from, :attachments => @copy_attachments, :subtasks => @copy_subtasks)
+        rescue ActiveRecord::RecordNotFound
+          render_404
+          return
+        end
+      end
+      @issue.project = @project
+    else
+      @issue = @project.issues.visible.find(params[:id])
+    end
+
+    @issue.project = @project
+    @issue.author ||= User.current
+    # Tracker must be set before custom field values
+    @issue.tracker ||= @project.trackers.find((params[:issue] && params[:issue][:tracker_id]) || params[:tracker_id] || :first)
+    if @issue.tracker.nil?
+      render_error l(:error_no_tracker_in_project)
+      return false
+    end
+    @issue.start_date ||= Date.today if Setting.default_issue_start_date_to_creation_date?
+    @issue.safe_attributes = params[:issue]
+
+    @priorities = IssuePriority.active
+    @allowed_statuses = @issue.new_statuses_allowed_to(User.current, @issue.new_record?)
+    @available_watchers = @issue.watcher_users
+    if @issue.project.users.count <= 20
+      @available_watchers = (@available_watchers + @issue.project.users.sort).uniq
+    end
+  end
+
+
+  def create_new_issue
+    call_hook(:controller_issues_new_before_save, { :params => params, :issue => @issue })
+    @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
+    if @issue.save
+      call_hook(:controller_issues_new_after_save, { :params => params, :issue => @issue})
+      @plugin_path = File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'AgileDwarf')
+      @closed_status = Setting.plugin_AgileDwarf[:stclosed].to_i
+      # with_format :html do
+      #   @html_content = render_to_string partial: 'adsprints/sprint_render', :locals => { :message => "@message" }
+      # end
+      respond_to do |format|
+        # render :json => { :attachmentPartial => render_to_string('adsprints/sprint_render', :layout => false, :locals => { :message => "@message" }) }
+        format.js {
+          render :json => { :attachmentPartial => "success" }
+        }
+      end
+      # return
+    else
+      respond_to do |format|
+
+        # format.api  { render_validation_errors(@issue) }
+        format.js {
+          @errors = ""
+          render :json => {
+                     :errors=> @issue.errors.full_messages.each {|s| @errors += (s + "</br>")}
+                 }
+        }
+      end
+    end
+  end
+
 
   # def log_entry_create
   #
