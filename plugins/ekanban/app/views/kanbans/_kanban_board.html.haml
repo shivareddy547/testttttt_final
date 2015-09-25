@@ -5,6 +5,7 @@
 
   = link_to l(:label_kanban_setup), edit_project_kanban_path(@project.id,kanban.id), :class => 'icon icon-setup', :style => 'float:right'
   = link_to l(:label_kanban_report), {:controller => "kanban_reports", :action => "index", :project_id => @project.id}, :class => 'icon icon-report', :style => 'float:right'
+
   -#%a.icon.icon-fullscreen{:href => "#", :style => "float:right;",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
   -#
   -#%a.icon.icon-add{:href => "#",:style => "float:right;margin-left:10px;margin-right:1px",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time

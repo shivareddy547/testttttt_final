@@ -31,8 +31,8 @@
             - card_selected_display_columns.each do |value|
               %p
               %strong= find_value(value.to_sym,i)
-    .card-content{:style => "font-size:10px;position:relative"}
-      %span{:style=>"margin:4em 0 0 0; text-align:center;font-weight:bold;color:navy;display:none"}="P#{i.priority.position - 1}"
+    .card-content{:style => "font-size:10px;position:relative",:class=>"p#{i.priority.position}-color"}
+      -#%span{:style=>"margin:4em 0 0 0; text-align:center;font-weight:bold;color:navy;display:none"}="P#{i.priority.position - 1}"
 
       - if @project.present?
         -#- issue_settings = IssueCardConfig.find_by_project_id(@project.id)
