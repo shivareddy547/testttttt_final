@@ -1,0 +1,33 @@
+<h3>
+  <%= link_to l(:label_texteditor),"#"  %>
+</h3>
+<% if controller.action_name =='page_layout' %>
+  <%= form_tag({ :controller => 'dashboard', :action => 'save_text_editor', :project_id => @project },
+             :method => :get, :id => 'editor_form') do %>
+    <%= hidden_field_tag 'project_id', @project.id if @project %>
+    <p id="attachments_form"><label><%= l(:label_attachment_plural) %></label><%= render :partial => 'attachments/editor_form', :locals => {:container => @project_preference} %></p>
+    <p>
+  <span id="text_editor_block_and_toolbar">
+    <textarea accesskey="e" class="wiki-edit" cols="60" id="text_editor_block" name="text_editor_block" rows="10" style="cursor:auto"><%=@project_preference.save_text_editor %></textarea></div>
+</span>
+    </p>
+<%= wikitoolbar_for 'text_editor_block' %>
+    <%= submit_tag l(:button_create) %>
+<% end %>
+<%= preview_link dashboard_preview_text_editor_path(:project_id => @project), 'editor_form' %>
+<div id="preview" class="wiki"></div>
+
+
+      <input id="text" style="cursor:default" > </input>
+      <input id="text" style="cursor:default" > </input>
+
+
+<% else %>
+<% if @project_preference.save_text_editor %>
+        <%= @project_preference.attachments %>
+    <% @attachments = @project_preference.attachments %>
+    <fieldset class="preview"><legend><%= l(:field_description) %></legend>
+      <%= textilizable @project_preference.save_text_editor, :attachments => @attachments, :object => @project_preference %>
+    </fieldset>
+<% end %>
+<% end %>

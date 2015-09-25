@@ -1,0 +1,30 @@
+
+
+<h3>
+  <%= link_to l(:label_overdue_tasks),"#" %>
+  <% if controller.action_name =='page_layout' %>
+  <%= link_to image_tag("/images/settings.png", :border=>0),'#', :class => 'overdue_tasks_settings_model' %>
+<% end %>
+</h3>
+
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<% @totalIssues = dashboard_helper.get_total_issues(@project.id,block_name) %>
+<% @managementissues = dashboard_helper.get_management_issues(@project.id,block_name) %>
+<% @overdueissueschart = dashboard_helper.get_overdue_issues_chart(@project.id,block_name) %>
+<% @overdueissues = dashboard_helper.get_overdue_issues(@project.id,block_name) %>
+<% @setting_overdue_trackers,@setting_overdue_statuses=dashboard_helper.get_selected__trackers_and_statuses(@project.id,block_name) %>
+<%= render :partial => 'dashboard/graphs/over_due_task_graph' %>
+
+
+<script>
+    $('.overdue_tasks_settings_model').click(function (e) {
+        $('#ajax-modal').html('<%= escape_javascript(render :partial => 'dashboard/graphs/setting_modal') %>');
+        $('#block_id').attr("value","overduetasks")
+        $('.unmanagement_overdue_tasks').empty();
+        child =$('.overdue_trackers_statuses').children().clone();
+        $('.unmanagement_overdue_tasks').append(child);
+        showModal('ajax-modal', '450px');
+        return false;
+    });
+
+</script>

@@ -1,0 +1,6 @@
+<%= error_messages_for 'category' %>
+
+<div class="box tabular">
+<p><%= f.label 'Name' %> <span class="required">*</span>   <%= f.text_field 'cat_name', :size => 30 %></p>
+<p><%= f.label 'Need Approval' %> <span class="required">*</span>   <%= f.check_box 'need_approval' %></p>
+</div>

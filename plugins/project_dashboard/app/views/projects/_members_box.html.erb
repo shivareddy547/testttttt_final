@@ -1,0 +1,28 @@
+  <% if @users_by_role.any? %>
+  <div class="members box">
+    <h3><%=l(:label_member_plural)%></h3>
+    <p><% @users_by_role.keys.sort.each do |role| %>
+    <%=h role %>: <%= @users_by_role[role].sort.collect{|u| link_to_user u}.join(", ").html_safe %><br />
+    <% end %></p>
+  </div>
+  <% end %>
+
+  <div class="members box">
+<%#= params %>
+    <h3><%=l(:label_issue_status_graph)%></h3>
+   <% @project = Project.find(params[:id]) %>
+   <%= form_tag({:controller=> "projects",:action => "show"}, {:method => :get}) do %>
+     <%= select_tag "fixed_version_id", options_from_collection_for_select(@project.versions, "id", "name",params[:fixed_version_id]) ,:prompt => "Select Version",:onchange => "this.form.submit();" %>
+     <%#= select_tag "issue_priority_id", options_from_collection_for_select(IssuePriority.all, "id", "name",params[:issue_priority_id]) ,:prompt => "Select Priority",:onchange => "this.form.submit();" %>
+
+  <% end %>
+    <%= javascript_include_tag "//www.google.com/jsapi" %>
+    <%= javascript_include_tag  "charttrick" %>
+
+    <%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+      <%#= pie_chart params[:fixed_version_id].present? ? dashboard_helper.get_issues_count(@project.id,params[:fixed_version_id]) : dashboard_helper.get_issues_count(@project.id, @project.versions.present? ? @project.versions.first.id : 0) %>
+    <%= pie_chart  dashboard_helper.get_issues_count(@project.id,params[:fixed_version_id].present? ?  params[:fixed_version_id] : @project.versions.present? ? @project.versions.first.id : 0,params[:issue_priority_id].present? ? params[:issue_priority_id] : 0) %>
+
+  </div>
+
+

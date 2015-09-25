@@ -1,0 +1,3 @@
+<h3><%=l(:label_news_latest)%></h3>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<%= render :partial => 'news/news', :collection => dashboard_helper.news_items(@project.id) %>

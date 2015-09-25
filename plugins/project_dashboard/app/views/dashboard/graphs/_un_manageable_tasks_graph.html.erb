@@ -1,0 +1,101 @@
+<% if @totalIssues > 0  %>
+    <%= render :partial => 'dashboard/index' %>
+<%end%>
+
+<div class="unmanagement_trackers_statuses" style="display:none">
+  <p><label for="tracker selection" id="tracker_select"><%= l(:lable_select_tracker) %></label> <span class="required">*</span>   <%= select_tag "tracker_id", options_from_collection_for_select(@project.trackers, "id", "name",:selected =>@setting_unmanagement_trackers),:multiple => true %></p>
+  <p><label for="status_selection" id="status_select"><%= l(:lable_select_status) %></label> <span class="required">*</span>  <%= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_unmanagement_statuses),:multiple => true %></p>
+</div>
+
+<%#= render :partial => '/mc_menu/mcmenu' %>
+<div class="central_charts">
+  <% if @totalIssues > 0  %>
+      <div class="double_charts">
+        <div class="double_chart">
+          <div id="managementissues" class="mini_chart"></div>
+          <div class="mini_note">
+            <% @managementissues.each do |issue| %>
+                <div>
+                  <%if (issue.id == 1)%>
+                      <b><%= issue.typemanagement %>: <%= issue.totalissues %></b>
+                      <div><%= t :manageable_text_tip %></div><br/>
+                  <%else%>
+                      <b><a href="#TB_inline?height=400&width=600&inlineId=hiddenModalContentUnmanageable&modal=false" title='<%= issue.typemanagement %>: <%= issue.totalissues %>' class="thickbox"><%= issue.typemanagement %>: <%= issue.totalissues %></a></b>
+                      <div><%= t :unmanageable_text_tip %></div>
+                      <div id="hiddenModalContentUnmanageable" style="display: none;">
+                        <% @unmanagementissues.each do |unmanagementissue| %>
+                            <% link_unmanagementissue = unmanagementissue.id.to_s+' - '+unmanagementissue.subject %>
+                            <div style="font-size: 11px; margin-left: 5px;"><%= link_to link_unmanagementissue, unmanagementissue %></div>
+                        <%end%>
+                      </div>
+                  <%end%>
+                </div>
+            <%end%>
+          </div>
+        </div>
+        <p id="notice"><%= notice %></p>
+      </div>
+      <script type="text/javascript">
+          $(function () {
+              var chart;
+              $(document).ready(function() {
+                  chart = new Highcharts.Chart({
+                      credits: {
+                          enabled: false
+                      },
+                      chart: {
+                          renderTo: 'managementissues',
+                          plotBackgroundColor: null,
+                          plotBorderWidth: null,
+                          plotShadow: false
+                      },
+                      title: {
+                          text: '<%=t :task_manageable_chart_title %>'
+                      },
+                      tooltip: {
+                          formatter: function() {
+                              return '<b>'+ this.point.name +'</b>: '+ Highcharts.numberFormat(this.y,0)+ ' <%=t :tasksof_label%> '+<%= @totalIssues %>;
+                          }
+                      },
+                      plotOptions: {
+                          pie: {
+                              allowPointSelect: true,
+                              cursor: 'pointer',
+                              showInLegend: true,
+                              dataLabels: {
+                                  enabled: true,
+                                  color: '#000000',
+                                  connectorColor: '#000000',
+                                  distance: 0,
+                                  formatter: function() {
+                                      return Highcharts.numberFormat(this.percentage,2) +' %';
+                                  }
+                              }
+                          }
+                      },
+                      series: [{
+                          type: 'pie',
+                          name: 'Tarefas por Situação',
+                          data: <%=@managementissues.map{ |issue| [issue.typemanagement.to_s, issue.totalissues.to_i]}.inspect.html_safe%>
+                      }]
+                  });
+              });
+
+          });
+      </script>
+
+<% else %>
+      <div id="errorExplanation"><%=t :time_mgmt_error_no_issues_found_text %></div>
+  <%end%>
+
+</div>
+
+
+<!--
+Tasks by Statuses / Situação por Tarefas
+-->
+
+
+<!--
+ Task Management / Gerenciamento de Tarefas
+-->

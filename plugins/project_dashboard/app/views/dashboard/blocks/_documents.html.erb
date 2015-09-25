@@ -1,0 +1,3 @@
+<h3><%=l(:label_document_plural)%></h3>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<%= render :partial => 'dashboard/documents/document', :collection => dashboard_helper.documents_items %>
