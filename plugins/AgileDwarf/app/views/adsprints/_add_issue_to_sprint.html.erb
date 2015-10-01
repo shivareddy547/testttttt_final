@@ -81,12 +81,12 @@
 
                     if(data.sprint_id) {
                         $("#sprints_sprints").find('.'+data.sprint_id).first().find(".task_list").first().find('.sc_task').first().prepend(data.attachmentPartial);
-                        $("#NewIssuepopupWindow").remove();
+                        $("#NewIssuepopupWindow").dialog('close');
                     }
                     else
                     {
                         $(".sprints_column").first().find(".task_list").first().prepend(data.attachmentPartial);
-                        $("#NewIssuepopupWindow").remove();
+                        $("#NewIssuepopupWindow").dialog('close');
                     }
 
                }
