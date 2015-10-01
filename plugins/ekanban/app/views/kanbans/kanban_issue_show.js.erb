@@ -13,6 +13,8 @@ else
 $('select#issue_status_id').val("<%= @issue_status_id %>");
 $('select#kanban_state_id').val("<%= @kanban_status_id %>");
 $('#kanban_pane_id').val("<%= @kanban_pane_id %>");
+$(".edit_issue #issue_status_id").prop( "disabled", true );
+$(".edit_issue #kanban_state_id").prop( "disabled", true );
 //$("#popupWindow #popupWindowBody")
 // $("#shivareddy").append("<%#= escape_javascript(render(:partial => 'kanbans/issues/edit',:issue => @issue)) %>");
 

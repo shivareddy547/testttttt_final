@@ -10,7 +10,7 @@
 <%= call_hook(:view_issues_new_top, {:issue => @issue}) %>
 
 <%= labelled_form_for @issue, :url => project_issues_path(@project),
-                      :html => {:id => 'new-issue-form', :multipart => true} do |f| %>
+                      :html => {:id => 'issue-form', :multipart => true} do |f| %>
     <%= error_messages_for 'issue' %>
     <%= hidden_field_tag 'project_id',@project.id %>
     <%= hidden_field_tag 'copy_from', params[:copy_from] if params[:copy_from] %>
@@ -61,9 +61,9 @@
 <% end %>
 <script>
 
-    $("#new-issue-form #NewpopupSubmit").click(function(){
+    $("#issue-form #NewpopupSubmit").click(function(){
         $.ajax({
-            url: "/kanban_cards/create_new_issue?" + $('#new-issue-form').serialize(), // Route to the Script Controller method
+            url: "/adsprints/create_issue_to_sprint?" + $('#issue-form').serialize(), // Route to the Script Controller method
             type: "POST",
             dataType: "json",
             // This goes to Controller in params hash, i.e. params[:file_name]
@@ -77,10 +77,19 @@
                 }
                 else
                 {
-                   console.log(data)
-                    window.location.reload();
+                    console.log(data)
 
-               }
+                    if(data.sprint_id) {
+                        $("#sprints_sprints").find('.'+data.sprint_id).first().find(".task_list").first().find('.sc_task').first().prepend(data.attachmentPartial);
+                        $("#NewIssuepopupWindow").remove();
+                    }
+                    else
+                    {
+                        $(".sprints_column").first().find(".task_list").first().prepend(data.attachmentPartial);
+                        $("#NewIssuepopupWindow").remove();
+                    }
+
+                }
 
 
             }

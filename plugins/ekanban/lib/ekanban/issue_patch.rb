@@ -54,7 +54,7 @@ module EKanban
 
           validate :validate_kanban_card_update, :if => Proc.new{!self.new_record?}
           validate :validate_kanban_card_new, :if => Proc.new{self.new_record?}
-          validates_presence_of :assigned_to
+          # validates_presence_of :assigned_to
           before_update :kanban_update
 
           def init_journal(user, notes = "")
@@ -68,7 +68,7 @@ module EKanban
               @custom_values_before_change = {}
               self.custom_field_values.each {|c| @custom_values_before_change.store c.custom_field_id, c.value }
             end
-
+             @current_journal
           end
 
           # Saves the changes in a Journal
@@ -179,10 +179,11 @@ module EKanban
           end
 
           assignee = issue.assigned_to
-          if assignee.nil?
-            errors.add :assigned_to_id, ":Need to specify an assignee"
-            return false
-          end
+          # if assignee.nil?
+          #   errors.add :assigned_to_id, ":Need to specify an assignee"
+          #   return false
+          # end
+          if assignee.present?
           wip = assignee.is_a?(Group) ? assignee.wip(pane.role_id, issue.project_id) : assignee.wip
           wip_limit = assignee.wip_limit
           if pane.in_progress == true and wip >= wip_limit
@@ -192,6 +193,7 @@ module EKanban
           #need to check the role (both user's and pane's)
           if !pane.accept_user?(assignee)
             errors.add :assigned_to_id, ":Pane #{pane.name} doesn't accept #{assignee.alias}, check his/her roles!"
+          end
           end
           puts errors if errors.full_messages.any?
           errors.blank?

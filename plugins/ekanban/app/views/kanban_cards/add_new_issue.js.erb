@@ -1,5 +1,10 @@
 
+//$("#NewIssuepopupWindow #NewIssuepopupWindowBody").html("<%#= escape_javascript(render('kanban_cards/add_new_issue', layout: "layouts/base", content_type: 'text/javascript')) %>");
+
+
+//$('#NewIssuepopupWindow #issue-form #issue_fixed_version_id').val("<%#= params[:sprint_id] %>")
+
 $("#NewIssuepopupWindow #NewIssuepopupWindowBody").html("<%= escape_javascript(render('kanban_cards/add_new_issue', layout: "layouts/base", content_type: 'text/javascript')) %>");
 
 
-//$('#NewIssuepopupWindow #issue-form #issue_fixed_version_id').val("<%= params[:sprint_id] %>")
+$('#NewIssuepopupWindow #issue-form #issue_fixed_version_id').val("<%= params[:sprint_id] %>")
