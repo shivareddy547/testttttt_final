@@ -1472,52 +1472,6 @@ module WktimeHelper
   end
 
 
-  # def check_bio_permission_list_user_id_project_id(l,user_id,project_2)
-  #
-  #   @all_roles=[]
-  #   user = User.find(user_id)
-  #   if project_2.present?
-  #   project = Project.where(id:project_2).last
-  #   else
-  #     project = user.projects.first.id
-  #   end
-  #
-  #
-  #   logtime_projects = user.roles_for_project(project)
-  #   if logtime_projects.present?
-  #     logtime_projects.each do |each_role|
-  #       @all_roles << each_role.permissions
-  #     end
-  #     @all_roles = @all_roles.flatten!
-  #   end
-  #
-  #   if project.present? && logtime_projects.present? && @all_roles.present?
-  #     if (l == "l1")
-  #       check_l1 = @all_roles.include? l.to_sym
-  #       check_l2 = @all_roles.include? "l2".to_sym
-  #       if check_l1.present? && !check_l2.present?
-  #         return true
-  #       end
-  #     elsif(l == "l2")
-  #       if @all_roles.include? l.to_sym
-  #         return true
-  #       end
-  #     elsif(l == "l3")
-  #       if @all_roles.include? l.to_sym
-  #         return true
-  #       end
-  #     elsif(l == "bio_hours_display")
-  #
-  #       if @all_roles.include? l.to_sym
-  #         return true
-  #       end
-  #     end
-  #   else
-  #   end
-  # end
-
-
-
   def check_bio_permission_list_user_id_project_id(l,user_id,project_ids)
     @all_roles=[]
 
