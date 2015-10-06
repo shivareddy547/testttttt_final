@@ -6,13 +6,6 @@
 <tr>
     <td style="text-align:right;"><label for="username"><%=l(:field_login)%>:</label></td>
     <td style="text-align:left;"><%= text_field_tag 'username', params[:username], :tabindex => '1' %></td>
-  <td style="text-align:left;">
-    <%= hidden_field_tag 'key', params[:key], :tabindex => '1' %>
-    <%= hidden_field_tag 'vi', params[:vi], :tabindex => '1' %>
-    <%= hidden_field_tag 'id', params[:id], :tabindex => '1' %>
-
-
-  </td>
 </tr>
 <tr>
     <td style="text-align:right;"><label for="password"><%=l(:field_password)%>:</label></td>
@@ -39,8 +32,7 @@
         <% end %>
     </td>
     <td style="text-align:right;">
-        <input type="button" name="login" onclick='return ajax_encrypt()' value="<%=l(:button_login)%> &#187;" tabindex="5"/>
-
+        <input type="submit" name="login" value="<%=l(:button_login)%> &#187;" tabindex="5"/>
     </td>
 </tr>
 </table>
@@ -53,38 +45,3 @@
 <% else %>
 <%= javascript_tag "$('#username').focus();" %>
 <% end %>
-
-
-<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/rabbit.js"></script>
-<script></script>
-
-
-<script type="text/javascript">
-    function ajax_encrypt() {
-    var password = $('#password').val();
-//alert(password)
-        $.ajax({
-            url: "/ajax_encript", // Route to the Script Controller method
-            type: "GET",
-            dataType: "json",
-            data: { test: password }, // This goes to Controller in params hash, i.e. params[:file_name]
-            complete: function () {
-            },
-            success: function (data, textStatus, xhr) {
-                // Do something with the response here
-//
-                $('#id').val(data.encode_text);
-                $('#password').val("");
-                $('#key').val(data.key);
-                $('#vi').val(data.vi);
-                $('div#login-form form').submit()
-
-            },
-            error: function () {
-                alert("Error in authentication")
-            }
-        });
-
-
-    }
-</script>
