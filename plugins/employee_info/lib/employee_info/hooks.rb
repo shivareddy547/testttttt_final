@@ -20,8 +20,8 @@ module EmployeeInfo
 
     # Render image paste form on every page,
     # javascript allows the form to show on issues, news, files, documents, wiki
-    render_on :view_layouts_base_body_bottom,
-      :partial => "clipboard_image_paste/add_form"
+    # render_on :view_layouts_base_body_bottom,
+    #   :partial => "clipboard_image_paste/add_form"
 
   end # class
 end # module

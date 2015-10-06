@@ -13,10 +13,8 @@ module UsersControllerPatch
         @user.pref.attributes = params[:pref]
 
         if @user.save
-          user_info = UserOfficialInfo.find_or_create_by_user_id(:user_id=>@user.id)
-          user_info.employee_id=params[:user_official_info].to_i
-          user_info.save
-            Mailer.account_information(@user, @user.password).deliver if params[:send_information]
+          UserOfficialInfo.build(@user.id,params[:user_official_info].to_i)
+          Mailer.account_information(@user, @user.password).deliver if params[:send_information]
 
           respond_to do |format|
             format.html {
@@ -56,9 +54,7 @@ module UsersControllerPatch
         # TODO: Similar to My#account
         @user.pref.attributes = params[:pref]
         if @user.present?
-          user_info = UserOfficialInfo.find_or_create_by_user_id(:user_id=>@user.id)
-          user_info.employee_id=params[:user_official_info].to_i
-          user_info.save
+          UserOfficialInfo.build(@user.id,params[:user_official_info].to_i)
         end
         if @user.save
           @user.pref.save
