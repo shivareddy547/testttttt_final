@@ -274,8 +274,7 @@ module EKanban
           end
 
           #need to check the role (both user's and pane's)
-
-          if !assignee.nil? && !new_pane.accept_user?(assignee)
+          if !new_pane.accept_user?(assignee)
             errors.add :assigned_to_id, ":Cannot assign issue to #{assignee.alias}, Pane #{new_pane.name} doesn't accept him/her, check his roles and wip_limit!"
           end
           puts errors if errors.full_messages.any?

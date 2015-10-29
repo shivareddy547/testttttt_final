@@ -29,9 +29,9 @@ Redmine::Plugin.register :ekanban do
   menu :admin_menu, :Kanban_States, {:controller=>'kanban_states', :action => 'setup'}, :caption => 'Agile Board States'
 
   Rails.configuration.to_prepare do
-    # unless ApplicationHelper.included_modules.include?(EKanban::Patches::ApplicationHelperPatch)
-    #     ApplicationHelper.send(:include, EKanban::Patches::ApplicationHelperPatch)
-    # end
+    unless ProjectsHelper.included_modules.include?(EKanban::Patches::ProjectsHelperPatch)
+        ProjectsHelper.send(:include, EKanban::Patches::ProjectsHelperPatch)
+    end
 
     unless ProjectsController.included_modules.include? EKanban::Patches::ProjectsControllerPatch
       ProjectsController.send(:include, EKanban::Patches::ProjectsControllerPatch)
