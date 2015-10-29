@@ -40,11 +40,10 @@
                     <%result = time_data[th].present? ? time_data[th] : '0.0'  %>
                     <%= currencySym %>&nbsp;<span id=<%= "day_total_#{i+1}" %>><%= ("%.2f" % result) %></span>
                     <% total_hr += result.to_f%>
-
                     <% if user_bio_permission %>
                         <span style="color:red">
-                          <% if @user_hours.present? && @user_hours[employee_id.last.to_s].present?%>
-                            <% @user_hours[employee_id.last.to_s].each do |key,value| %>
+                          <% if @user_hours.present? && @user_hours[employee_id].present?%>
+                            <% @user_hours[employee_id].each do |key,value| %>
                                   <% if key.to_date == th %>
                                     <%=  value  %>
 

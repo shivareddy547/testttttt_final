@@ -1301,13 +1301,17 @@ module WktimeHelper
 
   def get_emp_id(user_id)
     user = User.find(user_id)
-    user.custom_field_values.each_with_index do |c,index|
-      custom_field =CustomField.where(:id=>c.custom_field_id)
-      if custom_field.present? && (custom_field.last.name=="Emp_code")
-        p user.custom_field_values[index]
-        p user.custom_field_values[index].to_s
-      end
+    # user.custom_field_values.each_with_index do |c,index|
+    #   custom_field =CustomField.where(:id=>c.custom_field_id)
+    #   if custom_field.present? && (custom_field.last.name=="Emp_code")
+    #     p user.custom_field_values[index]
+    #     p user.custom_field_values[index].to_s
+    #   end
+    # end
+    if user.user_official_info.present? && user.user_official_info.employee_id.present?
+        user.user_official_info.employee_id.to_s
     end
+
   end
 
   def check_l2_status_for_month(select_time,user)
@@ -1387,7 +1391,7 @@ module WktimeHelper
   end
 
 
-  # def get_biometric_hours(user_id,date)
+  # def get_emmetric_hours(user_id,date)
   #   @user_emp_code=''
   #   user = User.find(user_id)
   #   user.custom_field_values.each_with_index do |c,index|
@@ -1421,14 +1425,20 @@ module WktimeHelper
   def get_biometric_hours_per_month(users,date,enddate,month_or_week)
     user_emp_code = []
      users = users.kind_of?(Array) ? users : [users]
-    users.flatten.each do |user|
-      user.custom_field_values.each_with_index do |c,index|
-        custom_field =CustomField.where(:id=>c.custom_field_id)
-        if custom_field.present? && (custom_field.last.name=="Emp_code")
-          user_emp_code << user.custom_field_values[index].to_s
-        end
-      end
-    end
+
+     users.flatten.each do |user|
+       if user.user_official_info.present? && user.user_official_info.employee_id.present?
+         user_emp_code << user.user_official_info.employee_id
+       else
+         user_emp_code << ""
+       end
+    #   user.custom_field_values.each_with_index do |c,index|
+    #     custom_field =CustomField.where(:id=>c.custom_field_id)
+    #     if custom_field.present? && (custom_field.last.name=="Emp_code")
+    #       user_emp_code << user.custom_field_values[index].to_s
+    #     end
+    #   end
+     end
     user_emp_code = user_emp_code.uniq.join(",")
     if month_or_week == "from_to_end"
       start_date = date.to_date.strftime('%d%m%Y')
