@@ -36,6 +36,9 @@ class KanbansController < ApplicationController
 
   skip_before_filter :check_if_login_required
   skip_before_filter :verify_authenticity_token
+  before_filter :find_project, :only => [ :update_form]
+  before_filter :build_new_issue_from_params, :only => [:update_form]
+
 
   def index
     @project = Project.find(params[:project_id])#Get member name of this project
@@ -518,22 +521,16 @@ end
  end
 
   def update_form
-    @issue = Issue.find(params[:id])
-    @project = @issue.project
-
-
+    # @issue = Issue.find(params[:id])
+    # @project = @issue.project
+    #
     @relations = @issue.relations.select {|r| r.other_issue(@issue) && r.other_issue(@issue).visible? }
     @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
     @edit_allowed = User.current.allowed_to?(:edit_issues, @project)
     @priorities = IssuePriority.active
     @time_entry = TimeEntry.new(:issue => @issue, :project => @issue.project)
     @relation = IssueRelation.new
-
-
     @time_entry = TimeEntry.new
-
-
-
     @project = @issue.project#Get member name of this project
     @members= @project.members
     @principals = @project.principals
@@ -544,12 +541,12 @@ end
 
     @member = nil
     @principal = nil
-
+    #
     @issue_statuss = IssueStatus.all
     @kanban_states = KanbanState.all
     @issue_status_kanban_state = IssueStatusKanbanState.all
     @kanban_flows = KanbanWorkflow.all
-
+    #
     params[:kanban_id] = 0 if params[:kanban_id].nil?
     params[:member_id] = 0 if params[:member_id].nil?
     params[:principal_id] = 0 if params[:principal_id].nil?
@@ -575,6 +572,18 @@ end
     @kanban_status_id = params[:kanban_status_id]
     @issue_status_id = params[:issue_status_id]
     @kanban_pane_id = params[:kanban_pane_id]
+    #
+    with_format :html do
+      @html_content = render_to_string partial: 'kanbans/issues/edit'
+    end
+
+    respond_to do |format|
+      # render :json => { :attachmentPartial => render_to_string('adsprints/sprint_render', :layout => false, :locals => { :message => "@message" }) }
+      format.js {
+        render :json => { :editcardPartial => @html_content,:issue_status_id=> @issue_status_id,:kanban_status_id=>@kanban_status_id,:kanban_pane_id=>@kanban_pane_id }
+      }
+    end
+
 
   end
 
@@ -616,6 +625,52 @@ end
 
   end
 
+
+  # TODO: Changing tracker on an existing issue should not trigger this
+  def build_new_issue_from_params
+    if params[:id].blank?
+      @issue = Issue.new
+      if params[:copy_from]
+        begin
+          @copy_from = Issue.visible.find(params[:copy_from])
+          @copy_attachments = params[:copy_attachments].present? || request.get?
+          @copy_subtasks = params[:copy_subtasks].present? || request.get?
+          @issue.copy_from(@copy_from, :attachments => @copy_attachments, :subtasks => @copy_subtasks)
+        rescue ActiveRecord::RecordNotFound
+          render_404
+          return
+        end
+      end
+      @issue.project = @project
+    else
+      @issue = @project.issues.visible.find(params[:id])
+    end
+
+    @issue.project = @project
+    @issue.author ||= User.current
+    # Tracker must be set before custom field values
+     @issue.tracker ||= @project.trackers.find((params[:issue] && params[:issue][:tracker_id]) || params[:tracker_id] || :first)
+    if @issue.tracker.nil?
+      render_error l(:error_no_tracker_in_project)
+      return false
+    end
+    @issue.start_date ||= Date.today if Setting.default_issue_start_date_to_creation_date?
+    @issue.safe_attributes = params[:issue]
+
+    @priorities = IssuePriority.active
+    @allowed_statuses = @issue.new_statuses_allowed_to(User.current, @issue.new_record?)
+    @available_watchers = @issue.watcher_users
+    if @issue.project.users.count <= 20
+      @available_watchers = (@available_watchers + @issue.project.users.sort).uniq
+    end
+  end
+
+  def find_project
+    project_id = params[:project_id] || (params[:issue] && params[:issue][:project_id])
+    @project = Project.find(project_id)
+  rescue ActiveRecord::RecordNotFound
+    render_404
+  end
 
 
 end

@@ -42,4 +42,5 @@ RedmineApp::Application.routes.draw do
 	match 'kanban_cards/add_new_issue', :controller => 'kanban_cards', :action => "add_new_issue",:via => [:get,:post]
 	match 'kanban_cards/create_new_issue', :controller => 'kanban_cards', :action => "create_new_issue",:via => [:get,:post]
 
+
 end

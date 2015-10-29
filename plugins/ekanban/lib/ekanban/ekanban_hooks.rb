@@ -36,16 +36,16 @@ module EKanban
       # This callback will be invoked from issue's update action when user update issue from "issues"
       # Issue updated from Kanban will go though another path, kanban_card's update action.
       def controller_issues_edit_after_save(context={})
-        p 77777777777777777777
+
        	# Assume the validation has been done in the validate callback
        	issue = context[:issue]
        	card = KanbanCard.find_by_issue_id(issue.id)
         if card.nil?
-          p 888888888888888888888888888888888
+
           card = KanbanCard.build(issue, context[:journal])
           return false if card.nil?
         end
-        p 999999999999999999999999999
+
         old_card = card.dup
        	assignee = issue.assigned_to
         new_state = IssueStatusKanbanState.state_id(issue.status_id, issue.tracker_id)
@@ -63,18 +63,17 @@ module EKanban
             old_pane  = card.kanban_pane
         end
         return false if !KanbanWorkflow.transition_allowed?(old_state,new_state,kanban.id)
-p 101010101010100111111111111111111111111
+
         journal = context[:journal]
         p journal
         p journal.details
         detail = journal.details
         detail = journal.details.detect {|x| x.prop_key == "estimated_hours"}
-        p 555555555555555
-        p detail
-        p 555555555555555555555
+
+
         #Assignee changed
         if !detail.nil?
-          p 1211212121121212122222222222222222222
+
           old_assignee = detail.old_value;
           card.developer_id = assignee.id if assignee.has_role?("Developer", issue.project)
           card.verifier_id  = assignee.id if assignee.has_role?("Verifier", issue.project)
@@ -84,8 +83,7 @@ p 101010101010100111111111111111111111111
     		card.kanban_pane_id = new_pane.id
 
         if card.save
-          p 131331313113133131313131313131313113
-          KanbanCardJournal.build(old_card,card,journal)
+                   KanbanCardJournal.build(old_card,card,journal)
         end
       end
     end

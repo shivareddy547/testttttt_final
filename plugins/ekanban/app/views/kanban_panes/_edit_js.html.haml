@@ -1,8 +1,10 @@
 :javascript
     $("#kanban_pane_wip_limit_auto").click(function(){
-        if ($(this).attr("checked") == "checked"){
+        if ($(this).is( ":checked" )){
+
             $("#kanban_pane_wip_limit").attr("disabled",true);
-        }else{
-            $("#kanban_pane_wip_limit").removeAttr("disabled");
+           }else{
+            //$("#kanban_pane_wip_limit").removeAttr("disabled");
+               $("#kanban_pane_wip_limit").prop('disabled', false);
         }
     });

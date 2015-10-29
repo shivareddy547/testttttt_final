@@ -733,3 +733,79 @@ function close_issues(ids,pane_id){
                 }
             }});
 }
+
+
+
+
+
+// Sprint Create
+$(document).on('click', '#new_sprints #new_sprint_submit', function() {
+    $.ajax({
+        url: "/adsprints/create_sprint?" + $('#new_sprints').serialize(), // Route to the Script Controller method
+        type: "POST",
+        dataType: "json",
+        // This goes to Controller in params hash, i.e. params[:file_name]
+        complete: function () {
+        },
+        success: function (data) {
+
+            console.log(data.errors);
+            if(data.errors) {
+                $('#sprint_errors #divError').css("display", "block");
+                $('#sprint_errors #divError').text(data.errors)
+            }
+            else
+            {
+                $("#sprints_sprints").prepend(data.sprintPartial);
+                $("#NewsprintpopupWindow").dialog('close');
+
+            }
+
+        }
+
+    });
+
+});
+
+
+
+function update_form(issue_id)
+
+{
+
+
+    // Sprint Create
+
+        $.ajax({
+            url: "/kanbans/update_form?" + $('form#kanban_card_form').serialize(), // Route to the Script Controller method
+            type: "POST",
+            dataType: "json",
+            // This goes to Controller in params hash, i.e. params[:file_name]
+
+            complete: function () {
+            },
+            success: function (data) {
+
+                console.log(data.errors);
+                if(data.errors) {
+                    $('#issue_errors #divError').css("display", "block");
+                    $('#issue_errors #divError').text(data.errors)
+                }
+                else
+                {
+//                    console.log(data.editcardPartial)
+                    $("#popupWindowBody").html(data.editcardPartial)
+//                    $("#popupWindow").dialog('close');
+                    console.log(7777777777777)
+
+                }
+
+            }
+
+        });
+
+
+
+
+
+}

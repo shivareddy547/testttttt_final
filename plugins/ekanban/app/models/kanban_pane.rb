@@ -95,6 +95,9 @@ class KanbanPane < ActiveRecord::Base
     project = self.kanban.project
 
     # He is a member of my project?
+    p "+++++++++=user+++++++++"
+    p user
+    p "+++++++++++++++++"
     if !user.member_of?(project)
       puts "user #{user.alias} is not a member of project #{project.name}"
       return false

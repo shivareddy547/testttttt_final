@@ -7,19 +7,15 @@
 </p>
 <% end %>
 
-<% if @issue.safe_attribute? 'project_id' %>
+    <% if @issue.safe_attribute? 'project_id' %>
 <p><%= f.select :project_id, project_tree_options_for_select(@issue.allowed_target_projects, :selected => @issue.project), {:required => true},
                 :onchange => "updateIssueFrom('#{escape_javascript project_issue_form_path(@project, :id => @issue, :format => 'js')}')" %></p>
 <% end %>
 
-<% if @issue.safe_attribute? 'tracker_id' %>
-<p><%= f.select :tracker_id, @issue.project.trackers.collect {|t| [t.name, t.id]}, {:required => true}
-               %></p>
-
-        <%#= f.select :tracker_id, @issue.project.trackers.collect {|t| [t.name, t.id]}, {:required => true},
-                     :onchange => "updateIssueFrom('#{escape_javascript kanban_issue_update_form_path(@project, :id => @issue, :format => 'js')}')" %>
+  <% if @issue.safe_attribute? 'tracker_id' %>
+        <p><%= f.select :tracker_id, @issue.project.trackers.collect {|t| [t.name, t.id]}, {:required => true},
+                        :onchange => "update_form(#{@issue.id});" %></p>
     <% end %>
-
 <% if @issue.safe_attribute? 'subject' %>
 <p><%= f.text_field :subject, :size => 80, :maxlength => 255, :required => true %></p>
 <% end %>

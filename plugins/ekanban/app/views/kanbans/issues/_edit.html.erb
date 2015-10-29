@@ -14,6 +14,7 @@
     <%= render :partial => 'kanbans/issues/conflict' if @conflict %>
     <%= hidden_field_tag :project_id, @project.id %>
     <%= hidden_field_tag :issue_id, @issue.id %>
+    <%= hidden_field_tag :id, @issue.id %>
     <%= hidden_field_tag :kanban_pane_id, 0 %>
     <%#= hidden_field_tag :kanban_pane_id, params[:project_id] %>
 
