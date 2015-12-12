@@ -17,11 +17,12 @@
 <% for u in @group%>
 
     <tr>
-        <td class="user"> <%= u["lastname"].to_s + " " + u["firstname"].to_s %> </td>
-        <% dep=render_user_depart(u["id"].to_i)%>
-        <td> <%= dep[:pos] %> </td>
-        <td> <%= dep[:dep]  %></td>
-    </tr>
+        <td class="user"> <%= u["firstname"].to_s + " " + u["lastname"].to_s %> </td>
+       <% dep=render_user_depart(u["id"].to_i)%>
+       <% dep && dep.each do |each_dep|%>
+            <td> <%= each_dep %></td>
+        <% end %>
+   </tr>
 <% end %>
 </tbody>
 </table>

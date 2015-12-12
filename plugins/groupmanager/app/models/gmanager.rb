@@ -1,6 +1,6 @@
 class Gmanager < ActiveRecord::Base
   unloadable
-  
+
   
   #show all project groups
   #returns hash {id_group => [array of users in group]}
@@ -51,11 +51,20 @@ class Gmanager < ActiveRecord::Base
 
   #return users's department from custom values
   def self.get_user_depart(id)
-    val = User.find(id).custom_values
-    res = { }
-    res[:pos] = val[0][:value].to_s 
-    res[:dep] = val[1][:value].to_s
+
+    # res = { }
+    custom = CustomField.find_all_by_type('UserCustomField')
+    res = false
+    if !custom.blank?
+      res = []
+      i = 0
+      custom.each do |c|
+        res[i] = val[i][:value] rescue ""
+        i += 1
+      end
+    end
     res
+    # res
   end
 
   def self.get_group_users(id)
@@ -89,7 +98,7 @@ class Gmanager < ActiveRecord::Base
     res = { }
     tres.each do |t|
       if !temp.index(t["id"])
-        res[t["id"]] = t["lastname"].to_s + " " + t["firstname"].to_s
+        res[t["id"]] = t["firstname"].to_s + " " + t["lastname"].to_s
       end
     end
     res
@@ -187,7 +196,7 @@ end
   def self.get_user_name(iduser)
     if iduser
       res = User.find(iduser)
-      ret = res['lastname'].to_s + " " + res['firstname'].to_s
+      ret = res['firstname'].to_s + " " + res['lastname'].to_s
       return ret
     else
       return false
