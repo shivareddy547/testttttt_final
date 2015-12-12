@@ -2,6 +2,9 @@ class Sprints < Version
   unloadable
 
   validate :start_and_end_dates
+  validates_presence_of :goal,:velocity
+  validates_numericality_of :velocity
+
 
   class << self
     def open_sprints(project)

@@ -46,7 +46,6 @@
 </script>
 
 <h2><%= l(:label_menu_sprints) %></h2>
-<a href="#" onclick="return runMyFunction();">Do it!</a>
 <fieldset id="filters" class="collapsible">
   <legend><%= l(:label_filter_plural) %></legend>
   <div id="sprints_selection" class="fl">
@@ -127,17 +126,25 @@
   </p>
 </div>
 
-<div id="NewIssuepopupWindow" title="New Issue">
+<div id="NewIssuepopupWindow" title="Issue">
   <div id="NewIssuepopupWindowBody">
     <% #= render :partial => "kanban_card" %>
   </div>
   <div id="NewIssuepopupWindowFoot"></div>
+</div>
+<div id="NewsprintpopupWindow" title="Sprint">
+  <div id="NewsprintpopupWindowBody">
+    <% #= render :partial => "kanban_card" %>
+  </div>
+  <div id="NewsprintpopupWindowFoot"></div>
 </div>
 
 
 <script>
 
     function openIssuePopup(sprint_id) {
+        console.log(111111111)
+
 //        alert(sprint_id)
 
         if(sprint_id) {
@@ -192,9 +199,7 @@
 
         }
 
-
-
-
     }
+
 
 </script>

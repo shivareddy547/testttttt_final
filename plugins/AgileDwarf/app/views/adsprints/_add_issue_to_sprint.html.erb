@@ -1,12 +1,6 @@
 <%= title l(:label_issue_new) %>
-<div id="issue_errors">
-  <div id="divError" style="display:none" >
-    <font color="red">
-
-    </font>
-
-  </div>
-</div>
+<div id="errorExplanation" style="display:none;"><ul>
+</ul></div>
 <%= call_hook(:view_issues_new_top, {:issue => @issue}) %>
 
 <%= labelled_form_for @issue, :url => project_issues_path(@project),
@@ -72,8 +66,11 @@
             success: function (data) {
                 console.log(data.errors);
                 if(data.errors) {
-                    $('#issue_errors #divError').css("display", "block");
-                    $('#issue_errors #divError').text(data.errors)
+//                    $('#issue_errors #divError').css("display", "block");
+//                    $('#issue_errors #divError').text(data.errors)
+                    $('#errorExplanation').css("display", "block");
+                    $('#errorExplanation ul').empty();
+                    $('#errorExplanation ul').append(data.errors)
                 }
                 else
                 {

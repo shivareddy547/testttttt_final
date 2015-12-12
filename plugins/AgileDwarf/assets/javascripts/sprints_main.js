@@ -582,25 +582,122 @@
         // create sprint button
         $('.create_sprint').click(function ()
         {
-            var date = new Date();
-            var name = $('#sprint_template').find('.sprint_name').text() + date.getDate() + '.' + (+date.getMonth() + 1) + '.' + date.getFullYear() + ' ' +
-                       date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-            $.ajax(
-            {
-                url: Sprints.getUrl('sprintcreate'),
-                data: {name: name},
-                success: function (data)
-                {
-                    var panel = $('#sprint_template').children(':eq(0)').clone().insertAfter('.sprints_column:eq(1) :eq(0)');
-                    panel.find('.sprint_name').text(name);
-                    panel.prop('id', 'sprint.' + data);
-                    sprints.push(new Sprints.Sprint(panel, true));
-                    $('#sprints_selection_el').append('<option value="' + data + '">' + name + '</option>');
+            var project_id = "<%= @project_id %>"
+            var w = "500px";
+            $("#NewsprintpopupWindow").dialog({
+                autoOpen: true,
+                //modal: isModal,
+                width: w,
+                //height: h,
+            });
+            //var project_id = "<%= @project_id %>"
+            $.ajax({
+                url: "/adsprints/new", // Route to the Script Controller method
+                type: "POST",
+                dataType: "script",
+                // This goes to Controller in params hash, i.e. params[:file_name]
+                complete: function () {
+                },
+                success: function (e, xhr, settings) {
+                },
+                error: function (e) {
+                    console.log(e)
                 }
             });
         });
 
-        // "show closed sprints" checkbox
+
+        // create sprint button
+        $(document).on('click', '.edit_sprint', function() {
+            var project_id = "<%= @project_id %>"
+            var sprint_id=$(this).attr("sprint_id")
+            var w = "500px";
+            $("#NewsprintpopupWindow").dialog({
+                autoOpen: true,
+                //modal: isModal,
+                width: w,
+                //height: h,
+            });
+            //var project_id = "<%= @project_id %>"
+            $.ajax({
+                url: "/adsprints/edit", // Route to the Script Controller method
+                type: "POST",
+                dataType: "script",
+                data: {project_id:project_id,sprint_id:sprint_id},
+                // This goes to Controller in params hash, i.e. params[:file_name]
+                complete: function () {
+                },
+                success: function (e, xhr, settings) {
+                },
+                error: function (e) {
+                    console.log(e)
+                }
+            });
+        });
+
+
+        // Sprint Create
+      $(document).on('click', '#new_sprints #new_sprint_submit', function() {
+            $.ajax({
+                url: "/adsprints/create_sprint?" + $('#new_sprints').serialize(), // Route to the Script Controller method
+                type: "POST",
+                dataType: "json",
+                // This goes to Controller in params hash, i.e. params[:file_name]
+                complete: function () {
+                },
+                success: function (data) {
+
+                    console.log(data.errors);
+                    if(data.errors) {
+                        $('#sprint_errors #divError').css("display", "block");
+                        $('#sprint_errors #divError').text(data.errors)
+                    }
+                    else
+                    {
+                        $("#sprints_sprints").prepend(data.sprintPartial);
+                        $("#NewsprintpopupWindow").dialog('close');
+
+                    }
+
+                }
+
+            });
+
+        });
+
+// update sprint
+        $(document).on('click', 'form.edit_sprints #edit_sprint_submit', function() {
+            $.ajax({
+                url: "/adsprints/update_sprint?" + $('form.edit_sprints').serialize(), // Route to the Script Controller method
+                type: "POST",
+                dataType: "json",
+                // This goes to Controller in params hash, i.e. params[:file_name]
+                complete: function () {
+                },
+                success: function (data) {
+
+                    console.log(data.errors);
+                    if(data.errors) {
+                        $('#sprint_errors #divError').css("display", "block");
+                        $('#sprint_errors #divError').text(data.errors)
+                    }
+                    else
+                    {
+//                        $("#sprints_sprints").prepend(data.sprintPartial);
+                        $(".sprints_panel."+data.sprint_id).replaceWith(data.sprintPartial);
+                        $("#NewsprintpopupWindow").dialog('close');
+
+                    }
+
+                }
+
+            });
+
+        });
+
+
+
+       // "show closed sprints" checkbox
         $("#show_closed_sprints input").change(function()
         {
             if ($(this).prop('checked'))
@@ -634,4 +731,9 @@
 
         Sprints.Coop.start(sprints);
     });
+
+
+
+
 })(jQuery);
+

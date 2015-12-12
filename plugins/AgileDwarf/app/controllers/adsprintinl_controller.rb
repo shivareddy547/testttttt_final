@@ -21,8 +21,15 @@ class AdsprintinlController < ApplicationController
     end
   end
 
+
+
+
   def inplace
     # element_id filtered too!
+    p "+++++++++++=ajax++++++++++"
+    p params[:ir_start_date]
+    p params[:ir_end_date] = DateTime.parse(params[:ir_end_date]).beginning_of_day if params[:ir_end_date].present?
+    p params[:ir_start_date] = DateTime.parse(params[:ir_start_date]).beginning_of_day if params[:ir_start_date].present?
     attribs = params.select{|k,v| k != 'id' && k != 'project_id' && Sprints.column_names.include?(k) }
     attribs = attribs.flatten
     param_id = attribs[0]

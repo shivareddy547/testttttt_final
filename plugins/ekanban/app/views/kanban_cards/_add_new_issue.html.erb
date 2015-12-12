@@ -1,12 +1,17 @@
 <%= title l(:label_issue_new) %>
-<div id="issue_errors">
-  <div id="divError" style="display:none" >
-    <font color="red">
+<div id="errorExplanation" style="display:none;"><ul>
+</ul></div>
 
-    </font>
+<!--<div id="issue_errors">-->
+  <!--<div id="divError" style="display:none" >-->
+    <!--<font color="red">-->
 
-  </div>
-</div>
+    <!--</font>-->
+
+  <!--</div>-->
+<!--</div>-->
+
+
 <%= call_hook(:view_issues_new_top, {:issue => @issue}) %>
 
 <%= labelled_form_for @issue, :url => project_issues_path(@project),
@@ -72,8 +77,10 @@
             success: function (data) {
                 console.log(data.errors);
                 if(data.errors) {
-                    $('#issue_errors #divError').css("display", "block");
-                    $('#issue_errors #divError').text(data.errors)
+//                    $('#issue_errors #divError').css("display", "block");
+//                    $('#issue_errors #divError').text(data.errors)
+                    $('#errorExplanation').css("display", "block");
+                    $('#errorExplanation ul').append(data.errors)
                 }
                 else
                 {
@@ -83,12 +90,14 @@
                         $("#sprints_sprints").find('.'+data.sprint_id).first().find(".task_list").first().find('.sc_task').first().prepend(data.attachmentPartial);
 //                        $("#NewIssuepopupWindow").remove();
                         $("#NewIssuepopupWindow").dialog('close');
+                        window.location.reload();
                     }
                     else
                     {
                         $(".sprints_column").first().find(".task_list").first().prepend(data.attachmentPartial);
 //                        $("#NewIssuepopupWindow").remove();
                         $("#NewIssuepopupWindow").dialog('close');
+                        window.location.reload();
                     }
 
                 }

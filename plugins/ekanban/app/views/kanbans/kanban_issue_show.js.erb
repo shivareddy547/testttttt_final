@@ -10,6 +10,7 @@ else
     $("#popupWindow #popupWindowBody").html("<%= escape_javascript(render('kanbans/issues/edit')) %>");
 }
 
+
 $('select#issue_status_id').val("<%= @issue_status_id %>");
 $('select#kanban_state_id').val("<%= @kanban_status_id %>");
 $('#kanban_pane_id').val("<%= @kanban_pane_id %>");

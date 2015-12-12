@@ -1,0 +1,20 @@
+<% @wiki_changes = (Redmine::AccessControl.modules_permissions(:wiki_permissions.to_s) - Redmine::AccessControl.public_permissions) %>
+<div class="skillsForm">
+  <a href="javascript:;" id="removeRole" role_id="" style="float:right"> Remove Role</a>
+  <%#= label_tag 'role' %>
+  <%= select_tag "role[]", options_from_collection_for_select(Role.all, "id", "name", ''),{ :prompt => "-Select Role-"} %>
+
+  <%#= label_tag 'permissions' %>
+  <% mod=:wiki_permissions %>
+  <fieldset><legend><%= mod.blank? ? l(:label_project) : l_or_humanize(mod, :prefix => 'project_module_') %></legend>
+    <% @wiki_changes.each do |permission| %>
+        <label class="floating">
+          <% if permission.project_module.to_s == :wiki_permissions.to_s %>
+              <%= check_box_tag 'permissions0[]', permission.name, (permission.project_module == :wiki_permissions.to_s), :id => nil %>
+              <%= l_or_humanize(permission.name, :prefix => 'permission_') %>
+          <% end %>
+        </label>
+    <% end %>
+  </fieldset>
+
+</div>

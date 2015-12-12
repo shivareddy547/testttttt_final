@@ -1,0 +1,141 @@
+<%= wiki_page_breadcrumb(@page) %>
+<% @wiki_changes = (Redmine::AccessControl.modules_permissions(:wiki_permissions.to_s) - Redmine::AccessControl.public_permissions) %>
+
+<h2><%= h @page.pretty_title %></h2>
+
+<%= form_for @content, :as => :content,
+             :url => {:action => 'update', :id => @page.title},
+             :html => {:method => :put, :multipart => true, :id => 'wiki_form'} do |f| %>
+    <%= f.hidden_field :version %>
+    <% if @section %>
+        <%= hidden_field_tag 'section', @section %>
+        <%= hidden_field_tag 'section_hash', @section_hash %>
+    <% end %>
+    <%= error_messages_for 'content' %>
+
+    <div class="box tabular">
+      <%= text_area_tag 'content[text]', @text, :cols => 100, :rows => 25,
+                        :class => 'wiki-edit', :accesskey => accesskey(:edit) %>
+<%#= @page.inspect %>
+
+          <%= fields_for @page do |fp| %>
+          <%# @page.safe_attribute_names.include?('parent_id')  %>
+          <% if  @wiki.pages.any? %>
+              <p>
+                <label><%= l(:field_parent_title) %></label>
+                <%= fp.select :parent_id,
+                              content_tag('option', '', :value => '') +
+                                      wiki_page_options_for_select(
+                                              @wiki.pages.includes(:parent).all -
+                                                      @page.self_and_descendants, @page.parent) %>
+              </p>
+              <% if @page.new_record? || user_allowed_to_manage_wiki_roles?(@project,@page.id).present? %>
+
+                  <a href="javascript:;" id="addNewTag" style="float:right">Add New Role</a></br>
+                  <div class="box tabular" id="permissions">
+                    <p>
+                      <% @wiki_roles = @page.new_record? ? @page.parent.wiki_roles : @page.wiki_roles %>
+
+                             <%= fp.fields_for :wiki_roles  do |wiki_role| -%>
+
+                          <%#= wiki_role.select(:role, Role.all.collect {|p| [ p.name, p.id ] rescue nil},
+                            { :prompt => "Please select"}
+                           ) %>
+                        <div id="skillSet">
+
+                          <% if @wiki_roles.present? %>
+                              <%#= @page.wiki_roles.inspect %>
+                              <% @wiki_roles.each_with_index do |each_role,index| %>
+                                  <%#= index.inspect %>
+                                  <%#= render partial: "wiki_changes/wiki_roles",locals: {each_role: each_role} %>
+
+                                  <div class="skillsForm">
+                                    <a href="javascript:;" id="removeRole" role_id="<%= each_role.role %>" style="float:right" > Remove Role</a>
+                                    <label><%#= l(:field_roles) %></label>
+                                    <%= select_tag "role[]", options_from_collection_for_select(Role.all, "id", "name", each_role.present? ? each_role.role : ""), { :prompt => "-Select Role-"} %>
+                                    <%#= check_box_tag "update_child_pages[]", :role_id => each_role.role %>
+                                    <%= check_box_tag 'detail[update_child_pages][]', each_role.role, false, :id => each_role.role %>
+                                    <%= l_or_humanize("Apply permission to child?", :prefix => 'permission_') %>
+                                    <label><%#= l(:field_permissions) %></label>
+                                    <%#= each_role.permisssion[index].inspect  %>
+                                    <% mod=:wiki_permissions %>
+                                    <fieldset><legend><%= mod.blank? ? l(:label_project) : l_or_humanize(mod, :prefix => 'project_module_') %></legend>
+                                      <% @wiki_changes.each do |permission| %>
+                                          <label class="floating">
+                                            <% if permission.project_module.to_s == :wiki_permissions.to_s %>
+                                                <%= check_box_tag "permissions#{index}[]", permission.name, (each_role.permissions.include?(permission.name.to_s)), :id => nil %>
+                                                <%= l_or_humanize(permission.name, :prefix => 'permission_') %>
+                                            <% end %>
+                                          </label>
+                                      <% end %>
+                                    </fieldset>
+
+                                  </div>
+
+                              <% end %>
+                          <% else %>
+                              <%= render partial: "wiki_changes/wiki_roles",locals: {each_role: ''} %>
+
+                          <% end %>
+
+                        </div>
+                    <% end %>
+                    </p>
+                  </div>
+              <% end %>
+          <% end %>
+      <% end %>
+
+
+      <p><label><%= l(:field_comments) %></label><%= f.text_field :comments, :size => 120 %></p>
+      <p><label><%=l(:label_attachment_plural)%></label><%= render :partial => 'attachments/form' %></p>
+    </div>
+
+    <p><%= submit_tag l(:button_save) %>
+<%#= @page.inspect %>
+      <%= preview_link({:controller => 'wiki', :action => 'preview', :project_id => @project, :id => @page.title }, 'wiki_form') %></p>
+    <%= wikitoolbar_for 'content_text' %>
+<% end %>
+
+<div id="preview" class="wiki"></div>
+
+<% content_for :header_tags do %>
+    <%= robot_exclusion_tag %>
+<% end %>
+
+<% html_title @page.pretty_title %>
+<div class="hide" id="new_skills_form" style="display:none">
+  <%= render partial: "wiki_changes/wiki_roles", locals: {skill: false} %>
+</div>
+
+<script>
+
+
+    $(document).ready(function(){
+        $("#addNewTag").click(function(){
+            $("#skillSet").append($("#new_skills_form").html());
+            var form_count = $("#skillSet .skillsForm").length
+            $("#new_skills_form input:checkbox").each(function(){
+                var next_name='permissions'+form_count+'[]'
+                $(this).attr('name',next_name);
+            });
+        });
+
+//        $("#removeRole").click(function(e){
+//
+//        });
+
+        $(document).on('click', '#removeRole', function() {
+            $(this).parent().remove();
+            role_id=$(this).attr("role_id");
+            $("#skillSet").append("<input type='hidden' name='remove_roles[]' value="+role_id+">");
+        });
+
+        var form_count = $("#skillSet .skillsForm").length
+        $("#new_skills_form input:checkbox").each(function(){
+            var next_name='permissions'+form_count+'[]'
+            $(this).attr('name',next_name);
+        });
+    });
+
+</script>

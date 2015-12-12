@@ -4,12 +4,15 @@
 <div class="splitcontentleft">
 
  <p>
-   <label for="issue_status_id">Status<span class="required"> *</span></label>
-    <%= select_tag "issue_status_id", options_from_collection_for_select(@issue_statuss, "id", "name"),onclick: "find_kanban_state_id();" %>
+
+    <%#= text_field_tag "issue[status_id]",@issue.status_id %>
+    <%#= f.select :status_id, options_from_collection_for_select(@issue_statuss, "id", "name"),onchange: "find_kanban_state_id();" %>
+   <%= f.select :status_id, options_from_collection_for_select(@issue_statuss, "id", "name"),{},
+                :onclick=>"find_kanban_state_id();" %>
   </p>
   <p>
     <label for="kanban_state_id">KanbanState<span class="required"> *</span></label>
-    <%= select_tag "kanban_state_id", options_from_collection_for_select(@kanban_states, "id", "name"),onclick: "find_issue_status_id();" %>
+    <%= select_tag "kanban_state_id", options_from_collection_for_select(@kanban_states, "id", "name"),onChange: "find_issue_status_id();" %>
   </p>
 
 <% if @issue.safe_attribute? 'priority_id' %>

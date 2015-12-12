@@ -20,28 +20,35 @@ function kanban_init()
             }else{
                 if (!confirm("Are you sure? Click 'OK' will update the moving to server")){
                     ui.sender.sortable("cancel");
+                    console.log(ui);
                 }else{
                     var popup = $("#popupWindow");
                     var id= $(ui.item).attr('id');
                     var element = "#popupWindow";
                     var kanban_status_id=$(this).attr("state_id");
                     var issue_status_id=$(ui.item).find("#issue_card_status_id").val();
+                    var project_id=$(ui.item).find("#project_id").val();
                     var kanban_pane_id=$(this).attr("id").split('_')[1];
                     popupCard(ui.sender,$(this),ui.item,popup,"drop");
                     $.ajax({
                         url: "/kanbans/kanban_issue_show", // Route to the Script Controller method
                         type: "POST",
                         dataType: "script",
-                        data: { issue_id: id,issue_status_id:issue_status_id,kanban_status_id:kanban_status_id,kanban_pane_id:kanban_pane_id  }, // This goes to Controller in params hash, i.e. params[:file_name]
+                        data: { project_id:project_id,issue_id: id,issue_status_id:issue_status_id,kanban_status_id:kanban_status_id,kanban_pane_id:kanban_pane_id  }, // This goes to Controller in params hash, i.e. params[:file_name]
                         complete: function () {
                         },
                         success: function (e, xhr, settings) {
                             find_issue_status_id();
 
+
                         },
                         error: function () {
                             alert("Error in authentication")
                         }
+                    });
+
+                    $(popup).on('dialogclose', function(event) {
+                        ui.sender.sortable("cancel");
                     });
 
 //                   popupCard(ui.sender,$(this),ui.item,popup,"drop");
@@ -156,12 +163,13 @@ function kanban_init()
         var kanban_status_id=$(this).find("#kanban_state_id").val();
         var issue_status_id=$(this).find("#issue_card_status_id").val();
         var kanban_pane_id=$(this).first().parent().attr("id").split('_')[1];
+        var project_id=$(this).find("#project_id").val();
         popupCard($(this).parent(".kanban-pane"),null,$(this),$(element),"edit")
        $.ajax({
             url: "/kanbans/kanban_issue_show", // Route to the Script Controller method
             type: "POST",
             dataType: "script",
-            data: { issue_id: id,issue_status_id:issue_status_id,kanban_status_id:kanban_status_id,kanban_pane_id:kanban_pane_id  }, // This goes to Controller in params hash, i.e. params[:file_name]
+            data: { project_id:project_id,issue_id: id,issue_status_id:issue_status_id,kanban_status_id:kanban_status_id,kanban_pane_id:kanban_pane_id  }, // This goes to Controller in params hash, i.e. params[:file_name]
             complete: function () {
             },
             success: function (e, xhr, settings) {
@@ -174,7 +182,7 @@ function kanban_init()
         });
 
 
-    });
+  });
 
     $("#popupSubmit").click(function(){
         /* Ajax update card here */
@@ -733,3 +741,171 @@ function close_issues(ids,pane_id){
                 }
             }});
 }
+
+
+
+
+
+// Sprint Create
+$(document).on('click', '#new_sprints #new_sprint_submit', function() {
+    $.ajax({
+        url: "/adsprints/create_sprint?" + $('#new_sprints').serialize(), // Route to the Script Controller method
+        type: "POST",
+        dataType: "json",
+        // This goes to Controller in params hash, i.e. params[:file_name]
+        complete: function () {
+        },
+        success: function (data) {
+
+            console.log(data.errors);
+            if(data.errors) {
+                $('#sprint_errors #divError').css("display", "block");
+                $('#sprint_errors #divError').text(data.errors)
+            }
+            else
+            {
+                $("#sprints_sprints").prepend(data.sprintPartial);
+                $("#NewsprintpopupWindow").dialog('close');
+
+            }
+
+        }
+
+    });
+
+});
+
+
+
+
+
+function find_kanban_state_id()
+{
+    var issue_status_id= $('form.edit_issue select#issue_status_id').val();
+    $.ajax({
+        url: "/kanbans/find_kanban_state_id", // Route to the Script Controller method
+        type: "GET",
+        dataType: "json",
+        // This goes to Controller in params hash, i.e. params[:file_name]
+        data: {issue_status_id: issue_status_id},
+
+        success: function (data) {
+
+            $('form.edit_issue select#kanban_state_id').val(data.kanban_state_id)
+            update_form()
+        }
+    });
+}
+
+function find_issue_status_id()
+{
+    var kanban_state_id= $('form.edit_issue select#kanban_state_id').val();
+    $.ajax({
+        url: "/kanbans/find_issue_status_id", // Route to the Script Controller method
+        type: "GET",
+        dataType: "json",
+        // This goes to Controller in params hash, i.e. params[:file_name]
+        data: {kanban_state_id: kanban_state_id},
+
+        success: function (data) {
+            console.log(data)
+            $('form.edit_issue select#issue_status_id').val(data.issue_status_id)
+            $('form.edit_issue input#issue_status_id').val(data.issue_status_id)
+
+            console.log($("form.edit_issue select#issue_status_id").val())
+            update_form()
+
+        }
+    });
+
+
+}
+
+
+
+function update_form(issue_id)
+
+{
+   // Sprint Create
+
+    $.ajax({
+        url: "/kanbans/update_form?" + $('form#kanban_card_form').serialize(), // Route to the Script Controller method
+        type: "POST",
+        dataType: "json",
+        // This goes to Controller in params hash, i.e. params[:file_name]
+
+        complete: function () {
+        },
+        success: function (data) {
+
+            console.log(data.errors);
+            if(data.errors) {
+                $('#issue_errors #divError').css("display", "block");
+                $('#issue_errors #divError').text(data.errors)
+            }
+            else
+            {
+                $("#popupWindowBody").html(data.editcardPartial)
+                $('form.edit_issue select#kanban_state_id').val(data.kanban_status_id);
+                $('form.edit_issue select#issue_status_id').val(data.issue_status_id);
+
+
+            }
+
+        }
+
+    });
+
+
+
+
+
+}
+
+//
+//function update_form(issue_id)
+//
+//{
+//
+//    // Sprint Create
+//
+//        $.ajax({
+//            url: "/kanbans/update_form?" + $('form#kanban_card_form').serialize(), // Route to the Script Controller method
+//            type: "POST",
+//            dataType: "json",
+//            // This goes to Controller in params hash, i.e. params[:file_name]
+//
+//            complete: function () {
+//            },
+//            success: function (data) {
+//
+//                console.log(data.errors);
+//                if(data.errors) {
+//                    $('#issue_errors #divError').css("display", "block");
+//                    $('#issue_errors #divError').text(data.errors)
+//                }
+//                else
+//                {
+////                    console.log(data.editcardPartial)
+//                    $("#popupWindowBody").html(data.editcardPartial)
+////                    $("#popupWindow").dialog('close');
+//                    console.log(7777777777777)
+//                    console.log(data.kanban_status_id);
+//                    console.log(data.issue_status_id)
+//                   $('form.edit_issue select#kanban_state_id').val(data.kanban_status_id);
+//                    $('form.edit_issue select#issue_status_id').val(data.issue_status_id);
+////                    console.log(kanban_state_id)
+////                    console.log(issue_status_id)
+////                    find_issue_status_id();
+//
+//                }
+//
+//            }
+//
+//        });
+//
+//
+//
+//
+//
+//}

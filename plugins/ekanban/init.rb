@@ -22,6 +22,7 @@ Redmine::Plugin.register :ekanban do
   requires_redmine :version_or_higher => '2.1.2'
   project_module :Kanban do
    permission :view_kanban, :kanbans => :index
+   permission :view_kanban, :kanbans => :index
    permission :sprints, {:adsprints => [:list], :adtaskinl => [:update, :inplace, :create, :tooltip], :adsprintinl => [:create, :inplace]} rescue nil
 
   end

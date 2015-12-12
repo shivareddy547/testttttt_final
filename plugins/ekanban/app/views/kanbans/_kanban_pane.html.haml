@@ -8,6 +8,7 @@
     .card-header{:style => "overflow:hidden; font-size:10px"}
       = link_to "##{i.id}", issue_path(i)
       = avatar(i.assigned_to, :size => "12", :title=>assignee_name, :style=>"float:right")
+      = hidden_field_tag :project_id, i.project_id
       = hidden_field_tag :issue_status_id, i.status_id
       = hidden_field_tag :issue_card_status_id, i.status_id
       = hidden_field_tag :assignee_id, i.assigned_to_id

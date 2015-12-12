@@ -24,6 +24,8 @@ class KanbanCardsController < ApplicationController
   skip_before_filter :check_if_login_required
   skip_before_filter :verify_authenticity_token
   before_filter :build_new_issue_from_params, :only => [:add_new_issue,:create_new_issue]
+  before_filter :find_issue, :only => [:update]
+
   def index
   	respond_to :json
   end
@@ -48,14 +50,11 @@ class KanbanCardsController < ApplicationController
   end
 
   def update
-
-    @issue = Issue.find(params[:issue_id])
     return unless update_issue_from_params
     @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
     saved = false
     begin
       saved = save_issue_with_child_records
-      @issue.status_id = params[:issue_status_id]
     rescue ActiveRecord::StaleObjectError
       @conflict = true
       if params[:last_journal_id]
@@ -63,33 +62,30 @@ class KanbanCardsController < ApplicationController
         @conflict_journals.reject!(&:private_notes?) unless User.current.allowed_to?(:view_private_notes, @issue.project)
       end
     end
-    # @issue = Issue.find(params[:issue_id])
-    @card = KanbanCard.find_by_issue_id(params[:issue_id])
-    old_card = @card.dup
 
-    # @journal = @issue.init_journal(User.current, params[:comment][:notes])
+    # if saved
+    #   render_attachment_warning_if_needed(@issue)
+    #   flash[:notice] = l(:notice_successful_update) unless @issue.current_journal.new_record?
     #
-    @issue.status_id = params[:issue_status_id]
-    if params[:kanban_state_id].nil?
-	   pane = KanbanPane.find(params[:kanban_pane_id])
-    else
-    	pane = KanbanPane.find_by_kanban_id_and_kanban_state_id(@card.kanban_pane.kanban.id, params[:kanban_state_id])
-    end
-    @card.kanban_pane_id = pane.id
+    #   respond_to do |format|
+    #     format.html { redirect_back_or_default issue_path(@issue) }
+    #     format.api  { render_api_ok }
+    #   end
+    # else
+    #   respond_to do |format|
+    #     format.html { render :action => 'edit' }
+    #     format.api  { render_validation_errors(@issue) }
+    #   end
+    # end
 
-    saved = false
-    begin
-      saved = save_with_issues();
-    rescue ActiveRecord::StaleObjectError
-    end
-    # KanbanCardJournal.build(old_card,@card,@journal) if @saved == true
 
     if !saved
-
-      @errors = ""
-      @issue.errors.full_messages.each {|s| @errors += (s + ";")}
+      @errors=""
+      @issue.errors.full_messages.each do |s|
+        @errors += ("<li>"+s+"</li>")
+      end
     end
-  	respond_to do |format|
+    respond_to do |format|
       format.json do
         if saved
           # project_id = @card.kanban_pane.kanban.project_id
@@ -100,10 +96,16 @@ class KanbanCardsController < ApplicationController
             }
           end
         else
-         # render :nothing => true
+          # render :nothing => true
           if request.xhr?
+
+            @errors=""
+            @issue.errors.full_messages.each do |s|
+              @errors += ("<li>"+s+"</li>")
+            end
             render :json => {
-                :errors=> @issue.errors.full_messages.each {|s| @errors += (s + "</br>")}
+
+                :errors=> @errors
             }
           end
         end
@@ -112,8 +114,111 @@ class KanbanCardsController < ApplicationController
         render :partial => "update"
       end
     end
+
+
   end
 
+
+
+  # def update
+  #
+  #   return unless update_issue_from_params
+  #   @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
+  #   saved = false
+  #   begin
+  #     saved = save_issue_with_child_records
+  #   rescue ActiveRecord::StaleObjectError
+  #     @conflict = true
+  #     if params[:last_journal_id]
+  #       @conflict_journals = @issue.journals_after(params[:last_journal_id]).all
+  #       @conflict_journals.reject!(&:private_notes?) unless User.current.allowed_to?(:view_private_notes, @issue.project)
+  #     end
+  #   end
+  #
+  #
+  #
+  #
+  #   @issue = Issue.find(params[:issue_id])
+  #   return unless update_issue_from_params
+  #   @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
+  #   saved = false
+  #   begin
+  #     saved = save_issue_with_child_records
+  #     # @issue.status_id = params[:issue_status_id]
+  #   rescue ActiveRecord::StaleObjectError
+  #     @conflict = true
+  #     if params[:last_journal_id]
+  #       @conflict_journals = @issue.journals_after(params[:last_journal_id]).all
+  #       @conflict_journals.reject!(&:private_notes?) unless User.current.allowed_to?(:view_private_notes, @issue.project)
+  #     end
+  #   end
+  #   # @issue = Issue.find(params[:issue_id])
+  #   @card = KanbanCard.find_by_issue_id(params[:issue_id])
+  #   old_card = @card.dup
+  #
+  #   # @journal = @issue.init_journal(User.current, params[:comment][:notes])
+  #   #
+  #   # @issue.status_id = params[:issue_status_id]
+  #   if params[:kanban_state_id].nil?
+	 #   pane = KanbanPane.find(params[:kanban_pane_id])
+  #   else
+  #   	pane = KanbanPane.find_by_kanban_id_and_kanban_state_id(@card.kanban_pane.kanban.id, params[:kanban_state_id])
+  #   end
+  #   @card.kanban_pane_id = pane.id
+  #
+  #   saved = false
+  #   begin
+  #     saved = save_with_issues();
+  #   rescue ActiveRecord::StaleObjectError
+  #   end
+  #   # KanbanCardJournal.build(old_card,@card,@journal) if @saved == true
+  #
+  #   if !saved
+  #      @errors=""
+  #     @issue.errors.full_messages.each do |s|
+  #       @errors += ("<li>"+s+"</li>")
+  #     end
+  #   end
+  # 	respond_to do |format|
+  #     format.json do
+  #       if saved
+  #         # project_id = @card.kanban_pane.kanban.project_id
+  #         # redirect_to project_kanbans_path(project_id)
+  #         if request.xhr?
+  #           render :json => {
+  #               :issue=> @issue.subject
+  #           }
+  #         end
+  #       else
+  #        # render :nothing => true
+  #         if request.xhr?
+  #
+  #           @errors=""
+  #           @issue.errors.full_messages.each do |s|
+  #             @errors += ("<li>"+s+"</li>")
+  #           end
+  #           render :json => {
+  #
+  #               :errors=> @errors
+  #           }
+  #         end
+  #       end
+  #     end
+  #     format.js do
+  #       render :partial => "update"
+  #     end
+  #   end
+  # end
+
+  def find_issue
+    # Issue.visible.find(...) can not be used to redirect user to the login form
+    # if the issue actually exists but requires authentication
+    @issue = Issue.find(params[:id])
+    raise Unauthorized unless @issue.visible?
+    @project = @issue.project
+  rescue ActiveRecord::RecordNotFound
+    render_404
+  end
 
   # TODO: Refactor, not everything in here is needed by #edit
   def update_issue_from_params
@@ -284,9 +389,19 @@ class KanbanCardsController < ApplicationController
       return
     end
 
-    call_hook(:controller_timelog_edit_before_save, { :params => params, :time_entry => @time_entry })
+    # call_hook(:controller_timelog_edit_before_save, { :params => params, :time_entry => @time_entry })
 
-    if @time_entry.save
+    log_status = call_hook(:controller_timelog_edit_before_save, { :params => params, :time_entry => @time_entry })
+    wktime_helper = Object.new.extend(WktimeHelper)
+    status = wktime_helper.getTimeEntryStatus((params[:time_entry][:spent_on]).to_date,User.current.id)
+    wiki_status_l1 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l1" )
+    wiki_status_l2 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l2" )
+    wiki_status_l3 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l3" )
+    log_time_status = check_time_log_entry(params[:time_entry][:spent_on],User.current)
+
+
+    # log_time_status = check_time_log_entry(params[:time_entry][:spent_on],User.current)
+    if log_time_status==true && @time_entry.save
       respond_to do |format|
         format.html {
           flash[:notice] = l(:notice_successful_create)
@@ -301,18 +416,73 @@ class KanbanCardsController < ApplicationController
 
       end
     else
+
+      if status.to_s != 's' && log_time_status == false
+        if wiki_status_l1.present? || wiki_status_l2.present? || wiki_status_l3.present?
+          @time_entry.errors.add(:Note,'Your log time approved,Please contact your manger to log a time.')
+        else
+          @time_entry.errors.add(:Note,'Your log time was locked,Please contact your manger to log a time.')
+        end
+        #@time_entry.errors.add(:Note,'Your log time was locked,Please contact your manger to log a time.')
+
+      end
       respond_to do |format|
         format.html { render :action => 'new' }
         format.js {
-          @errors = ""
+          @errors=""
+          @time_entry.errors.full_messages.each do |s|
+            @errors += ("<li>"+s+"</li>")
+          end
           render :json => {
-              :errors=> @time_entry.errors.full_messages.each {|s| @errors += (s + "</br>")}
+              :errors=> @errors
           }
         }
       end
     end
   end
 
+  def check_time_log_entry(select_time,current_user)
+    days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
+    setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_nonlog_min'].to_i
+    #current_time = Time.now
+    #expire_time = Time.new(current_time.year, current_time.month, current_time.day,setting_hr,setting_min,1, "+05:30")
 
+    wktime_helper = Object.new.extend(WktimeHelper)
+
+    current_time = wktime_helper.set_time_zone(Time.now)
+    expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+    deadline_date = (current_time.to_date-days.to_i).strftime('%Y-%m-%d').to_date
+    deadline_date = UserUnlockEntry.dead_line_final_method
+    if deadline_date.present?
+      #date = date - days.to_i
+      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+    end
+    lock_status = UserUnlockEntry.where(:user_id=>current_user.id)
+    if lock_status.present?
+      lock_status_expire_time = lock_status.last.expire_time
+      if lock_status_expire_time.to_date <= expire_time.to_date
+        lock_status.delete_all
+      end
+    end
+    entry_status =  TimeEntry.where(:user_id=>current_user.id,:spent_on=>select_time.to_date.strftime('%Y-%m-%d').to_date)
+    wiki_status_l1=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l1")
+    wiki_status_l2=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l2")
+    wiki_status_l3=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l3")
+    #lock_status = UserUnlockEntry.where(:user_id=>current_user.id)
+    permanent_unlock = PermanentUnlock.where(:user_id=>current_user.id)
+    if ((select_time.to_date > deadline_date.to_date || lock_status.present?) || ( permanent_unlock.present? && permanent_unlock.last.status == true)) && (!wiki_status_l1.present? && !wiki_status_l2.present? && !wiki_status_l3.present?)
+
+      return true
+
+    elsif ((select_time.to_date == deadline_date.to_date && expire_time > current_time) || lock_status.present? || (permanent_unlock.present? && permanent_unlock.last.status == true)) && ((!wiki_status_l1.present? && !wiki_status_l2.present? && !wiki_status_l3.present?))
+
+      return true
+    else
+
+      return false
+    end
+
+  end
 
 end

@@ -42,3 +42,11 @@ en:
   label_settings_column4status: Task Status for 4th column
   label_settings_column5status: Task Status for 5th column
   label_settings_columncount: Number of columns
+  field_ir_start_date: "Start Date"
+  field_ir_end_date: "End Date"
+  field_goal: "Goal"
+  field_velocity: "Velocity"
+  label_sprints_placeholder_goal: "[Goal]"
+  label_sprints_placeholder_velocity: "[Velocity]"
+  label_sprints_title_edit: "Edit Sprint"
+  label_sprints_title_new: "New Sprint"

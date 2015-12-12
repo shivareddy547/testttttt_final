@@ -1,12 +1,20 @@
 <div class='sprints_panel <%= sprint.status == 'closed' ? 'closed_sprint' : '' %> <%= sprint.id %>' id="sprint.<%= sprint.id %>">
   <div class="sprints_panel_header">
-    <span class="fl sprint_start"><%= sprint['ir_start_date'] || l(:label_sprints_placeholder_startdate) %></span>
-    <span class="fl sprint_end"><%= sprint['ir_end_date'] || l(:label_sprints_placeholder_enddate) %></span>
-    <h3 class="fl sprint_name"><%= sprint.name %></h3>
-    <img class="fr add_tasks" src="<%= File.join(@plugin_path, 'images', 'add_task.png') %>" onclick="openIssuePopup(<%= sprint.id %>);"  title="<%= l(:label_sprints_title_add_task)  %>"/>
+    <div class="sprint_details" style="float: left;">
+      <h3 class="sprint_name"><%= sprint.name %></h3>
+    <span class="sprint_start"><%= sprint['ir_start_date'] || l(:label_sprints_placeholder_startdate) %></span>
+    <span class="sprint_end"><%= sprint['ir_end_date'] || l(:label_sprints_placeholder_enddate) %></span>
+
+    <span class="sprint_goal"><%= sprint['goal'] || l(:label_sprints_placeholder_goal) %></span>
+    <span class="sprint_velocity"><%= sprint['velocity'] || l(:label_sprints_placeholder_velocity) %></span>
+    <span class="sprint_description"><%= sprint['description'].blank? ? l(:label_sprints_placeholder_desc) : sprint['description'] %></span>
+    </div>
+    <div class="sprint_icons" style="float: right;">
+      <img class="fr add_tasks" src="<%= File.join(@plugin_path, 'images', 'add_task.png') %>" onclick="openIssuePopup(<%= sprint.id %>);"  title="<%= l(:label_sprints_title_add_task)  %>"/>
     <img class="fr fold_sprint" src="<%= File.join(@plugin_path, 'images', 'fold_sprint.png') %>" title="<%= l(:label_sprints_title_fold) %>"/>
     <img class="fr close_sprint" src="<%= File.join(@plugin_path, 'images', sprint.status == 'closed' ? 'closed_sprint.png' : 'close_sprint.png') %>" title="<%= l(:label_sprints_title_close) %>"/>
-    <span class="sprint_description"><%= sprint['description'].blank? ? l(:label_sprints_placeholder_desc) : sprint['description'] %></span>
+    <img class="fr edit_sprint" src="<%= File.join(@plugin_path, 'images', 'edit.png') %>" sprint_id="<%= sprint.id %>" title="<%= l(:label_sprints_title_edit)  %>"/>
+    </div>
   </div>
   <div class="task_list">
     <%= render :partial => "task", :collection => sprint.tasks %>

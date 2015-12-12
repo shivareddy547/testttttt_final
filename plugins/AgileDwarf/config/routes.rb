@@ -15,4 +15,9 @@ else
 
   match 'adsprints/add_issue_to_sprint', :controller => 'adsprints', :action => "add_issue_to_sprint",:via => [:get,:post]
   match 'adsprints/create_issue_to_sprint', :controller => 'adsprints', :action => "create_issue_to_sprint",:via => [:get,:post]
+  match 'adsprints/new', :controller => 'adsprints', :action => "new",:via => [:get,:post]
+  match 'adsprints/edit', :controller => 'adsprints', :action => "edit",:via => [:get,:post]
+  match 'adsprints/create_sprint', :controller => 'adsprints', :action => "create_sprint",:via => [:get,:post]
+  match 'adsprints/update_sprint', :controller => 'adsprints', :action => "update_sprint",:via => [:get,:post]
+
 end

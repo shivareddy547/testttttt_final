@@ -40,6 +40,78 @@ class AdsprintsController < ApplicationController
     @closed_status = Setting.plugin_AgileDwarf[:stclosed].to_i
   end
 
+  def create_sprint
+    @sprints = Sprints.new(params[:sprints])
+    @project_id = @project.id
+    @plugin_path = File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'AgileDwarf')
+    @closed_status = Setting.plugin_AgileDwarf[:stclosed].to_i
+    if @sprints.save
+      with_format :html do
+        @html_content = render_to_string partial: 'adsprints/sprint',:locals => { :sprint => @sprints }
+      end
+
+       respond_to do |format|
+          # render :json => { :attachmentPartial => render_to_string('adsprints/sprint_render', :layout => false, :locals => { :message => "@message" }) }
+          format.js {
+            render :json => { :sprintPartial => @html_content,:sprint_id=>@sprints.id }
+          }
+        end
+
+    else
+      # This line overrides the default rendering behavior, which
+      # would have been to render the "create" view.
+      respond_to do |format|
+      format.js {
+        @errors = ""
+        render :json => {
+                   :errors=> @sprints.errors.full_messages.each {|s| @errors += (s + "</br>")}
+               }
+      }
+        end
+    end
+
+  end
+
+
+  def update_sprint
+    # @sprints = Sprints.new(params[:sprints])
+
+    @sprints = Sprints.find(params[:sprint_id])
+
+
+    @project_id = @project.id
+    @plugin_path = File.join(Redmine::Utils.relative_url_root, 'plugin_assets', 'AgileDwarf')
+    @closed_status = Setting.plugin_AgileDwarf[:stclosed].to_i
+    if @sprints.update_attributes(params[:sprints])
+      with_format :html do
+        @html_content = render_to_string partial: 'adsprints/sprint',:locals => { :sprint => @sprints }
+      end
+
+      respond_to do |format|
+        # render :json => { :attachmentPartial => render_to_string('adsprints/sprint_render', :layout => false, :locals => { :message => "@message" }) }
+        format.js {
+          render :json => { :sprintPartial => @html_content,:sprint_id=>@sprints.id }
+        }
+      end
+
+    else
+      # This line overrides the default rendering behavior, which
+      # would have been to render the "create" view.
+      respond_to do |format|
+        format.js {
+          @errors = ""
+          render :json => {
+              :errors=> @sprints.errors.full_messages.each {|s| @errors += (s + "</br>")}
+          }
+        }
+      end
+    end
+
+  end
+
+
+
+
   def add_issue_to_sprint
     # @project = Project.find(params[:project_id])
     # respond_to do |format|
@@ -114,12 +186,18 @@ class AdsprintsController < ApplicationController
       respond_to do |format|
         format.html { render :action => 'new' }
         # format.api  { render_validation_errors(@issue) }
+        @errors=""
+        @issue.errors.full_messages.each do |s|
+          @errors += ("<li>"+s+"</li>")
+        end
         format.js {
-          @errors = ""
-          render :json => {
-                     :errors=> @issue.errors.full_messages.each {|s| @errors += (s + "</br>")}
-                 }
+            render :json => {
+                     :errors=> @errors
+              }
         }
+
+
+
       end
     end
   end
@@ -129,6 +207,17 @@ class AdsprintsController < ApplicationController
       render_error l(:error_no_default_issue_status)
       return false
     end
+  end
+
+  def new
+    # @time_entry = TimeEntry.new
+    @sprint = Sprints.new
+
+  end
+  def edit
+
+    @sprint = Sprints.find(params[:sprint_id])
+
   end
 
   private
