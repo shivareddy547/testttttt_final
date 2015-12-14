@@ -1,0 +1,42 @@
+
+<div class="members box">
+
+  <div class="contextual">
+    <%#= link_to l(:label_personalize_page), :contoller=>"dashboard",:action => 'page_layout' %>
+    <%= link_to l(:label_personalize_page), dashboard_page_layout_path(:project_id=>@project.id),:project_id=>@project.id %>
+  </div>
+
+  <h2><%=l(:label_my_page)%></h2>
+
+  <div id="list-top">
+    <%#= @blocks['top'] %>
+    <% @blocks['top'].each do |b|
+      next unless DashboardController::BLOCKS.keys.include? b  %>
+        <div class="mypage-box">
+          <%= render :partial => "dashboard/blocks/#{b}", :locals => { :user => @user,:block_name=>b } %>
+        </div>
+    <% end if @blocks['top'] %>
+  </div>
+
+  <div id="list-left" class="splitcontentleft">
+    <% @blocks['left'].each do |b|
+      next unless DashboardController::BLOCKS.keys.include? b %>
+        <div class="mypage-box">
+          <%= render :partial => "dashboard/blocks/#{b}", :locals => { :user => @user,:block_name=>b }  %>
+        </div>
+    <% end if @blocks['left'] %>
+  </div>
+
+  <div id="list-right" class="splitcontentright">
+    <% @blocks['right'].each do |b|
+      next unless DashboardController::BLOCKS.keys.include? b %>
+        <div class="mypage-box">
+          <%= render :partial => "dashboard/blocks/#{b}", :locals => { :user => @user,:block_name=>b }  %>
+        </div>
+    <% end if @blocks['right'] %>
+  </div>
+
+  <%= context_menu issues_context_menu_path %>
+
+  <% html_title(l(:label_my_page)) -%>
+</div>

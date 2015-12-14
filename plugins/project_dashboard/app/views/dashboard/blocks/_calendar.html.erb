@@ -1,0 +1,6 @@
+<h3><%= l(:label_calendar) %></h3>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<% calendar = Redmine::Helpers::Calendar.new(Date.today, current_language, :week)
+   calendar.events = dashboard_helper.calendar_items(calendar.startdt, calendar.enddt) %>
+
+<%= render :partial => 'dashboard/common/calendar', :locals => {:calendar => calendar } %>

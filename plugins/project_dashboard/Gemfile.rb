@@ -1,0 +1,2 @@
+gem 'googlecharts'
+gem "chartkick"

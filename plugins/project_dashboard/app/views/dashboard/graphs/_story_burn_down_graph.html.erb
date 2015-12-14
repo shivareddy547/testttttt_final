@@ -1,0 +1,98 @@
+<div id="story_burn_down_chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+
+<script>
+
+    var uvalue=$("#usrname").attr("value");
+    var idle_issues_count=$("#idle_issues_hours_count").attr("value");
+    var issues_count_array=$("#issues_hours_count_array").attr("value");
+    //  alert(uvalue.split(','));
+    var total_values=uvalue.split(',');
+    var idle_issues_count=idle_issues_count.split(',');
+    var issues_count_array=issues_count_array.split(',');
+    var total_spent_hours = "<%= @total_spent_hours %>"
+    var total_estimation_hours = "<%= @total_estimation_hours %>"
+
+
+    var total_dates=[<%= @total_dates.join(", ") %>]
+    $(function () {
+        $('#story_burn_down_chart').highcharts({
+            title: {
+                text: 'Story Burndown Chart',
+                x: -20 //center
+            },
+            credits:{
+
+                enabled: false
+            },
+            colors: ['blue', 'red'],
+            plotOptions: {
+                line: {
+                    lineWidth: 3
+                },
+                tooltip: {
+                    hideDelay: 200
+                }
+            },
+            subtitle: {
+                text: 'Sprint 1',
+                x: -20
+            },
+            xAxis: {
+                title: {
+                    text: 'Sprint period'
+                },
+                categories: total_values
+            },
+            yAxis: {
+                title: {
+                    text: 'Issues Stories Count'
+                },
+                allowDecimals: false,
+                plotLines: [{
+                    value: 0,
+                    width: 1
+                }]
+            },
+            tooltip: {
+                valueSuffix: 'stories',
+                crosshairs: true
+
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'Ideal Burn',
+                color: 'rgba(255,0,0,0.25)',
+                lineWidth: 2,
+                data: <%= @idle_issues_hours_count_array %>
+            }, {
+                name: 'Actual Burn',
+                color: 'rgba(0,120,200,0.75)',
+                marker: {
+                    radius: 6
+                },
+                data: <%= @issues_hours_count_array %>
+            }]
+        });
+    });
+
+
+</script>
+
+
+<script>
+    $('.story_burn_down_chart_settings_model').click(function (e) {
+        $('#ajax-modal').html('<%= escape_javascript(render :partial => 'dashboard/graphs/setting_modal') %>');
+        $('#block_id').attr("value","issues_burndown_chart")
+        $('.unmanagement_overdue_tasks').empty();
+        child =$('.issues_burn_down_trackers_statuses').children().clone();
+        $('.unmanagement_overdue_tasks').append(child);
+        showModal('ajax-modal', '450px');
+        return false;
+    });
+
+</script>

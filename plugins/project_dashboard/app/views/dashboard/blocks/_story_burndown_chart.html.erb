@@ -1,0 +1,32 @@
+<%#= render_agile_chart(@chart, @issues) if @query.valid? %>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+
+<% @total_dates,@idle_issues_hours_count_array,@issues_hours_count_array,@total_estimation_hours,@total_spent_hours = dashboard_helper.get_issues1_burn_down(@query,@project) %>
+
+<h3>
+  <%= link_to l(:label_story_burndown_chart),"#" %>
+
+  <% if controller.action_name =='page_layout' %>
+      <%= link_to image_tag("settings.png", :plugin => 'project_dashboard',:border=>0),'#', :class => 'story_burn_down_chart_settings_model' %>
+  <% end %>
+</h3>
+<%= javascript_include_tag 'highcharts', :plugin => 'project_dashboard' %>
+<%#= @idle_issues_hours_count_array.inspect %>
+<%#= @issues_hours_count_array.inspect %>
+<!--<script src='https://code.highcharts.com/highcharts.js'></script>-->
+<%= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
+<input type="hidden" name="usrname" id="usrname" value="<%= @total_dates.join(", ") %>">
+<input type="hidden" name="usrname" id="idle_issues_hours_count" value="<%= @idle_issues_hours_count_array %>">
+<input type="hidden" name="usrname" id="issues_hours_count_array" value="<%= @issues_hours_count_array %>">
+<% @setting_work_burn_down_trackers,@setting_work_burn_down_statuses=dashboard_helper.get_selected__trackers_and_statuses(@project.id,block_name) %>
+
+<div class="story_burn_down_trackers_statuses" style="display:none">
+  <p><label for="tracker selection" id="tracker_select"><%= l(:lable_select_tracker) %></label> <span class="required">*</span>   <%= select_tag "tracker_id", options_from_collection_for_select(@project.trackers, "id", "name",:selected =>@setting_work_burn_down_trackers),:multiple => true %></p>
+  <p><label for="status_selection" id="status_select"><%= l(:lable_select_status) %></label> <span class="required">*</span>  <%= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>
+</div>
+
+<%= render :partial => 'dashboard/graphs/story_burn_down_graph' %>
+
+
+
+
