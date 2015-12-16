@@ -390,7 +390,7 @@ end
         idle_issues_devide = idle_issues_devide+idle_issues_devide1
        #idle_issues_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1)
       else
-        idle_issues_devide = (@idle_issues_count.to_f/(total_no_of_days.to_f-1.0))
+        idle_issues_devide = @idle_issues_count > 0 ? (@idle_issues_count.to_f/(total_no_of_days.to_f-1.0)) : 0.0
       end
 
       @idle_issues_count_array=[]
@@ -481,7 +481,8 @@ end
         idle_issues_actual_devide = idle_issues_devide+idle_issues_second_devide
         #idle_issues_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1)
       else
-        idle_issues_actual_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1)
+        idle_issues_actual_devide = @idle_issues_hours_count > 0 ? (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1) : 0.0
+
       end
 
       @idle_issues_hours_count_array=[]
@@ -492,7 +493,7 @@ end
         else
           @idle_issues_hours_count_array << (@idle_issues_hours_count -= idle_issues_actual_devide).round
         end
-        sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',')})")
+        sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',') } #{get_sql_for_filter_query} #{get_sql_for_only_trackers})")
         if sprint_issues.present?
           # closed_issues = closed_issu.map(&:hours).compact.sum
           time_entries = TimeEntry.where(:spent_on=> start_date.to_date..each_day.to_date,:issue_id=>sprint_issues.map(&:id)).map(&:hours).compact.sum
@@ -529,9 +530,9 @@ end
 
 
   def get_story_burn_down(query,project)
-    p "+++++++++++++++++++++=end +++++++++++++++"
-    p get_sql_for_filter_query = get_sql_for_filter_query(project.id)
-    p "++++++++++++++++=="
+
+     get_sql_for_filter_query = get_sql_for_filter_query(project.id)
+
     @project= project
     dash_board_query = DashboardQuery.where(:project_id=>@project.id)
     if dash_board_query.present?
@@ -654,7 +655,7 @@ end
         idle_issues_devide = idle_issues_devide+idle_issues_devide1
         #idle_issues_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1)
       else
-        idle_issues_devide = (@idle_issues_count.to_f/(total_no_of_days.to_f-1.0))
+        idle_issues_devide = @idle_issues_count > 0 ? (@idle_issues_count.to_f/(total_no_of_days.to_f-1.0)) : 0.0
       end
 
       @idle_issues_count_array=[]
