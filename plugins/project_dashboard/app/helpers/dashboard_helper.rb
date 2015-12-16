@@ -428,7 +428,7 @@ end
 
         closed_issues = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").where("issues.start_date <= ?",Time.parse(each_day.to_date.to_s)).count
         # @idle_issues_total_count
-        issues_count = (@idle_issues_total_count.to_i-closed_issues.to_i)
+        issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_i-closed_issues.to_i) : 0.0
         @issues_count_array << issues_count rescue 0
       end
     end
@@ -482,7 +482,6 @@ end
         #idle_issues_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1)
       else
         idle_issues_actual_devide = @idle_issues_hours_count > 0 ? (@idle_issues_hours_count.to_f/total_no_of_days.to_f-1) : 0.0
-
       end
 
       @idle_issues_hours_count_array=[]
@@ -493,15 +492,16 @@ end
         else
           @idle_issues_hours_count_array << (@idle_issues_hours_count -= idle_issues_actual_devide).round
         end
-        sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',') } #{get_sql_for_filter_query} #{get_sql_for_only_trackers})")
+        sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',') })")
         if sprint_issues.present?
           # closed_issues = closed_issu.map(&:hours).compact.sum
           time_entries = TimeEntry.where(:spent_on=> start_date.to_date..each_day.to_date,:issue_id=>sprint_issues.map(&:id)).map(&:hours).compact.sum
         else
           time_entries=0
         end
-        issues_count = (@idle_issues_total_count.to_f-time_entries.to_f)
+        issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_f-time_entries.to_f) : 0.0
         @issues_hours_count_array << issues_count rescue 0
+
       end
     else
       total_no_of_days= 30
@@ -672,7 +672,7 @@ end
 
         closed_issues = Issue.find_by_sql("select * from issues INNER JOIN custom_values on issues.id=custom_values.customized_id WHERE custom_values.custom_field_id=#{story.id} and issues.start_date <='#{each_day.to_date}' and issues.fixed_version_id IN (#{find_versions.map(&:id).join(',')}) and issues.status_id=#{closed_status.id} #{get_sql_for_filter_query} #{get_sql_for_trackers_and_statuses}").compact.map(&:value).map(&:to_i).sum
         # @idle_issues_total_count
-        issues_count = (@idle_issues_total_count.to_f-closed_issues.to_f)
+        issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_f-closed_issues.to_f) : 0.0
         @issues_count_array << issues_count rescue 0
       end
     else

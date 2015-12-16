@@ -23,8 +23,8 @@
     <%= select_tag "tracker_id", options_from_collection_for_select(@trackers, "id", "name") %>
     <br>
         <label for="assigneed_to_id" class="assigneed_to_lable"><%= l(:lable_for_select_assignee) %></label>
-    <%= select_tag "assigneed_to_id",principals_options_for_select_default(@project.assignable_users, User.current),class: "assignee_select" %>
-    <%#= select_tag "assigned_to_id", principals_options_for_select(@project.assignable_users, User.current),class: "assignee_select",:include_blank => true %>
+    <%#= select_tag "assigneed_to_id",principals_options_for_select_default(@project.assignable_users, User.current),class: "assignee_select" %>
+    <%= select_tag "assigned_to_id", principals_options_for_select(@project.assignable_users, User.current),class: "assignee_select",:include_blank => true %>
        <br>
     <%= submit_tag l(:button_submit),:class=>"assign_submit" %>
 </div>
