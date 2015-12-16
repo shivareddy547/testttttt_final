@@ -24,7 +24,7 @@
                         <% @overdueissues.each do |delayed| %>
                             <%link_name = delayed.id.to_s+' - '+delayed.subject%>
                             <div style="font-size: 11px; margin-left: 5px;">
-                              <%= link_to link_name, delayed %> - <span style="color: red;"><%= (Date.today - delayed.due_date).to_i %> <%= t :days_late_text %></span>
+                              <%= link_to link_name, delayed %> - <span style="color: red;"><%= (Date.today - delayed.due_date).to_i rescue 0%> <%= t :days_late_text %></span>
                             </div>
                         <%end%>
                       </div>
