@@ -368,8 +368,9 @@ end
     if @query.present? && @query.filters.present? && @query.filters["fixed_version_id"].present?
       find_fixed_version_ids= @query.filters["fixed_version_id"].values.last
       find_versions = Version.where(:id=>find_fixed_version_ids)
-      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date rescue Date.today
-      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date rescue (Date.today-30)
+
+      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date.present? ? find_versions.sort_by(&:ir_start_date).first.ir_start_date : Date.today
+      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date.present? ? find_versions.sort_by(&:ir_end_date).last.ir_end_date : (Date.today-30)
       # start_date = find_version.ir_start_date
       # end_date = find_version.ir_end_date
       total_no_of_days = (start_date.to_date..end_date.to_date).to_a.count
@@ -449,8 +450,11 @@ end
     if @query.present? && @query.filters.present? && @query.filters["fixed_version_id"].present?
       find_fixed_version_ids= @query.filters["fixed_version_id"].values.last
       find_versions = Version.where(:id=>find_fixed_version_ids)
-      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date rescue Date.today
-      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date rescue Date.today-30
+      # start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date rescue Date.today
+      # end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date rescue Date.today-30
+      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date.present? ? find_versions.sort_by(&:ir_start_date).first.ir_start_date : Date.today
+      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date.present? ? find_versions.sort_by(&:ir_end_date).last.ir_end_date : (Date.today-30)
+
       # start_date = find_version.ir_start_date
       # end_date = find_version.ir_end_date
       total_no_of_days = (start_date.to_date..end_date.to_date).to_a.count
@@ -628,8 +632,11 @@ end
     if @query.present? && @query.filters.present? && @query.filters["fixed_version_id"].present?
       find_fixed_version_ids= @query.filters["fixed_version_id"].values.last
       find_versions = Version.where(:id=>find_fixed_version_ids)
-      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date rescue Date.today
-      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date rescue Date.today-30
+      # start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date rescue Date.today
+      # end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date rescue Date.today-30
+      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date.present? ? find_versions.sort_by(&:ir_start_date).first.ir_start_date : Date.today
+      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date.present? ? find_versions.sort_by(&:ir_end_date).last.ir_end_date : (Date.today-30)
+
       # start_date = find_version.ir_start_date
       # end_date = find_version.ir_end_date
       total_no_of_days = (start_date.to_date..end_date.to_date).to_a.count
