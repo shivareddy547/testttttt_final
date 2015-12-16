@@ -242,9 +242,8 @@ module EKanban
           end
 
           new_state = IssueStatusKanbanState.state_id(issue.status_id, issue.tracker_id)
-         p "++++++++++++++++new +++++++++++statttatat++++++++++++++="
-          p new_state
-          p new_pane = KanbanPane.pane_by(new_state,kanban)
+
+          new_pane = KanbanPane.pane_by(new_state,kanban)
           if new_pane.nil?
             errors[:status_id] = ":No Kanban Pane found that associated with this status, check your kanban setting!"
             return true
@@ -263,9 +262,7 @@ module EKanban
             old_state = card.kanban_pane.kanban_state_id
             old_pane  = card.kanban_pane
           end
-          p "+++++++++++++++++++++++++panes update +++++++++++++++++"
-          p old_pane
-          p new_pane
+
 
 
           if !KanbanWorkflow.transition_allowed?(old_state,new_state,kanban.id)

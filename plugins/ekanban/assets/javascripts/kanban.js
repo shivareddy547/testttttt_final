@@ -43,7 +43,7 @@ function kanban_init()
 
                         },
                         error: function () {
-                            alert("Error in authentication")
+//                            alert("Error in authentication")
                         }
                     });
 
@@ -177,7 +177,7 @@ function kanban_init()
 
             },
             error: function () {
-                alert("Error in authentication")
+//                alert("Error in authentication")
             }
         });
 
