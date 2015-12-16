@@ -223,7 +223,7 @@ module DashboardHelper
     #    sql="and tracker_id in (#{trackers})"
     # end
     if statuses.present?
-      sql = sql + "and status_id in (#{statuses})"
+      sql = sql + "and status_id in (#{statuses.chomp(",")})"
     end
 
     return sql
@@ -244,7 +244,7 @@ module DashboardHelper
     #    sql="and tracker_id in (#{trackers})"
     # end
     if statuses.present?
-      sql = sql + "and status_id not in (#{statuses})"
+      sql = sql + "and status_id not in (#{statuses.chomp(",")})"
     else
       sql = sql + "and status_id not in (5)"
     end
@@ -266,7 +266,7 @@ module DashboardHelper
     #    sql="and tracker_id in (#{trackers})"
     # end
     if statuses.present?
-      sql = sql + "and status_id in (#{statuses})"
+      sql = sql + "and status_id in (#{statuses.chomp(",")})"
     else
       sql = sql + "and status_id in (5)"
     end
@@ -289,7 +289,7 @@ module DashboardHelper
     #    sql="and tracker_id in (#{trackers})"
     # end
     if trackers.present?
-      sql = sql + "and tracker_id in (#{trackers})"
+      sql = sql + "and tracker_id in (#{trackers.chomp(",")})"
     end
 
     return sql
@@ -403,7 +403,7 @@ end
         end
 
         closed_status = IssueStatus.find_by_name("Closed")
-        closed_issues = @project.issues.where("fixed_version_id in (#{find_versions.map(&:id).join(',')}) #{get_sql_for_trackers_and_statuses}").where("start_date <= ? AND status_id=?",(each_day.to_date),closed_status.id).count
+        closed_issues = @project.issues.where("fixed_version_id in (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}").where("start_date <= ? AND status_id=?",(each_day.to_date),closed_status.id).count
 
         # @idle_issues_total_count
         issues_count = (@idle_issues_total_count.to_f-closed_issues.to_f)
