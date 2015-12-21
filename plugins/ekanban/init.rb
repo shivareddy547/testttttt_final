@@ -20,7 +20,7 @@ Redmine::Plugin.register :ekanban do
   author_url 'http://www.e-kaifa.com'
 
   requires_redmine :version_or_higher => '2.1.2'
-  project_module :Kanban do
+  project_module :AgileBoard do
    permission :view_kanban, :kanbans => :index
    permission :view_kanban, :kanbans => :index
    permission :sprints, {:adsprints => [:list], :adtaskinl => [:update, :inplace, :create, :tooltip], :adsprintinl => [:create, :inplace]} rescue nil
