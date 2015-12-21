@@ -77,7 +77,8 @@ class KanbanCardsController < ApplicationController
     #     format.api  { render_validation_errors(@issue) }
     #   end
     # end
-
+p "++++++++++++++issue errrorooooooooooo"
+    p @issue.errors
 
     if !saved
       @errors=""
@@ -251,19 +252,41 @@ class KanbanCardsController < ApplicationController
 # Saves @issue and a time_entry from the parameters
   def save_issue_with_child_records
     Issue.transaction do
+
+
       if params[:time_entry] && (params[:time_entry][:hours].present? || params[:time_entry][:comments].present?) && User.current.allowed_to?(:log_time, @issue.project)
         time_entry = @time_entry || TimeEntry.new
+
+        if params[:time_entry][:spent_on].present?
+          wktime_helper = Object.new.extend(WktimeHelper)
+          status = wktime_helper.getTimeEntryStatus((params[:time_entry][:spent_on]).to_date,User.current.id)
+          wiki_status_l1 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l1" )
+          wiki_status_l2 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l2" )
+          wiki_status_l3 = Wktime.where(:user_id=>User.current.id,:begin_date=>params[:time_entry][:spent_on],:status =>"l3" )
+          log_time_status = check_time_log_entry(params[:time_entry][:spent_on],User.current)
+        if log_time_status ==true
         time_entry.project = @issue.project
         time_entry.issue = @issue
         time_entry.user = User.current
         # time_entry.spent_on = User.current.today
         time_entry.attributes = params[:time_entry]
         time_entry.spent_on = params[:time_entry][:spent_on].blank? ? User.current.today : params[:time_entry][:spent_on]
-        @issue.time_entries << time_entry
+        end
+        else
+          time_entry.project = @issue.project
+          time_entry.issue = @issue
+          time_entry.user = User.current
+          # time_entry.spent_on = User.current.today
+          time_entry.attributes = params[:time_entry]
+          time_entry.spent_on = params[:time_entry][:spent_on].blank? ? User.current.today : params[:time_entry][:spent_on]
+        end
+         @issue.time_entries << time_entry
+
       end
 
       call_hook(:controller_issues_edit_before_save, { :params => params, :issue => @issue, :time_entry => time_entry, :journal => @issue.current_journal})
       if @issue.save
+        p @issue.errors
         call_hook(:controller_issues_edit_after_save, { :params => params, :issue => @issue, :time_entry => time_entry, :journal => @issue.current_journal})
       else
         raise ActiveRecord::Rollback
