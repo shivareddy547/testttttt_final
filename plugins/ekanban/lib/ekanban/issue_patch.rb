@@ -139,20 +139,11 @@ module EKanban
       module InstanceMethods
 
         def kanban_update
-          p 5555555555555555555555555555555555555555555555
-          p self.kanban_card
-          # @kanban_project = self.kanban_card
+             # @kanban_project = self.kanban_card
           # p self.kanban_card.delete
           if self.kanban_card.present? && self.kanban_card.kanban_pane.present? && self.kanban_card.kanban_pane.kanban.present?
-            p 66666666666666666666666666666666666666
-           p self.kanban_card
-            p self
-            p self.kanban_card.kanban_pane.kanban.tracker_id
-            p self.tracker_id
-            if self.kanban_card.kanban_pane.kanban.tracker_id == self.tracker_id
-              p 77777777777777777777777777
-            else
-              p 8888888888888888888888888888888888888888888
+          if self.kanban_card.kanban_pane.kanban.tracker_id == self.tracker_id
+             else
               self.kanban_card.delete if self.kanban_card.present?
             end
           end
@@ -218,16 +209,13 @@ module EKanban
 
           # card = KanbanCard.find_by_issue_id(self.id)
           card = self.kanban_card
-          p 3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
-          p self.id
           kanban = Kanban.find_by_project_id_and_tracker_id_and_is_valid(self.project_id,self.tracker_id,true)
           #only apply to issue with kanban created.
           return true if kanban.nil?
 
           # update existing issue after kanban created.
           if card.nil?
-            p card
-            p 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
             # create a 'fake' obj
             issue.status_id = @attributes_before_change["status_id"]
             issue.assigned_to = @attributes_before_change["assigned_to"]
@@ -266,8 +254,7 @@ module EKanban
 
 
           if !KanbanWorkflow.transition_allowed?(old_state,new_state,kanban.id)
-            p "++++++++++++++++++can not move +++++++++++++++++++++++++"
-            errors.add(:status_id, ":Cannot move from '#{old_pane.name}' to '#{new_pane.name}'")
+             errors.add(:status_id, ":Cannot move from '#{old_pane.name}' to '#{new_pane.name}'")
           end
 
           #assignee changed?
@@ -302,10 +289,6 @@ module EKanban
           errors.blank?
           #TODO: validate present of start_date and due_date if status is "accepted"
         end
-
-
-
-
 
       end
     end

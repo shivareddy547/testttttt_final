@@ -32,7 +32,7 @@
                 </div>
                 <div class="splitcontentright">
                   <p><%= time_entry.select :activity_id, activity_collection_for_select_options %></p>
-                  <p><%= time_entry.text_field :spent_on, :size => 10, :required => true %><%= calendar_for('time_entry_spent_on') %></p>
+
                 </div>
                 <p><%= time_entry.text_field :comments, :size => 60 %></p>
                 <% @time_entry.custom_field_values.each do |value| %>

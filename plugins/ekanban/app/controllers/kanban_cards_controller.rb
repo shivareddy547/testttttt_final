@@ -258,6 +258,7 @@ class KanbanCardsController < ApplicationController
         time_entry.user = User.current
         # time_entry.spent_on = User.current.today
         time_entry.attributes = params[:time_entry]
+        time_entry.spent_on = params[:time_entry][:spent_on].blank? ? User.current.today : params[:time_entry][:spent_on]
         @issue.time_entries << time_entry
       end
 
