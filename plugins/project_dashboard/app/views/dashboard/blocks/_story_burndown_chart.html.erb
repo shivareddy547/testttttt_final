@@ -1,7 +1,7 @@
 <%#= render_agile_chart(@chart, @issues) if @query.valid? %>
 <%  dashboard_helper = Object.new.extend(DashboardHelper) %>
 
-<% @total_dates,@idle_issues_hours_count_array,@issues_hours_count_array,@total_estimation_hours,@total_spent_hours = dashboard_helper.get_issues1_burn_down(@query,@project) %>
+<% @total_dates,@idle_issues_hours_count_array,@issues_hours_count_array,@total_estimation_hours,@total_spent_hours = dashboard_helper.get_story_burn_down(@query,@project) %>
 
 <h3>
   <%= link_to l(:label_story_burndown_chart),"#" %>
@@ -14,7 +14,7 @@
 <%#= @idle_issues_hours_count_array.inspect %>
 <%#= @issues_hours_count_array.inspect %>
 <!--<script src='https://code.highcharts.com/highcharts.js'></script>-->
-<%= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
+<%#= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
 <input type="hidden" name="usrname" id="usrname" value="<%= @total_dates.join(", ") %>">
 <input type="hidden" name="usrname" id="idle_issues_hours_count" value="<%= @idle_issues_hours_count_array %>">
 <input type="hidden" name="usrname" id="issues_hours_count_array" value="<%= @issues_hours_count_array %>">

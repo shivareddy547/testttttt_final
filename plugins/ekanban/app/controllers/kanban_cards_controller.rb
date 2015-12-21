@@ -256,7 +256,7 @@ class KanbanCardsController < ApplicationController
         time_entry.project = @issue.project
         time_entry.issue = @issue
         time_entry.user = User.current
-        time_entry.spent_on = User.current.today
+        # time_entry.spent_on = User.current.today
         time_entry.attributes = params[:time_entry]
         @issue.time_entries << time_entry
       end

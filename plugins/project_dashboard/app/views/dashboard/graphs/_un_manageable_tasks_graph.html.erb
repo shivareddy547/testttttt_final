@@ -18,11 +18,11 @@
                 <div>
                   <%if (issue.id == 1)%>
                       <b><%= issue.typemanagement %>: <%= issue.totalissues %></b>
-                      <div><%= t :manageable_text_tip %></div><br/>
+                      <!--<div><%#= t :manageable_text_tip %></div><br/>-->
                   <%else%>
-                      <b><a href="#TB_inline?height=400&width=600&inlineId=hiddenModalContentUnmanageable&modal=false" title='<%= issue.typemanagement %>: <%= issue.totalissues %>' class="thickbox"><%= issue.typemanagement %>: <%= issue.totalissues %></a></b>
-                      <div><%= t :unmanageable_text_tip %></div>
-                      <div id="hiddenModalContentUnmanageable" style="display: none;">
+                      <b><a href="#TB_inline?height=400&width=600&inlineId=hiddenModalContentUnmanageable&modal=false" onclick="unmanageblePopup();" title='<%= issue.typemanagement %>: <%= issue.totalissues %>' class="thickbox"><%= issue.typemanagement %>: <%= issue.totalissues %></a></b>
+                      <!--<div><%#= t :unmanageable_text_tip %></div>-->
+                      <div id="hiddenModalContentUnmanageable" style="display: none;" title="Unmanageable Issues">
                         <% @unmanagementissues.each do |unmanagementissue| %>
                             <% link_unmanagementissue = unmanagementissue.id.to_s+' - '+unmanagementissue.subject %>
                             <div style="font-size: 11px; margin-left: 5px;"><%= link_to link_unmanagementissue, unmanagementissue %></div>
@@ -36,6 +36,20 @@
         <p id="notice"><%= notice %></p>
       </div>
       <script type="text/javascript">
+
+          function unmanageblePopup()
+          {
+              var w = "600px";
+              var h="400px"
+              $("#hiddenModalContentUnmanageable").dialog({
+                  autoOpen: true,
+                  //modal: isModal,
+                  width: w
+//                height: "400px"
+              });
+          }
+
+
           $(function () {
               var chart;
               $(document).ready(function() {

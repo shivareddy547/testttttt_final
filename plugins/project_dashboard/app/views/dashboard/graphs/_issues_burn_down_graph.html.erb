@@ -14,7 +14,7 @@
     $(function () {
         $('#issues_burn_down_chart').highcharts({
             title: {
-                text: 'Burndown Chart',
+                text: '',
                 x: -20 //center
             },
             credits:{
@@ -31,7 +31,7 @@
                 }
             },
             subtitle: {
-                text: 'Sprint',
+                text: '',
                 x: -20
             },
             xAxis: {
@@ -67,7 +67,7 @@
                 lineWidth: 2,
                 data: <%= @idle_issues_count_array %>
             }, {
-                name: 'Actual Burn',
+                name: 'Remain to Burn',
                 color: 'rgba(0,120,200,0.75)',
                 marker: {
                     radius: 6

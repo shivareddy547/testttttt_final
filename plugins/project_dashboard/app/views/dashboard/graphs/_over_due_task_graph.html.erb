@@ -19,9 +19,9 @@
                 <div>
                   <%if (
                   issue.id == 2)%>
-                      <b><a href="#TB_inline?height=400&width=600&inlineId=hiddenModalContentOverdue&modal=false" title='<%=issue.typeissue%>(<%=issue.totalissuedelayed%>)' class="thickbox"><%=issue.typeissue%>: <%=issue.totalissuedelayed%></a></b>
-                      <div id="hiddenModalContentOverdue" style="display: none;">
-                        <% @overdueissues.each do |delayed| %>
+                      <b><a href="#TB_inline?height=400&width=600&inlineId=hiddenModalContentOverdue&modal=false" onclick="overduePopup();" title='<%=issue.typeissue%>(<%=issue.totalissuedelayed%>)' class="thickbox"><%=issue.typeissue%>: <%=issue.totalissuedelayed%></a></b>
+                    <div id="hiddenModalContentOverdue" style="display: none;" title="Overdue Issues">
+                      <% @overdueissues.each do |delayed| %>
                             <%link_name = delayed.id.to_s+' - '+delayed.subject%>
                             <div style="font-size: 11px; margin-left: 5px;">
                               <%= link_to link_name, delayed %> - <span style="color: red;"><%= (Date.today - delayed.due_date).to_i rescue 0%> <%= t :days_late_text %></span>
@@ -38,7 +38,22 @@
 
 
 
+
+
       <script type="text/javascript">
+
+        function overduePopup()
+        {
+            var w = "600px";
+            var h="400px"
+            $("#hiddenModalContentOverdue").dialog({
+                autoOpen: true,
+                //modal: isModal,
+                width: w
+//                height: "400px"
+            });
+        }
+
           $(function () {
               var chart;
               $(document).ready(function() {
@@ -87,10 +102,6 @@
           });
 
       </script>
-
-
-
-
 
 <% else %>
       <div id="errorExplanation"><%=t :time_mgmt_error_no_issues_found_text %></div>

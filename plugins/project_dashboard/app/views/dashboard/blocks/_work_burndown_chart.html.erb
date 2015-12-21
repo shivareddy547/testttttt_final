@@ -13,7 +13,7 @@
 <%#= @idle_issues_hours_count_array.inspect %>
 <%#= @issues_hours_count_array.inspect %>
 <!--<script src='https://code.highcharts.com/highcharts.js'></script>-->
-<%= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
+<%#= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
 <input type="hidden" name="usrname" id="usrname" value="<%= @total_dates.join(", ") %>">
 <input type="hidden" name="usrname" id="idle_issues_hours_count" value="<%= @idle_issues_hours_count_array %>">
 <input type="hidden" name="usrname" id="issues_hours_count_array" value="<%= @issues_hours_count_array %>">

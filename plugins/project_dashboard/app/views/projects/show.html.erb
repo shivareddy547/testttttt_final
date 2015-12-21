@@ -1,3 +1,5 @@
+<h2><%=l(:label_overview)%></h2>
+
 <%= form_tag({ :controller => 'dashboard', :action => 'filter_query', :project_id => @project.id },
              :method => :get, :id => 'query_form') do %>
     <div id="query_form_with_buttons" class="hide-when-print">
@@ -27,7 +29,7 @@
 
 
 
-<h2><%=l(:label_overview)%></h2>
+
 <%= render :partial => 'mypage' %>
 <% unless @project.active? %>
     <p class="warning"><span class="icon icon-lock"><%= l(:text_project_closed) %></span></p>

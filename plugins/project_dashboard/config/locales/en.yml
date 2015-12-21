@@ -69,4 +69,5 @@ en:
     lable_select_tracker_status: "Select Tracker and Status"
     label_issues_burn_down_chart: "Issues Burn Down Chart"
     label_work_burn_down_chart: "Work Burn Down Chart"
+    label_work_burndown_chart: "Work Burn Down Chart"
     label_story_burndown_chart: "Story Burn down chart"

@@ -10,7 +10,7 @@
   <% end %>
 </h3>
 <%= javascript_include_tag 'highcharts', :plugin => 'project_dashboard' %>
-<%= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
+<%#= javascript_include_tag 'js/index.js', :plugin => 'ekanban' %>
 <input type="hidden" name="usrname" id="usrname" value="<%= @total_dates.join(", ") %>">
 <input type="hidden" name="usrname" id="idle_issues_count" value="<%= @idle_issues_count_array %>">
 <input type="hidden" name="usrname" id="issues_count_array" value="<%= @issues_count_array %>">
