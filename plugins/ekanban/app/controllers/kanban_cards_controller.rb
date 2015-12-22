@@ -81,6 +81,7 @@ p "++++++++++++++issue errrorooooooooooo"
     p @issue.errors
 
     if !saved
+      return unless update_issue_from_params
       @errors=""
       @issue.errors.full_messages.each do |s|
         @errors += ("<li>"+s+"</li>")
@@ -97,11 +98,13 @@ p "++++++++++++++issue errrorooooooooooo"
             }
           end
         else
+
           # render :nothing => true
           if request.xhr?
 
             @errors=""
-            @issue.errors.full_messages.each do |s|
+            @messages = @time_log_messages+@issue.errors.full_messages
+            @messages.each do |s|
               @errors += ("<li>"+s+"</li>")
             end
             render :json => {
@@ -253,10 +256,13 @@ p "++++++++++++++issue errrorooooooooooo"
   def save_issue_with_child_records
     Issue.transaction do
 
-
+      @time_log_messages=[]
       if params[:time_entry] && (params[:time_entry][:hours].present? || params[:time_entry][:comments].present?) && User.current.allowed_to?(:log_time, @issue.project)
         time_entry = @time_entry || TimeEntry.new
-
+        # @time_log_messages=[]
+        if params[:time_entry][:activity_id].blank?
+          @time_log_messages << "Activity can't be blank"
+        end
         if params[:time_entry][:spent_on].present?
           wktime_helper = Object.new.extend(WktimeHelper)
           status = wktime_helper.getTimeEntryStatus((params[:time_entry][:spent_on]).to_date,User.current.id)
@@ -271,6 +277,8 @@ p "++++++++++++++issue errrorooooooooooo"
         # time_entry.spent_on = User.current.today
         time_entry.attributes = params[:time_entry]
         time_entry.spent_on = params[:time_entry][:spent_on].blank? ? User.current.today : params[:time_entry][:spent_on]
+        else
+          @time_log_messages << "Note Your log time was locked,Please contact your manger to log a time."
         end
         else
           time_entry.project = @issue.project
@@ -293,6 +301,8 @@ p "++++++++++++++issue errrorooooooooooo"
       end
     end
   end
+
+
 
 
   def card_filelds_setup
