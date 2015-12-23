@@ -134,10 +134,10 @@ module DashboardHelper
     stringSqlProjectsSubProjects = return_ids(project_id)
     get_sql_for_filter_query = get_sql_for_filter_query(project_id)
     Issue.find_by_sql("select 1 as id, 'Manageable(s)' as typemanagement, count(1) as totalissues
-                                                from issues  where project_id in (#{stringSqlProjectsSubProjects})  #{get_sql_for_trackers_and_statuses_unmanage} #{get_sql_for_filter_query} and due_date is not null
+                                                from issues  where project_id in (#{stringSqlProjectsSubProjects})  #{get_sql_for_trackers_and_statuses_unmanage} #{get_sql_for_filter_query} and (due_date+0) > 0
                                                 union
                                                 select 2 as id, 'Unmanageable(s)' as typemanagement, count(1) as totalissues
-                                                from issues  where project_id in (#{stringSqlProjectsSubProjects})  #{get_sql_for_trackers_and_statuses_unmanage} and due_date is null  #{get_sql_for_filter_query};")
+                                                from issues  where project_id in (#{stringSqlProjectsSubProjects})  #{get_sql_for_trackers_and_statuses_unmanage} and (due_date+0)=0  #{get_sql_for_filter_query};")
 
   end
 
@@ -200,9 +200,10 @@ module DashboardHelper
     stringSqlProjectsSubProjects = return_ids(project_id)
     get_sql_for_filter_query = get_sql_for_filter_query(project_id)
     get_sql_for_trackers_and_statuses_unmanage = get_sql_for_trackers_and_statuses_unmanage(project_id,block_name)
+
     Issue.find_by_sql("select *
                                from issues  where project_id in (#{stringSqlProjectsSubProjects}) #{get_sql_for_trackers_and_statuses_unmanage} #{get_sql_for_filter_query}
-                               and due_date is null
+                               and (due_date+0)=0
                                order by 1;")
 
   end
