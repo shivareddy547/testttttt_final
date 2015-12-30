@@ -1,0 +1,31 @@
+<td>
+    <%= select_tag "user_billable", options_for_select(["Billable", "Non Billable" ], !member.billable.nil? ? member.billable==true ? "Billable" : "Non Billable" : "") ,include_blank: true,:member_id=>member.id,:disabled => true %>
+  <%= hidden_field_tag 'billable_status', member.billable,:id=>"member_billable_status",:member_id=>member.id,:billable_status=>member.billable %>
+
+</td>
+<td>
+<div class="member-<%=member.id%>-capacity" id="member_capacity">
+    <div style="width:60px;">
+    <span id="available_capacity" style="float:left; display:inline;color:#f6931f; font-weight:bold;">Available:<%= Member.available_capacity(member)  %>%</span>
+    <span id="completed_capacity" style="float:left; display:inline;color:#808080; font-weight:bold; ">Used:<%= Member.capacity(member)  %>%</span>
+    <span id="selected_capacity" style="float:left; display:inline;color:#8ae234; font-weight:bold; ">Selected:0%</span>
+    <input type="hidden" id="member_id" value="<%= member.id  %>" member_id="<%=member.id %>">
+    <input type="hidden" id="current_capacity" value="<%=  Member.current_project_capacity(member) %>" member_id="<%=member.id %>">
+    <input type="hidden" id="available_capacity" value="<%=   Member.available_capacity(member) %>%" member_id="<%=member.id %>">
+    <input type="hidden" id="selected_capacity" value="" member_id="<%=member.id %>">
+    <input type="hidden" id="other_capacity" value="<%=  Member.other_capacity(member) %>" member_id="<%=member.id %>">
+    <div id="capacity_chart_<%=member.id %>" style="width: 150px; height: 150px;"></div>
+    <!--<div id="donut_single" style="width: 150px; height: 150px;"></div>-->
+
+  </div>
+  <!--<label for="amount">Used:</label>-->
+
+   <div id="div_member_capacity_slider"></div>
+  <%= hidden_field_tag 'member_capacity', member.capacity,:member_id=>member.id %>
+</div>
+
+</td>
+
+
+
+

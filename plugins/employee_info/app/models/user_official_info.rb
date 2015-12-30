@@ -1,6 +1,6 @@
 class UserOfficialInfo < ActiveRecord::Base
   unloadable
-  belongs_to :user
+  belongs_to :user,dependent: :destroy
   validates :employee_id, :presence => true,length: { maximum: 8 }
 
   def self.update_employee_ids
@@ -22,6 +22,8 @@ class UserOfficialInfo < ActiveRecord::Base
      user_info = UserOfficialInfo.find_or_create_by_user_id(:user_id=>user_id)
      user_info.employee_id=employee_id
      user_info.save
-   end
+  end
+
+
 
 end

@@ -1,0 +1,140 @@
+<%= error_messages_for 'member' %>
+<% roles = Role.find_all_givable
+   members = @project.member_principals.includes(:member_roles, :roles, :principal).all.sort %>
+
+<div class="splitcontentleft">
+  <% if members.any? %>
+      <table class="list members">
+        <thead>
+        <tr>
+          <th><%= l(:label_user) %> / <%= l(:label_group) %></th>
+          <th><%= l(:label_role_plural) %></th>
+          <th style="width:15%"></th>
+          <%= call_hook(:view_projects_settings_members_table_header, :project => @project) %>
+        </tr>
+        </thead>
+        <tbody>
+
+        <% manager_role_id = Role.where(:name=>'Manager').first.id %>
+        <% @manager_id = members.collect{|member| member.user.id if member.member_roles.present? && member.member_roles.first.id == manager_role_id }.compact %>
+        <% members.each do |member| %>
+            <% next if member.new_record? %>
+            <tr id="member-<%= member.id %>" class="<%= cycle 'odd', 'even' %> member">
+              <td class="name <%= member.principal.class.name.downcase %>"><%= link_to_user member.principal %></td>
+
+              <td class="roles">
+                <span id="member-<%= member.id %>-unlock"><%= member.roles.sort.collect(&:to_s).join(', ') %></span>
+
+                <%= form_for(member,
+                             {:as => :membership, :remote => true,
+                              :url => wktime_unlock_users_path,
+                              :method => :put,
+                              :html => { :id => "member-#{member.id}-unlock-form", :class => 'hol' }}
+                    ) do |f| %>
+                    <p>
+                      <span id="unlock_error_<%= member.id %>" style="color:red;display:block;">Please enter comment.</span>
+                      <%= text_area_tag 'comment' %>
+                      <%= hidden_field_tag 'user_id', member.user_id %>
+                      <%= hidden_field_tag 'manager_id', @manager_id %>
+                      <%= hidden_field_tag 'permission', 'true' %>
+                    </p>
+                    <p>
+                      <%= link_to_function(l(:button_save),"validate_unlock_comment(#{member.id})") %>
+                      <%= link_to_function(l(:button_cancel),
+                                           "$('#member-#{member.id}-unlock-form').hide();$('#unlock_error_#{member.id}').hide();$('#member-#{member.id}-unlock').show();$('#member-#{member.id}-unlock-form #comment').attr('value', ''); return false;") %>
+                    </p>
+                <% end %>
+                <td class="roles">
+                  <%= form_for(member,
+                               {:as => :membership, :remote => true,
+                                :url => membership_path(member),
+                                :method => :put,
+                                :html => { :id => "member-#{member.id}-roles-form", :class => 'hol' }}
+                      ) do |f| %>
+                      <p>
+                        <% roles.each do |role| %>
+                            <label>
+                              <%= check_box_tag('membership[role_ids][]',
+                                                role.id, member.roles.include?(role),
+                                                :id => nil,
+                                                :disabled => member.member_roles.detect {
+                                                        |mr| mr.role_id == role.id && !mr.inherited_from.nil?
+                                                } ) %> <%= role %>
+                            </label><br />
+                        <% end %>
+                      </p>
+                      <%= hidden_field_tag 'membership[role_ids][]', '' %>
+                      <p>
+                        <%= submit_tag l(:button_save), :class => "small" %>
+
+                        <%= link_to_function(l(:button_cancel),
+                                             "$('#member-#{member.id}-roles').show(); $('#member-#{member.id}-roles-form').hide(); return false;") %>
+
+                      </p>
+                  <% end %>
+                </td>
+                <%= call_hook(:view_projects_settings_members_table_row, { :project => @project, :member => member}) %>
+                <td class="buttons">
+                  <% user_unlock_status = UserUnlockEntry.user_lock_status(member.user_id)  %>
+                  <% user_lock_status = UserUnlockEntry.lock_status(member.user_id)  %>
+                  <% if user_unlock_status == true %>
+                      <%= link_to_function l(:button_unlock),
+                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');$('#unlock_error_#{member.id}').hide(); return false;",
+                                           :class => "icon icon-unlock icon-unlock-#{member.user_id} btn" %>
+                      <%= link_to_function l(:button_lock),
+                                           "lock_user(#{member.user_id});return false;",
+                                           :class => "icon icon-lock icon-lock-#{member.user_id} btn",:style=>"display:none;" %>
+                  <% elsif user_lock_status == true %>
+                      <%= link_to_function l(:button_lock),
+                                           "lock_user(#{member.user_id});return false;",
+                                           :class => "icon icon-lock icon-lock-#{member.user_id} btn" %>
+                      <%= link_to_function l(:button_unlock),
+                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');$('#unlock_error_#{member.id}').hide(); return false;",
+                                           :class => "icon icon-unlock icon-unlock-#{member.user_id} btn",:style=>"display:none;" %>
+
+                  <%end%>
+                  <%= link_to_function l(:button_edit),
+                                       "$('#member-#{member.id}-roles').hide(); $('#member-#{member.id}-roles-form').show(); return false;",
+                                       :class => 'icon icon-edit' %>
+                  <%= delete_link membership_path(member),
+                                  :remote => true,
+                                  :data => (!User.current.admin? && member.include?(User.current) ? {:confirm => l(:text_own_membership_delete_confirmation)} : {}) if member.deletable? %>
+                </td>
+
+                </tr>
+        <% end; reset_cycle %>
+        </tbody>
+      </table>
+  <% else %>
+      <p class="nodata"><%= l(:label_no_data) %></p>
+  <% end %>
+</div>
+
+<div class="splitcontentright">
+  <% if roles.any? %>
+      <%= form_for(@member,
+                   {:as => :membership, :url => project_memberships_path(@project),
+                    :remote => true, :method => :post}) do |f| %>
+          <fieldset>
+            <legend><%=l(:label_member_new)%></legend>
+            <%= call_hook(:view_projects_settings_members_new_user_header, :project => @project) %>
+
+            <p>
+              <%= label_tag("principal_search", l(:label_principal_search)) %>
+              <%= text_field_tag('principal_search', nil) %>
+            </p>
+            <%= javascript_tag "observeSearchfield('principal_search', null, '#{ escape_javascript autocomplete_project_memberships_path(@project, :format => 'js') }')" %>
+            <div id="principals_for_new_member">
+              <%= render_principals_for_new_members(@project) %>
+            </div>
+            <p>
+              <%= l(:label_role_plural) %>:
+              <% roles.each do |role| %>
+                  <label><%= check_box_tag 'membership[role_ids][]', role.id, false, :id => nil %> <%= role %></label>
+              <% end %>
+            </p>
+            <p><%= submit_tag l(:button_add), :id => 'member-add-submit' %></p>
+          </fieldset>
+      <% end %>
+  <% end %>
+</div>

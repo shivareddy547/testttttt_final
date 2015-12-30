@@ -1,0 +1,35 @@
+#red, #div_member_capacity_slider, #blue {
+    float: left;
+    clear: left;
+    width: 150px;
+    margin: 15px;
+    background: #808080;
+}
+
+#div_member_capacity_slider .ui-slider-range { background: #006600; }
+#div_member_capacity_slider .ui-slider-handle { border-color: #006600; }
+
+.task_doneratio_slide
+{
+    margin: 5px;
+    width: 50%;
+    float: left;
+}
+
+
+tr.odd rect  {
+    fill: #f6f7f8 !important;
+}
+
+tr.even rect {
+    fill: #fff !important;
+}
+
+
+tr:hover rect  {
+    fill: #ffffdd !important;
+}
+
+
+
+
