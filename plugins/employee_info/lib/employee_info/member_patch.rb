@@ -9,7 +9,7 @@ module EmployeeInfo
           validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"}
           validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
-          validates :capacity,presence:true, numericality: {greater_than: 0}
+          validates :capacity,presence:true, numericality: {greater_than: 0,:message=>"Utilization should be grater than zero"}
           def validate_billable
             if !self.billable.present?
                errors.add(:Billable, "can not be blank for #{self.user.firstname.present? ? self.user.firstname : "" }")
