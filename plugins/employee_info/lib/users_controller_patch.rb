@@ -84,6 +84,22 @@ module UsersControllerPatch
         end
       end
 
+     def edit_membership
+       @membership = Member.edit_membership(params[:membership_id], params[:membership], @user)
+
+       if params[:membership].present?
+         @membership.role_ids = params[:membership][:role_ids]
+         @membership.billable=params[:billable]
+         @membership.capacity=params[:capacity].present? ? params[:capacity].to_f/100 : 0.0
+       end
+
+       @membership.save
+       respond_to do |format|
+         format.html { redirect_to edit_user_path(@user, :tab => 'memberships') }
+         format.js
+       end
+     end
+
 
   end
   end

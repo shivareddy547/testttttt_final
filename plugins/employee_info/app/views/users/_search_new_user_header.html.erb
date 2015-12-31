@@ -1,0 +1,18 @@
+<div class="capacity_slider_inline">
+  <label for="billable">Billable / Non Billable<span class="required"> *</span></label>
+  <%= select_tag "billable", options_for_select(["Billable", "Non Billable" ], "") ,prompt: "--select--" %>
+  <%= hidden_field_tag 'capacity', "" %>
+  <%= hidden_field_tag 'member_total_capacity', User.capacity(@user).to_i %>
+
+</div>
+<div class="capacity_slider_inline">
+  <label for="billable">Utilization:<span class="required"> *</span></label>
+  <div id="div_member_capacity_slider"></div></br>
+</div>
+
+
+
+
+
+
+

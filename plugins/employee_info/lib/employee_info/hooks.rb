@@ -19,10 +19,20 @@ module EmployeeInfo
       :partial => "official_info/form"
     render_on :view_projects_settings_members_table_header,
               :partial => "members/header_form"
+    render_on :view_users_memberships_table_header,
+              :partial => "users/member_header_form"
     render_on :view_projects_settings_members_table_row,
               :partial => "members/row_form"
+
+    render_on :view_users_memberships_table_row,
+              :partial => "users/member_row_form"
+
     render_on :view_projects_settings_members_new_user_header,
               :partial => "members/search_new_user_header"
+
+    render_on :view_users_new_user_header,
+              :partial => "users/admin_search_new_user_header"
+
     render_on :view_layouts_base_html_head,
               :partial => "members/header_render_js"
     # Render image paste form on every page,

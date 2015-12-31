@@ -47,16 +47,18 @@ $(document).on('change', '#user_billable', function(event) {
 
 });
 
-$(document).on('click', 'table.members .icon-edit', function(event) {
+$(document).on('click', 'table.memberships .icon-edit', function(event) {
     event.stopImmediatePropagation();
-    console.log(11111111111111111113333333333333333111111)
+    console.log(1111111111111111111111111)
     $(this).closest('tr').find("#user_billable").attr("disabled", false);
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
     var member_id = $(this).closest('tr').find("#member_billable_status").attr("member_id");
     $('#member-'+member_id+'-roles-form').find('a').attr('id', 'cancel_member');
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
+
     $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
+    $(this).closest('tr').find("#div_member_capacity_slider").show();
     //console.log(billable_status);
     //console.log(member_id);
 
@@ -97,11 +99,11 @@ $(document).on('change', '#billable', function(event) {
     event.stopImmediatePropagation();
 
     if($(this).val()) {
-        $("#new_membership").find('[name=commit]').attr("disabled", false);
+        $("#user_new_membership").find('[name=commit]').attr("disabled", false);
     }
     else{
         alert("Error:Please Select Billable Or Non Billable")
-        $("#new_membership").find('[name=commit]').attr("disabled", true);
+        $("#user_new_membership").find('[name=commit]').attr("disabled", true);
     }
 
 
@@ -118,7 +120,7 @@ $(document).on('change', '#billable', function(event) {
 $( document ).ready(function() {
     // Handler for .ready() called.
 
-    $(".list.members #member_capacity").each(function() {
+    $(".list.memberships #member_capacity").each(function() {
 
         var current_capacity = $(this).find("input#current_capacity").val();
         var available_capacity = $(this).find("input#available_capacity").val();
@@ -282,9 +284,9 @@ $(document).on('click', 'input#member_ship_check', function() {
 //        $(this).attr("member_available");
         var member_available_value = $(this).attr("member_available_value");
 
-        $("form#new_membership #member_capacity").val(member_available_value);
+        $("form#user_new_membership #member_capacity").val(member_available_value);
 
-        $("form#new_membership #div_member_capacity_slider").slider({
+        $("form#user_new_membership #div_member_capacity_slider").slider({
             range: "min",
             step: 25,
             value: member_available_value,
@@ -293,7 +295,7 @@ $(document).on('click', 'input#member_ship_check', function() {
             slide: function (event, ui) {
                 tooltip.text(ui.value);
                 $(this).find("input#member_capacity" ).val(ui.value);
-                $("form#new_membership #member_capacity").val(ui.value);
+                $("form#user_new_membership #member_capacity").val(ui.value);
             },
             change: function (event, ui) {
             }
@@ -305,7 +307,7 @@ $(document).on('click', 'input#member_ship_check', function() {
         );
     }
     var member_available_value = $(this).attr("member_available_value");
-    var available_value = $("form#new_membership #member_capacity").val();
+    var available_value = $("form#user_new_membership #member_capacity").val();
     console.log(member_available_value)
     console.log(available_value)
 
@@ -319,7 +321,7 @@ $(document).on('click', 'input#member_ship_check', function() {
     if(uniq_result.count > 1)
     {
         alert("Error:Please Select available members")
-        $("#new_membership").find('[name=commit]').attr("disabled", true);
+        $("#user_new_membership").find('[name=commit]').attr("disabled", true);
     }
 
 });
@@ -340,17 +342,32 @@ $( document ).ready(function() {
         left: -10
     }).hide();
 
-    $("form#new_membership #div_member_capacity_slider").slider({
+    var current_capacity = $(this).find("input#current_capacity").val();
+//    var available_capacity = $(this).find("input#available_capacity").val();
+    var other_capacity = $(this).find("input#member_total_capacity").val();
+    var available_capacity = $(this).find("input#available_capacity").val();
+
+    $("form#user_new_membership #div_member_capacity_slider").slider({
         range: "min",
         step: 25,
-        value: 0,
+        value: other_capacity,
         min: 0,
         max: 100,
         slide: function (event, ui) {
             tooltip.text(ui.value);
             $(this).find("input#member_capacity" ).val(ui.value);
-
-            $("form#new_membership #member_capacity").val(ui.value);
+            console.log(11111111111111111)
+            console.log(ui.value)
+            console.log(other_capacity)
+            console.log(3333333333333)
+            if(ui.value < other_capacity )
+            {
+                return false;
+            }
+            var current_selected_capacity=(ui.value-other_capacity);
+            console.log(current_selected_capacity);
+            $("form#user_new_membership #member_capacity").val(ui.value);
+            $("form#user_new_membership #capacity").val(current_selected_capacity);
 
         },
         change: function (event, ui) {

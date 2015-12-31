@@ -6,10 +6,10 @@ module EmployeeInfo
         # base.send(:include, InstanceMethods)
         base.class_eval do
           # validate :validate_billable
-          validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"},if: :validate_with_class?
-          validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable,if: :validate_with_class?
+          validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"}
+          validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
-          validates :capacity,presence:true, numericality: {greater_than: 0},if: :validate_with_class?
+          validates :capacity,presence:true, numericality: {greater_than: 0}
           def validate_billable
             if !self.billable.present?
                errors.add(:Billable, "can not be blank for #{self.user.firstname.present? ? self.user.firstname : "" }")
@@ -21,6 +21,11 @@ module EmployeeInfo
 
           def self.capacity(member)
             total_capacity =   Member.where(:user_id=>member.user_id).map(&:capacity).sum
+            return total_capacity*100
+          end
+
+          def self.user_capacity(id)
+            total_capacity =   Member.where(:user_id=>id).map(&:capacity).sum
             return total_capacity*100
           end
 
@@ -41,14 +46,30 @@ module EmployeeInfo
             return other_capacity*100
           end
 
-          def self.user_available_capacity(user)
-            total_capacity =  Member.where(:user_id=>user.id).map(&:capacity).sum
+          def self.user_available_capacity(id)
+            total_capacity =  Member.where(:user_id=>id).map(&:capacity).sum
             available_capacity = (1-total_capacity)*100
             return available_capacity
           end
 
+# user
+#           def self.available_capacity(id)
+#             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
+#             available_capacity = (1-total_capacity)*100
+#             return available_capacity
+#           end
+#
+#
+#           def self.other_capacity(id)
+#             current_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
+#             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
+#             other_capacity = total_capacity.to_f - current_capacity.to_f
+#             return other_capacity*100
+#           end
+
+
           def concat_user_name_with_mail
-           return "#{self.user.firstname}#{self.user.lastname}<#{self.user.mail}>"
+           return "#{self.user.firstname rescue ""}#{self.user.lastname rescue ""}<#{self.user.mail rescue ""}>"
           end
           def used_capacity
             return self.capacity*100

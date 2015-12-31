@@ -2,4 +2,4 @@
 en:
   # my_label: "My label"
   billable_label: "Billable / Non Billable"
-  capacity_label: "Capacity"
+  capacity_label: "Utilization"
