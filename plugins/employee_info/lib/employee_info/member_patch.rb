@@ -10,13 +10,14 @@ module EmployeeInfo
           validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
           validates :capacity,presence:true, numericality: {greater_than: 0,:message=>"Utilization should be grater than zero"}
+          validates :capacity,presence:true, numericality: {less_than: 101,:message=>"Utilization should not be grater than 100"}
           def validate_billable
             if !self.billable.present?
                errors.add(:Billable, "can not be blank for #{self.user.firstname.present? ? self.user.firstname : "" }")
             end
           end
           def validate_with_class?
-            !User.current.admin? && self.user.class.name =="User"
+              self.user.class.name == "User"
           end
 
           def self.capacity(member)
