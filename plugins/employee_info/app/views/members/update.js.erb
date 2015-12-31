@@ -173,9 +173,9 @@ $(document).on('click', 'input#member_ship_check', function() {
 //        $(this).attr("member_available");
         var member_available_value = $(this).attr("member_available_value");
 
-        $("form#edit_membership #member_capacity").val(member_available_value);
+        $("form#new_membership #member_capacity").val(member_available_value);
 
-        $("form#edit_membership #div_member_capacity_slider").slider({
+        $("form#new_membership #div_member_capacity_slider").slider({
             range: "min",
             step: 25,
             value: member_available_value,
@@ -184,7 +184,7 @@ $(document).on('click', 'input#member_ship_check', function() {
             slide: function (event, ui) {
                 tooltip.text(ui.value);
                 $(this).find("input#member_capacity" ).val(ui.value);
-                $("form#edit_membership #member_capacity").val(ui.value);
+                $("form#new_membership #member_capacity").val(ui.value);
             },
             change: function (event, ui) {
             }
@@ -196,11 +196,11 @@ $(document).on('click', 'input#member_ship_check', function() {
         );
     }
     var member_available_value = $(this).attr("member_available_value");
-    var available_value = $("form#edit_membership #member_capacity").val();
+    var available_value = $("form#new_membership #member_capacity").val();
     console.log(member_available_value)
     console.log(available_value)
 
-    if(parseInt(member_available_value) < parseInt(available_value) || parseInt(member_available_value) <=)
+    if(parseInt(member_available_value) < parseInt(available_value) || (parseInt(member_available_value) <=0))
     {
         console.log(3333)
         $(this).prop('checked', false);
@@ -210,7 +210,7 @@ $(document).on('click', 'input#member_ship_check', function() {
     if(uniq_result.count > 1)
     {
         alert("Error:Please Select available members")
-        $("#edit_membership").find('[name=commit]').attr("disabled", true);
+        $("#new_membership").find('[name=commit]').attr("disabled", true);
     }
 
 });
@@ -231,7 +231,7 @@ $( document ).ready(function() {
         left: -10
     }).hide();
 
-    $("form#edit_membership #div_member_capacity_slider").slider({
+    $("form#new_membership #div_member_capacity_slider").slider({
         range: "min",
         step: 25,
         value: 0,
@@ -241,7 +241,7 @@ $( document ).ready(function() {
             tooltip.text(ui.value);
             $(this).find("input#member_capacity" ).val(ui.value);
 
-            $("form#edit_membership #member_capacity").val(ui.value);
+            $("form#new_membership #member_capacity").val(ui.value);
 
         },
         change: function (event, ui) {
@@ -256,35 +256,35 @@ $( document ).ready(function() {
 
 
 
-//$( document ).ready(function() {
-//    var tooltip = $('<div id="tooltip" />').css({
-//        position: 'absolute',
-//        top: -25,
-//        left: -10
-//    }).hide();
-//
-//    $("form#edit_membership #div_member_capacity_slider").slider({
-//        range: "min",
-//        step: 25,
-//        value: 0,
-//        min: 0,
-//        max: 100,
-//        slide: function (event, ui) {
-//            tooltip.text(ui.value);
-//            $(this).find("input#member_capacity" ).val(ui.value);
-//
-//            $("form#edit_membership #member_capacity").val(ui.value);
-//
-//        },
-//        change: function (event, ui) {
-//        }
-//    }).find(".ui-slider-handle").append(tooltip).hover(function () {
-//                tooltip.show();
-//            }, function () {
-//                tooltip.hide();
-//            }
-//    );
-//});
+$( document ).ready(function() {
+    var tooltip = $('<div id="tooltip" />').css({
+        position: 'absolute',
+        top: -25,
+        left: -10
+    }).hide();
+
+    $("form#_membership #div_member_capacity_slider").slider({
+        range: "min",
+        step: 25,
+        value: 0,
+        min: 0,
+        max: 100,
+        slide: function (event, ui) {
+            tooltip.text(ui.value);
+            $(this).find("input#member_capacity" ).val(ui.value);
+
+            $("form#new_membership #member_capacity").val(ui.value);
+
+        },
+        change: function (event, ui) {
+        }
+    }).find(".ui-slider-handle").append(tooltip).hover(function () {
+                tooltip.show();
+            }, function () {
+                tooltip.hide();
+            }
+    );
+});
 
 
 if(error_messages > 0)
