@@ -155,7 +155,7 @@ $( document ).ready(function() {
 
         $(this).find("#div_member_capacity_slider").slider({
             range: "min",
-            step: 25,
+            step: 05,
             value: current_capacity,
             min: 0,
             max: 100,
@@ -286,7 +286,7 @@ $(document).on('click', 'input#member_ship_check', function() {
 
         $("form#new_membership #div_member_capacity_slider").slider({
             range: "min",
-            step: 25,
+            step: 05,
             value: member_available_value,
             min: 0,
             max: 100,
@@ -342,7 +342,7 @@ $( document ).ready(function() {
 
     $("form#new_membership #div_member_capacity_slider").slider({
         range: "min",
-        step: 25,
+        step: 05,
         value: 0,
         min: 0,
         max: 100,
