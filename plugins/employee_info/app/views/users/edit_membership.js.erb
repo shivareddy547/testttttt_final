@@ -389,3 +389,15 @@ $( document ).ready(function() {
             }
     );
 });
+
+
+if(error_messages > 0)
+{
+    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
+    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
+}
+else
+{
+    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('disable');
+    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").hide();
+}

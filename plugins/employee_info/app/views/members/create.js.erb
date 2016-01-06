@@ -280,6 +280,7 @@ $( document ).ready(function() {
         }
         $(element).find("span#selected_capacity" ).text( "Selected" + $(element).find("#div_member_capacity_slider").slider( "value" )+"%" );
         $(element).find("#div_member_capacity_slider").slider('disable');
+        $(element).find("#div_member_capacity_slider")
 
     });
 
@@ -336,7 +337,7 @@ $(document).on('click', 'input#member_ship_check', function() {
 
     if(parseInt(member_available_value) < parseInt(available_value)  || parseInt(member_available_value) <=0)
     {
-        console.log(3333)
+
         $(this).prop('checked', false);
 
     }

@@ -223,6 +223,19 @@ function unique(list) {
 }
 
 
+$(document).on('click', '#cancel_member', function(event) {
+    event.stopImmediatePropagation();
+    var billable_status = $(this).closest('tr').find("#member_billable_status").val();
+    //alert(billable_status);
+    var member_id = $(this).attr("member_id");
+    $(this).closest('tr').find("#user_billable").attr("disabled", true);
+//    $(this).closest('tr').find("#").attr("disabled", true);
+    console.log($(this).closest('tr').find("#div_member_capacity_slider"))
+    $(this).closest('tr').find("#div_member_capacity_slider").slider('disable');
+    return false;
+
+});
+
 
 $( document ).ready(function() {
     var tooltip = $('<div id="tooltip" />').css({
@@ -231,7 +244,7 @@ $( document ).ready(function() {
         left: -10
     }).hide();
 
-    $("form#new_membership #div_member_capacity_slider").slider({
+    $("form#edit_membership #div_member_capacity_slider").slider({
         range: "min",
         step: 05,
         value: 0,
@@ -292,6 +305,7 @@ if(error_messages > 0)
     $('#member-<%= @member.id %>-roles-form').show();
     $('#member-<%= @member.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", false);
     $('#member-<%= @member.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
+    $('#member-<%= @member.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
     $('<input>').attr({
         type: 'hidden',
         id: "member_capacity_<%= @member.id %>",

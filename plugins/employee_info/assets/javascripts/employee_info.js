@@ -49,7 +49,6 @@ $(document).on('change', '#user_billable', function(event) {
 
 $(document).on('click', 'table.members .icon-edit', function(event) {
     event.stopImmediatePropagation();
-    console.log(11111111111111111113333333333333333111111)
     $(this).closest('tr').find("#user_billable").attr("disabled", false);
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
@@ -57,6 +56,7 @@ $(document).on('click', 'table.members .icon-edit', function(event) {
     $('#member-'+member_id+'-roles-form').find('a').attr('id', 'cancel_member');
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
     $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
+    $(this).closest('tr').find("#div_member_capacity_slider").show();
     //console.log(billable_status);
     //console.log(member_id);
 
@@ -87,6 +87,7 @@ $(document).on('click', '#cancel_member', function(event) {
 //    $(this).closest('tr').find("#").attr("disabled", true);
     console.log($(this).closest('tr').find("#div_member_capacity_slider"))
     $(this).closest('tr').find("#div_member_capacity_slider").slider('disable');
+    $(this).closest('tr').find("#div_member_capacity_slider").hide();
     return false;
 
 });

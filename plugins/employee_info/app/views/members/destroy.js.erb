@@ -141,6 +141,7 @@ $( document ).ready(function() {
         }
         $(element).find("span#selected_capacity" ).text( "Selected" + $(element).find("#div_member_capacity_slider").slider( "value" )+"%" );
         $(element).find("#div_member_capacity_slider").slider('disable');
+        $(element).find("#div_member_capacity_slider").hide();
 
     });
 
