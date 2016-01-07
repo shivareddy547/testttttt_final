@@ -141,6 +141,7 @@ $( document ).ready(function() {
             pieHole: 0.4,
             pieSliceText: "value",
             text: "value",
+            tooltip: { isHtml: true },
             tooltip: {text: "percentage"},
             pieSliceTextStyle: {
                 color: 'black',
