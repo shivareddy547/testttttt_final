@@ -1,0 +1,38 @@
+production:
+  adapter: mysql2
+  database: nanba2
+  server: 192.168.4.74
+  host: 192.168.4.74
+  port: 3306
+  username: root
+  password: root
+  encoding: utf8
+development:
+  adapter: mysql2
+  database: nanba2
+  server: 192.168.4.74
+  host: 192.168.4.74
+  port: 3306
+  username: root
+  password: root
+  encoding: utf8
+
+
+test:
+  adapter: mysql2
+  database: nanba2
+  server: 192.168.4.74
+  host: 192.168.4.74
+  port: 3306
+  username: root
+  password: root
+  encoding: utf8
+  
+hrms_user_sync:
+  adapter_sync: mysql2
+  database_sync: hrms
+  host_sync: 192.168.8.241
+  port_sync: 3306
+  username_sync: hrms_user
+  password_sync: hrmspass!23!
+  encoding: utf8

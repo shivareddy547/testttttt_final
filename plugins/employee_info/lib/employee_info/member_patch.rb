@@ -6,11 +6,32 @@ module EmployeeInfo
         # base.send(:include, InstanceMethods)
         base.class_eval do
           # validate :validate_billable
+          validates :capacity,presence:true, numericality: {less_than: 100,:message=>"Utilization should not be grater than 100"},:if=>:validate_availablity
+
           validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"}
           validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
-          validates :capacity,presence:true, numericality: {greater_than: 0,:message=>"Utilization should be grater than zero"}
-          validates :capacity,presence:true, numericality: {less_than: 101,:message=>"Utilization should not be grater than 100"}
+          validates :capacity,presence:true
+
+          # validates_numericality_of :capacity, less_than: ->(self) { (self.capacity*100+self.other_capacity) < 100  }
+
+          validate :capacity_is_less_than_total
+          validate :capacity_is_grater_than_total
+
+          def capacity_is_less_than_total
+            errors.add(:utilization, "should be less than 100") if (self.capacity*100+self.other_capacity) > 100
+          end
+          def capacity_is_grater_than_total
+            errors.add(:utilization, "should be grater than 0") if (self.capacity <= 0)
+          end
+
+         def validate_availablity
+          current_capacity =  Member.where(:user_id=>self.user_id,:project_id=>self.project_id).map(&:capacity).sum
+         total_capacity =  Member.where(:user_id=>self.user_id).map(&:capacity).sum
+         other_capacity = total_capacity.to_f - current_capacity.to_f
+          return (other_capacity+self.capacity)*100 < 100
+
+         end
           def validate_billable
             if !self.billable.present?
                errors.add(:Billable, "can not be blank for #{self.user.firstname.present? ? self.user.firstname : "" }")
@@ -43,6 +64,12 @@ module EmployeeInfo
           def self.other_capacity(member)
             current_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
+            other_capacity = total_capacity.to_f - current_capacity.to_f
+            return other_capacity*100
+          end
+          def other_capacity
+            current_capacity =  Member.where(:user_id=>self.user_id,:project_id=>self.project_id).map(&:capacity).sum
+            total_capacity =  Member.where(:user_id=>self.user_id).map(&:capacity).sum
             other_capacity = total_capacity.to_f - current_capacity.to_f
             return other_capacity*100
           end
