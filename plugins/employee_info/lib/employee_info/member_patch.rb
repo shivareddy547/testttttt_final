@@ -19,7 +19,7 @@ module EmployeeInfo
           validate :capacity_is_grater_than_total
 
           def capacity_is_less_than_total
-            errors.add(:utilization, "should be less than 100") if (self.capacity*100+self.other_capacity) > 100
+            errors.add(:utilization, "should be less than or equal to #{(100-self.other_capacity)}") if (self.capacity*100+self.other_capacity) > 100
           end
           def capacity_is_grater_than_total
             errors.add(:utilization, "should be grater than 0") if (self.capacity <= 0)
