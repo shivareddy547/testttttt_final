@@ -21,7 +21,7 @@ class Sync < ActiveRecord::Base
 # hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
     hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
     # @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
-      @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+      @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
     hrms.disconnect!
     inia =  ActiveRecord::Base.establish_connection(:production).connection
     @user_info.each(:as => :hash) do |user|
@@ -64,7 +64,7 @@ class Sync < ActiveRecord::Base
     # rec.save
 # hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
     hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
-    @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no,b.is_active FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date <= '#{Time.now}'")
+    @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no,b.is_active FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date <= '#{Time.now}'")
     hrms.disconnect!
     inia =  ActiveRecord::Base.establish_connection(:production).connection
     @user_info.each(:as => :hash) do |user|
