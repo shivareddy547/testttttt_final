@@ -11,7 +11,7 @@ module EmployeeInfo
 
 
         def concat_user_name_with_mail
-          return "#{self.firstname rescue ""}#{self.lastname rescue ""}<#{self.mail rescue ""}>"
+          return "#{self.firstname rescue ""} #{self.lastname rescue ""}<#{self.mail rescue ""}>"
         end
 
         end
