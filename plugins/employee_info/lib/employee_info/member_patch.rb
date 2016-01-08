@@ -19,7 +19,7 @@ module EmployeeInfo
           validate :capacity_is_grater_than_total
 
           def capacity_is_less_than_total
-            errors.add(:utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
+            errors.add(:utilization, "should be less than or equal to #{(100-self.other_capacity)}") if (self.capacity*100+self.other_capacity) > 100
           end
           def capacity_is_grater_than_total
             errors.add(:utilization, "should be grater than 0") if (self.capacity <= 0)
@@ -42,43 +42,43 @@ module EmployeeInfo
           end
 
           def self.capacity(member)
-            total_capacity =   Member.where(:user_id=>member.user_id).map(&:capacity).sum*100
-            return total_capacity.round
+            total_capacity =   Member.where(:user_id=>member.user_id).map(&:capacity).sum
+            return total_capacity*100
           end
 
           def self.user_capacity(id)
-            total_capacity =   Member.where(:user_id=>id).map(&:capacity).sum*100
-            return total_capacity.round
+            total_capacity =   Member.where(:user_id=>id).map(&:capacity).sum
+            return total_capacity*100
           end
 
           def self.available_capacity(member)
             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
             available_capacity = (1-total_capacity)*100
-            return available_capacity.round
+            return available_capacity
           end
           def self.current_project_capacity(member)
-            total_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum*100
-            return total_capacity.round
+            total_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
+            return total_capacity*100.to_i
           end
 
           def self.other_capacity(member)
             current_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
-            other_capacity = (total_capacity.to_f - current_capacity.to_f)*100
-            return other_capacity.round
+            other_capacity = total_capacity.to_f - current_capacity.to_f
+            return other_capacity*100.to_i
           end
           def other_capacity
             current_capacity =  Member.where(:user_id=>self.user_id,:project_id=>self.project_id).map(&:capacity).sum
             total_capacity =  Member.where(:user_id=>self.user_id).map(&:capacity).sum
-            other_capacity = (total_capacity.to_f - current_capacity.to_f)*100
-            return other_capacity.round
+            other_capacity = total_capacity.to_f - current_capacity.to_f
+            return other_capacity*100.to_i
           end
 
           def self.user_available_capacity(id)
             total_capacity =  Member.where(:user_id=>id).map(&:capacity).sum
             available_capacity = (1-total_capacity)*100
 
-            return available_capacity.round
+            return available_capacity.to_i
           end
 
 # user

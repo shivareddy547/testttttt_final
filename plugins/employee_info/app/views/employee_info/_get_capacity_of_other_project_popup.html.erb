@@ -1,10 +1,10 @@
-<div id='OtherCapacitypopupWindow' title='Capacity details of other project'>
+<div id='OtherCapacitypopupWindow' title='Other assignments'>
   <div id='OtherCapacitypopupWindowBody'>
     <% if @collect_other_project_capacity.present? %>
     <table border="1">
       <tr>
         <th>Manager</th>
-        <th>Used Percentage</th>
+        <th>Utilization(%)</th>
       </tr>
       <% @collect_other_project_capacity.each do |each_member| %>
       <tr>
@@ -14,7 +14,7 @@
      <% end %>
     </table>
         <% else %>
-    <h1>No capacity assigned..! </h1>
+    <h1>No Utilization assigned..! </h1>
      <% end %>
   </div>
   <div id='OtherCapacitypopupWindowFoot'></div>

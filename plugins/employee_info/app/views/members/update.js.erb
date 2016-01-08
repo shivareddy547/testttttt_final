@@ -113,11 +113,17 @@ $( document ).ready(function() {
                                 $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
                             }
                             $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
-                            $("#OtherCapacitypopupWindow").dialog({
-                                autoOpen: true,
-                                width: "500px",
-                                draggable: false
+                            $( "#OtherCapacitypopupWindow" ).dialog({
+                                resizable: false,
+                                width:600,
 
+                                modal: true,
+                                buttons: {
+
+                                    Close: function() {
+                                        $( this ).dialog( "close" );
+                                    }
+                                }
                             });
                         }
 

@@ -15,13 +15,22 @@ class EmployeeInfoController < ApplicationController
      @collect_other_project_capacity =[]
      other_projects.each do |each_project|
      collect_member_emails =[]
-     members = Member.find_by_sql("select * from members inner join member_roles on members.id = member_roles.member_id where members.project_id in (#{each_project.id}) AND members.user_id NOT in (#{member.user_id}) AND member_roles.role_id IN (#{manager_role_id.id})")
+     # members = Member.find_by_sql("select * from members inner join member_roles on members.id = member_roles.member_id where members.project_id in (#{each_project.id}) AND members.user_id NOT in (#{member.user_id}) AND member_roles.role_id IN (#{manager_role_id.id})")
      # concat_user_name_with_mail << {project_id=>}
-     members.each do |each_member|
-       collect_member_emails << each_member.concat_user_name_with_mail
+     # members.each do |each_member|
+     #   collect_member_emails << each_member.concat_user_name_with_mail
+     # end
+     each_project.custom_field_values.each_with_index do |c,index|
+       custom_field =CustomField.where(:id=>c.custom_field_id)
+       if custom_field.present? && (custom_field.last.name=="Manager")
+         user = each_project.custom_field_values[index].to_s
+         @user = User.find(user) if user.present?
+       end
      end
+
+     collect_member_emails1=@user.concat_user_name_with_mail
        used_capacity = Member.where(:project_id=>each_project.id,:user_id=>member.user_id)
-       @collect_other_project_capacity << {:project_id=> each_project.id, :manager =>collect_member_emails.join(','),:used_capacity=> used_capacity.last.capacity*100}
+       @collect_other_project_capacity << {:project_id=> each_project.id, :manager =>collect_member_emails1,:used_capacity=> used_capacity.last.capacity*100}
        end
      end
      # @members =  Member.find_by_sql ["SELECT * FROM members WHERE user_id = ? AND project_id != ?", member.user_id, member.project_id]

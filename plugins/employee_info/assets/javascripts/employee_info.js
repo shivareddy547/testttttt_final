@@ -224,12 +224,53 @@ $( document ).ready(function() {
                                     $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
                                 }
                                  $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
-                                  $("#OtherCapacitypopupWindow").dialog({
-                                     autoOpen: true,
-                                     width: "500px",
-                                     draggable: false
 
-                                 });
+
+//
+//                             $("div#OtherCapacitypopupWindow").dialog({
+//                                 title: "My Dialog Title",
+//                                 open: function (event, ui) {
+//                                     $(".ui-widget-overlay").css({
+//                                         opacity: 1.0,
+//                                         filter: "Alpha(Opacity=100)",
+//                                         backgroundColor: "black"
+//                                     });
+//                                 },
+//                                 modal: true
+//                             });
+
+                             $( "#OtherCapacitypopupWindow" ).dialog({
+                                 resizable: false,
+                                 width:600,
+
+                                 modal: true,
+                                 buttons: {
+
+                                     Close: function() {
+                                         $( this ).dialog( "close" );
+                                     }
+                                 }
+                             });
+
+//                             dialog = $( "#OtherCapacitypopupWindow" ).dialog({
+//                                 autoOpen: false,
+//                                 height: 300,
+//                                 width: 350,
+//                                 modal: true,
+//                                 buttons: {
+//                                     "Create an account": addUser,
+//                                     Cancel: function() {
+//                                         dialog.dialog( "close" );
+//                                     }
+//                                 },
+//                                 close: function() {
+//                                     form[ 0 ].reset();
+//                                     allFields.removeClass( "ui-state-error" );
+//                                 }
+//                             });
+
+
+
                          }
 
                      });

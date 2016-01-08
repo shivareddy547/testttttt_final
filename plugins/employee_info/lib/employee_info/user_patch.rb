@@ -10,6 +10,10 @@ module EmployeeInfo
         has_one :user_official_info
 
 
+        def concat_user_name_with_mail
+          return "#{self.firstname rescue ""}#{self.lastname rescue ""}<#{self.mail rescue ""}>"
+        end
+
         end
       end
 
