@@ -42,13 +42,13 @@ module EmployeeInfo
           end
 
           def self.capacity(member)
-            total_capacity =   Member.where(:user_id=>member.user_id).map(&:capacity).sum
-            return total_capacity*100.round
+            total_capacity =   Member.where(:user_id=>member.user_id).map(&:capacity).sum*100
+            return total_capacity.round
           end
 
           def self.user_capacity(id)
-            total_capacity =   Member.where(:user_id=>id).map(&:capacity).sum
-            return total_capacity*100.round
+            total_capacity =   Member.where(:user_id=>id).map(&:capacity).sum*100
+            return total_capacity.round
           end
 
           def self.available_capacity(member)
@@ -57,21 +57,21 @@ module EmployeeInfo
             return available_capacity.round
           end
           def self.current_project_capacity(member)
-            total_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
-            return total_capacity*100.round
+            total_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum*100
+            return total_capacity.round
           end
 
           def self.other_capacity(member)
             current_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum
             total_capacity =  Member.where(:user_id=>member.user_id).map(&:capacity).sum
-            other_capacity = total_capacity.to_f - current_capacity.to_f
-            return (other_capacity*100).round
+            other_capacity = (total_capacity.to_f - current_capacity.to_f)*100
+            return other_capacity.round
           end
           def other_capacity
             current_capacity =  Member.where(:user_id=>self.user_id,:project_id=>self.project_id).map(&:capacity).sum
             total_capacity =  Member.where(:user_id=>self.user_id).map(&:capacity).sum
-            other_capacity = total_capacity.to_f - current_capacity.to_f
-            return other_capacity*100.round
+            other_capacity = (total_capacity.to_f - current_capacity.to_f)*100
+            return other_capacity.round
           end
 
           def self.user_available_capacity(id)
