@@ -338,49 +338,14 @@ module KanbansHelper
 
 
   def find_value(value,issue)
-      case value
-        when :is_private
-          "Private: #{issue.is_private ==true ? "yes" : "No"}"
-        when :subject
-          "Subject: #{issue.subject}"
-        when :project
-          "Project: #{issue.project.name}" if issue.project.present?
-        when :tracker
-          "Tracker: #{issue.tracker.name}" if issue.tracker.present?
-        when :parent
-          "Parent: #{issue.parent.subject}" if issue.parent.present?
-        when :status
-          "Status: #{issue.status.name}" if issue.status.present?
-        when :priority
-          "Priority: #{issue.priority.name}" if issue.priority.present?
-        when :author
-          "Author: #{issue.author.firstname} #{issue.author.lastname}" if issue.author.present?
-        when :assigned_to
-          "Assigned To: #{issue.assigned_to.firstname rescue nil } #{issue.assigned_to.lastname rescue nil }" if issue.author.present?
-        when :updated_on
-          "Updated on: #{time_ago_in_words(issue.updated_on)} ago"
-        when :category
-          "Category: #{issue.category.name}" if issue.category.present?
-        when :fixed_version
-          "Sprint Version: #{issue.fixed_version.name}" if issue.fixed_version.present?
-        when :start_date
-           "Started on: #{time_ago_in_words(issue.start_date)} ago"
-        when :due_date
-          "Due Date: #{issue.due_date}"
-        when :spent_hours
-          "Spent hours: #{issue.spent_hours}"
-        when :done_ratio
-          "Done #{issue.done_ratio}%"
-        when :created_on
-         "Created on: #{time_ago_in_words(issue.created_on)} ago"
-        when :relations
 
-        else
-         find_custom_id =  value.to_s.split('cf_')
-          if find_custom_id.present?
-            issue.custom_field_value(find_custom_id.last)
-          end
-          # format_object(value)
+    if value.to_s.include?("cf_")
+      find_custom_id =  value.to_s.split('cf_')
+      if find_custom_id.present?
+        issue.custom_field_value(find_custom_id.last)
+      end
+      else
+      "#{value.to_s.capitalize}:#{issue.send(value)}"
       end
 
   end
