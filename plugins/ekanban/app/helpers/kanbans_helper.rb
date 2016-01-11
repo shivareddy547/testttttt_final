@@ -344,9 +344,9 @@ module KanbansHelper
       if find_custom_id.present?
         issue.custom_field_value(find_custom_id.last)
       end
-      else
+    else
       "#{value.to_s.capitalize}:#{issue.send(value)}"
-      end
+    end
 
   end
 

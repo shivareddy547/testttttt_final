@@ -34,17 +34,14 @@ table.kanban td#backlog {}
 
 .hidden {display:none}
 
-
-.kanban-pane {width:auto;min-width:auto;max-width:auto;max-height:auto;}
-.kanban-card { margin: 2px;width:100%;max-width:auto;float:left;border: 1px solid;
-    border-color: #d3d3d3;}
-.card-max-height {height:auto;}
+.kanban-pane {width:auto;min-width:160px;max-width:300px;max-height:600px;}
+.kanban-card { margin: 2px;width:45%;max-width:80px;float:left;}
+.card-max-height {height:100px;}
 .card-min-height {height:auto;}
 .kanban-card span.tip {overflow:visible !important; z-index: 1; }
 .card-header { text-align: left; overflow:visible; font-size: 11px }
 .card-header .ui-icon { float: right; }
-.card-content { margin:1px;padding: 1px; height:75%; overflow:hidden;text-align: left; color: black;
-    background-color: #F5F5F5;}
+.card-content { margin:1px;padding: 1px; height:75%; overflow:hidden;text-align: left; color:#303030;}
 .card-foot { margin:1px;padding: 1px; height:10px; overflow:hidden;text-align: left; color:#303030;}
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
@@ -73,7 +70,7 @@ table.kanban td#backlog {}
 
 
 .p1-color{background-color: #ff6666}
-.p2-color{background-color: green}
+.p2-color{background-color: #ffc1c1}
 .p3-color{background-color: #ccff99}
 .p4-color{background-color: #defebd}
 .p5-color{background-color: #ffffff}

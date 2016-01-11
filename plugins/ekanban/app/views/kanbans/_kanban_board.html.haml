@@ -10,8 +10,8 @@
   -#
   -#%a.icon.icon-add{:href => "#",:style => "float:right;margin-left:10px;margin-right:1px",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time
   -#%input{:onclick => "fullscreen();", :type => "button",:id=>"fullscreen", :value => "fullscreen"}/
-  = search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
-  = label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
+  -#= search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
+  -#= label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
   -#%p
   = search_field_tag "kanban-search", "", :class => "small find-card", :style=>"float:right;width:150px",:selector=>"#kanban_#{kanban.id}"
   = label_tag "search card:", "Find:",:style => "float:right;margin-top:5px;margin-right:5px"
