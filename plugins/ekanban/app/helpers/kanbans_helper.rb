@@ -342,10 +342,59 @@ module KanbansHelper
     if value.to_s.include?("cf_")
       find_custom_id =  value.to_s.split('cf_')
       if find_custom_id.present?
-        issue.custom_field_value(find_custom_id.last)
+        custom_field= CustomField.find(find_custom_id.last)
+        if issue.custom_field_value(custom_field.id).present?
+        "#{custom_field.name}:  #{issue.custom_field_value(custom_field.id)}"
+        end
       end
     else
-      "#{value.to_s.capitalize}:#{issue.send(value)}"
+      # "#{value.to_s.capitalize}:  #{issue.send(value)}"
+      # ["id", "tracker_id", "project_id", "subject", "description", "due_date", "category_id", "status_id",
+      #  "assigned_to_id", "priority_id", "fixed_version_id", "author_id", "lock_version", "created_on",
+      #  "updated_on", "start_date", "done_ratio", "estimated_hours", "parent_id", "root_id", "lft", "rgt",
+      #  "is_private", "closed_on", "ir_position", "s2b_position", "expiration_date", "first_response_date",
+      #  "bulk_update", "imported", "pre_status_id", "issue_sla", "update_by_manager_date", "response", "closed_date"]
+      # 1.9.3-p547 :022 > Issue.column_names
+      case value
+
+      when :is_private
+      "Private: #{issue.is_private ==true ? "yes" : "No"}"
+      when :subject
+      "Subject: #{issue.subject}"
+      when :description
+      "Description: #{issue.description}"
+      when :project_id
+      "Project: #{issue.project.name}" if issue.project.present?
+      when :tracker_id
+      "Tracker: #{issue.tracker.name}" if issue.tracker.present?
+      when :parent_id
+      "Parent: #{issue.parent.subject}" if issue.parent.present?
+      when :status_id
+      "Status: #{issue.project.name}" if issue.status.present?
+      when :priority_id
+      "Priority: #{issue.priority.name}" if issue.priority.present?
+      when :author_id
+      "Author: #{issue.author.firstname}" if issue.author.present?
+      when :updated_on
+      "Updated on: #{time_ago_in_words(issue.updated_on)} ago"
+      when :category_id
+      "Category: #{issue.category.name}" if issue.category.present?
+      when :fixed_version_id
+      "Sprint Version: #{issue.fixed_version.name}" if issue.fixed_version.present?
+      when :start_date
+      "Started on: #{time_ago_in_words(issue.start_date)} ago" if issue.start_date.present?
+      when :due_date
+      "Due Date: #{time_ago_in_words(issue.due_date)}" if issue.due_date.present?
+      when :spent_hours
+      "Spent hours: #{issue.spent_hours}"
+      when :done_ratio
+      "Done #{issue.done_ratio}%"
+      when :created_on
+      "Created on: #{time_ago_in_words(issue.created_on)} ago" if issue.created_on.present?
+      when :estimated_hours
+      "Estimation Hours:#{issue.estimated_hours}" if issue.estimated_hours.present?
+      end
+
     end
 
   end
