@@ -27,8 +27,9 @@ class EmployeeInfoController < ApplicationController
          @user = User.find(user) if user.present?
        end
      end
-
-     collect_member_emails1=@user.concat_user_name_with_mail
+     #  p "++++++++++++===@user+++++++++++++="
+     # p @user
+      collect_member_emails1=@user.concat_user_name_with_mail if @user.present?
        used_capacity = Member.where(:project_id=>each_project.id,:user_id=>member.user_id)
        @collect_other_project_capacity << {:project_id=> each_project.id, :manager =>collect_member_emails1,:used_capacity=> used_capacity.last.capacity*100}
        end

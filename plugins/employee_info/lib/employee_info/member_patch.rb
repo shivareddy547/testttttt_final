@@ -98,6 +98,8 @@ module EmployeeInfo
 
 
           def concat_user_name_with_mail
+            p "concat_user_name_with_mail+++++++="
+            p self
             return "#{self.user.firstname rescue ""}#{self.user.lastname rescue ""}<#{self.user.mail rescue ""}>"
           end
           def used_capacity
