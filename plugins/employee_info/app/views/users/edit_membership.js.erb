@@ -399,8 +399,38 @@ $( document ).ready(function() {
 
 if(error_messages > 0)
 {
+//    $('#member-<%#= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
+//    $('#member-<%#= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
+
+
+    var current_capacity ="<%=  Member.current_project_capacity(@membership) %>"
+    var billable ="<%=  @membership.billable.present? && @membership.billable=="true" ? "true" : "false" %>"
+    console.log(billable)
+    $('#member-<%= @membership.id %>-roles-form').show();
+    $('#member-<%= @membership.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", false);
     $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
     $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
+    $('<input>').attr({
+        type: 'hidden',
+        id: "member_capacity_<%= @membership.id %>",
+        name: 'capacity',
+        value: current_capacity
+    }).appendTo('#member-<%= @membership.id %>-roles-form');
+    $('<input>').attr({
+        type: 'hidden',
+        id: "billable_<%= @membership.id %>",
+        name: 'billable',
+        value: billable
+    }).appendTo('#member-<%= @membership.id %>-roles-form');
+
+    $(".members #member-<%=@membership.id %> #user_billable").val("<%= @membership.billable.present? ? @membership.billable=="true" ? "Billable" : "Non Billable" : "" %>")
+
+
+
+
+
+
+
 }
 else
 {

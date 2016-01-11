@@ -6,10 +6,12 @@
 <td>
 <div class="member-<%=member.id%>-capacity" id="member_capacity">
     <div style="width:200px;">
-    <span id="available_capacity" style="float:left; display:inline;color:#f6931f; font-weight:bold;">Available:<%= Member.available_capacity(member)  %>%</span>
-    <span id="completed_capacity" style="float:left; display:inline;color:#808080; font-weight:bold; ">Used:<%= Member.capacity(member)  %>%</span>
-    <span id="selected_capacity" style="float:left; display:inline;color:#8ae234; font-weight:bold; ">Selected:0%</span>
+    <!--<span id="available_capacity" style="float:left; display:inline;color:#f6931f; font-weight:bold;">Available:<%#= Member.available_capacity(member)  %>%</span>-->
+    <!--<span id="completed_capacity" style="float:left; display:inline;color:#808080; font-weight:bold; ">Used:<%#= Member.capacity(member)  %>%</span>-->
+    <!--<span id="selected_capacity" style="float:left; display:inline;color:#8ae234; font-weight:bold; ">Selected:0%</span>-->
     <input type="hidden" id="member_id" value="<%= member.id  %>" member_id="<%=member.id %>">
+
+      <%#=  Member.current_project_capacity(member) %>
     <input type="hidden" id="current_capacity" value="<%=  Member.current_project_capacity(member) %>" member_id="<%=member.id %>">
     <input type="hidden" id="available_capacity" value="<%=   Member.available_capacity(member) %>%" member_id="<%=member.id %>">
     <input type="hidden" id="selected_capacity" value="" member_id="<%=member.id %>">
