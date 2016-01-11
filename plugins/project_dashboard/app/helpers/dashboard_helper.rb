@@ -360,7 +360,7 @@ end
     get_sql_for_filter_query = get_sql_for_filter_query(project.id)
 
     @project= project
-    dash_board_query = DashboardQuery.where(:project_id=>@project.id)
+    dash_board_query = DashboardQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
     if dash_board_query.present?
       @query = dash_board_query.first
     else
@@ -442,12 +442,13 @@ end
 
      get_sql_for_filter_query = get_sql_for_filter_query(project.id)
     @project= project
-    dash_board_query = DashboardQuery.where(:project_id=>@project.id)
+     dash_board_query = DashboardQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
     if dash_board_query.present?
       @query = dash_board_query.first
     else
       @query = query
     end
+
     if @query.present? && @query.filters.present? && @query.filters["fixed_version_id"].present?
       find_fixed_version_ids= @query.filters["fixed_version_id"].values.last
       find_versions = Version.where(:id=>find_fixed_version_ids)
@@ -544,7 +545,7 @@ end
      get_sql_for_filter_query = get_sql_for_filter_query(project.id)
 
     @project= project
-    dash_board_query = DashboardQuery.where(:project_id=>@project.id)
+     dash_board_query = DashboardQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
     if dash_board_query.present?
       @query = dash_board_query.first
     else
@@ -629,7 +630,7 @@ end
     get_sql_for_filter_query = get_sql_for_filter_query(project.id)
 
     @project= project
-    dash_board_query = DashboardQuery.where(:project_id=>@project.id)
+    dash_board_query = DashboardQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
     if dash_board_query.present?
       @query = dash_board_query.first
     else
