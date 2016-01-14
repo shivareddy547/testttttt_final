@@ -309,7 +309,7 @@ $( document ).ready(function() {
 if(error_messages > 0)
 {
    var current_capacity ="<%=  Member.current_project_capacity(@member) %>"
-    var billable ="<%=  @member.billable.present? && @member.billable=="true" ? "true" : "false" %>"
+    var billable ="<%=  @member.billable.present? ? (@member.billable=="true" ? "true" : "false") : "" %>"
     console.log(billable)
     $('#member-<%= @member.id %>-roles-form').show();
     $('#member-<%= @member.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", false);
@@ -330,7 +330,6 @@ if(error_messages > 0)
 
    $(".members #member-<%=@member.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
 
-    
 
 }
 else
