@@ -35,7 +35,7 @@ module EmployeeInfo
           end
           def validate_billable
             if  !["true","false"].include?(self.billable.to_s)
-              errors.add(:choose, "billable or non billable for  #{self.user.firstname.present? ? self.user.firstname : "" }")
+              errors.add(:choose, "billable or non billable.")
             end
           end
           def validate_with_class?
