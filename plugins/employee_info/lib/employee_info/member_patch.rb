@@ -20,10 +20,10 @@ module EmployeeInfo
           validate :validate_billable
 
           def capacity_is_less_than_total
-            errors.add(:utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
+            errors.add(:Utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
           end
           def capacity_is_grater_than_total
-            errors.add(:utilization, "should be grater than 0") if (self.capacity <= 0)
+            errors.add(:Utilization, "should be grater than 0") if (self.capacity <= 0)
           end
 
           def validate_availablity
@@ -35,7 +35,7 @@ module EmployeeInfo
           end
           def validate_billable
             if  !["true","false"].include?(self.billable.to_s)
-              errors.add(:choose, "billable or non billable.")
+              errors.add(:Choose, "billable or non billable")
             end
           end
           def validate_with_class?
