@@ -328,7 +328,7 @@ if(error_messages > 0)
         value: billable
     }).appendTo('#member-<%= @member.id %>-roles-form');
 
-   $(".members #member-<%=@member.id %> #user_billable").val("<%= @member.billable.present? ? @member.billable=="true" ? "Billable" : "Non Billable" : "" %>")
+   $(".members #member-<%=@member.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
 
 
 }

@@ -6,9 +6,9 @@ module EmployeeInfo
         # base.send(:include, InstanceMethods)
         base.class_eval do
           # validate :validate_billable
-          validates :capacity,presence:true, numericality: {less_than: 100,:message=>"Utilization should not be grater than 100"},:if=>:validate_availablity
+          # validates :capacity,presence:true, numericality: {less_than: 100,:message=>"Utilization should not be grater than 100"},:if=>:validate_availablity
 
-          validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"}
+          # validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"},:if=>:validate_billable
           validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
           validates :capacity,presence:true
@@ -17,6 +17,7 @@ module EmployeeInfo
 
           validate :capacity_is_less_than_total
           validate :capacity_is_grater_than_total
+          validate :validate_billable
 
           def capacity_is_less_than_total
             errors.add(:utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
@@ -33,8 +34,8 @@ module EmployeeInfo
 
           end
           def validate_billable
-            if !self.billable.present?
-              errors.add(:Billable, "can not be blank for #{self.user.firstname.present? ? self.user.firstname : "" }")
+            if  !["true","false"].include?(self.billable.to_s)
+              errors.add(:choose, "billable or non billable for  #{self.user.firstname.present? ? self.user.firstname : "" }")
             end
           end
           def validate_with_class?
@@ -98,8 +99,7 @@ module EmployeeInfo
 
 
           def concat_user_name_with_mail
-            p "concat_user_name_with_mail+++++++="
-            p self
+
             return "#{self.user.firstname rescue ""}#{self.user.lastname rescue ""}<#{self.user.mail rescue ""}>"
           end
           def used_capacity
