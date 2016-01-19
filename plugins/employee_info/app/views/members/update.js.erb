@@ -31,6 +31,7 @@ $( document ).ready(function() {
             pieHole: 0.4,
             pieSliceText: "value",
             text: "value",
+            tooltip: { isHtml: true },
             tooltip: {text: "percentage"},
             pieSliceTextStyle: {
                 color: 'black',
@@ -51,8 +52,29 @@ $( document ).ready(function() {
             min: 0,
             max: 100,
             slide: function( event, ui ) {
-             console.log(1111111111111)
+
                 tooltip.text(ui.value);
+
+                if(ui.value == 0)
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                }
+                else
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
+                    console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    console.log(billable_value)
+                    if(billable_value=="true") {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                    }
+                    else if(billable_value=="false")
+                    {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    }
+                }
+
                 if(ui.value > (100-other_capacity) )
                 {
                     return false;
@@ -113,6 +135,21 @@ $( document ).ready(function() {
                                 $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
                             }
                             $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
+
+
+//
+//                             $("div#OtherCapacitypopupWindow").dialog({
+//                                 title: "My Dialog Title",
+//                                 open: function (event, ui) {
+//                                     $(".ui-widget-overlay").css({
+//                                         opacity: 1.0,
+//                                         filter: "Alpha(Opacity=100)",
+//                                         backgroundColor: "black"
+//                                     });
+//                                 },
+//                                 modal: true
+//                             });
+
                             $( "#OtherCapacitypopupWindow" ).dialog({
                                 resizable: false,
                                 width:600,
@@ -189,6 +226,16 @@ $(document).on('click', 'input#member_ship_check', function() {
             max: 100,
             slide: function (event, ui) {
                 tooltip.text(ui.value);
+                if(ui.value == 0)
+                {
+                    $("form#new_membership select#billable").attr("disabled", true);
+                    $("form#new_membership select#billable").val("Non Billable");
+                }
+                else
+                {
+                    $("form#new_membership select#billable").attr("disabled", false);
+
+                }
                 $(this).find("input#member_capacity" ).val(ui.value);
                 $("form#new_membership #member_capacity").val(ui.value);
             },
@@ -208,7 +255,7 @@ $(document).on('click', 'input#member_ship_check', function() {
 
     if(parseInt(member_available_value) < parseInt(available_value) || (parseInt(member_available_value) <=0))
     {
-        console.log(3333)
+
         $(this).prop('checked', false);
 
     }
@@ -258,9 +305,18 @@ $( document ).ready(function() {
         max: 100,
         slide: function (event, ui) {
             tooltip.text(ui.value);
+            if(ui.value == 0)
+            {
+                $("form#edit_membership select#billable").attr("disabled", true);
+                $("form#edit_membership select#billable").val("Non Billable");
+            }
+            else
+            {
+                $("form#edit_membership select#billable").attr("disabled", false);
+            }
             $(this).find("input#member_capacity" ).val(ui.value);
+            $("form#edit_membership #member_capacity").val(ui.value);
 
-            $("form#new_membership #member_capacity").val(ui.value);
 
         },
         change: function (event, ui) {
@@ -282,7 +338,7 @@ $( document ).ready(function() {
         left: -10
     }).hide();
 
-    $("form#_membership #div_member_capacity_slider").slider({
+    $("form#new_membership #div_member_capacity_slider").slider({
         range: "min",
         step: 5,
         value: 0,
@@ -290,9 +346,19 @@ $( document ).ready(function() {
         max: 100,
         slide: function (event, ui) {
             tooltip.text(ui.value);
+            if(ui.value == 0)
+            {
+                $("form#new_membership select#billable").attr("disabled", true);
+                $("form#new_membership select#billable").val("Non Billable");
+            }
+            else
+            {
+                $("form#new_membership select#billable").attr("disabled", false);
+            }
             $(this).find("input#member_capacity" ).val(ui.value);
 
             $("form#new_membership #member_capacity").val(ui.value);
+
 
         },
         change: function (event, ui) {
@@ -328,7 +394,7 @@ if(error_messages > 0)
         value: billable
     }).appendTo('#member-<%= @member.id %>-roles-form');
 
-   $(".members #member-<%=@member.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
+  $(".members #member-<%=@member.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
 
 
 }

@@ -108,12 +108,6 @@ $(document).on('change', '#billable', function(event) {
 
 });
 
-//$(function() {
-//    $( "#slider" ).slider();
-//});
-
-
-/* Loading chart Handile bar */
 
 
 $( document ).ready(function() {
@@ -164,6 +158,29 @@ $( document ).ready(function() {
             slide: function( event, ui ) {
 
                 tooltip.text(ui.value);
+
+                if(ui.value == 0)
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+                }
+                else
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
+                   console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    console.log(billable_value)
+                    if(billable_value=="true") {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                    }
+                    else if(billable_value=="false")
+                    {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    }
+                 }
+
                 if(ui.value > (100-other_capacity) )
                 {
                     return false;
@@ -251,26 +268,6 @@ $( document ).ready(function() {
                                      }
                                  }
                              });
-
-//                             dialog = $( "#OtherCapacitypopupWindow" ).dialog({
-//                                 autoOpen: false,
-//                                 height: 300,
-//                                 width: 350,
-//                                 modal: true,
-//                                 buttons: {
-//                                     "Create an account": addUser,
-//                                     Cancel: function() {
-//                                         dialog.dialog( "close" );
-//                                     }
-//                                 },
-//                                 close: function() {
-//                                     form[ 0 ].reset();
-//                                     allFields.removeClass( "ui-state-error" );
-//                                 }
-//                             });
-
-
-
                          }
 
                      });
@@ -337,6 +334,17 @@ $(document).on('click', 'input#member_ship_check', function() {
                 tooltip.text(ui.value);
                 $(this).find("input#member_capacity" ).val(ui.value);
                 $("form#new_membership #member_capacity").val(ui.value);
+
+                if(ui.value == 0)
+                {
+                    $("form#new_membership select#billable").attr("disabled", true);
+                    $("form#new_membership select#billable").val("Non Billable");
+                }
+                else
+                {
+                    $("form#new_membership select#billable").attr("disabled", false);
+                }
+
             },
             change: function (event, ui) {
             }
@@ -354,8 +362,7 @@ $(document).on('click', 'input#member_ship_check', function() {
 
     if((parseInt(member_available_value) < parseInt(available_value)) || parseInt(member_available_value) <=0)
     {
-        console.log(3333)
-        $(this).prop('checked', false);
+         $(this).prop('checked', false);
 
     }
 
@@ -391,9 +398,19 @@ $( document ).ready(function() {
         max: 100,
         slide: function (event, ui) {
             tooltip.text(ui.value);
+            if(ui.value == 0)
+            {
+                $("form#new_membership select#billable").attr("disabled", true);
+                $("form#new_membership select#billable").val("Non Billable");
+            }
+            else
+            {
+                $("form#new_membership select#billable").attr("disabled", false);
+            }
             $(this).find("input#member_capacity" ).val(ui.value);
 
             $("form#new_membership #member_capacity").val(ui.value);
+
 
         },
         change: function (event, ui) {
