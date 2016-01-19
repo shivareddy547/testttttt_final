@@ -9,7 +9,7 @@ module EmployeeInfo
           # validates :capacity,presence:true, numericality: {less_than: 100,:message=>"Utilization should not be grater than 100"},:if=>:validate_availablity
 
           # validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"},:if=>:validate_billable
-          validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
+          # validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
           validates :capacity,presence:true
 
@@ -23,8 +23,14 @@ module EmployeeInfo
             errors.add(:Utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
           end
           def capacity_is_grater_than_total
-            errors.add(:Utilization, "should be greater than 0") if ((self.capacity <= 0) &&  self.billable.to_s=="false")
+            errors.add(:Utilization, "should be greater than 0") if ((self.capacity <= 0) &&  self.billable.to_s=="true")
           end
+
+
+          def user_billable?
+            return self.billable == true
+          end
+
 
           def validate_availablity
             current_capacity =  Member.where(:user_id=>self.user_id,:project_id=>self.project_id).map(&:capacity).sum

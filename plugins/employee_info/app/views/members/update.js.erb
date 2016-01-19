@@ -59,19 +59,23 @@ $( document ).ready(function() {
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
                 }
                 else
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
-                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
-                    console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+//                   console.log('#member-'+member_id+' '+ '#member_billable_status')
                     console.log(billable_value)
-                    if(billable_value=="true") {
+                    if(billable_value=="Billable") {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
                     }
                     else if(billable_value=="false")
                     {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
                     }
                 }
 

@@ -169,15 +169,17 @@ $( document ).ready(function() {
                 else
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
-                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
-                   console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+//                   console.log('#member-'+member_id+' '+ '#member_billable_status')
                     console.log(billable_value)
-                    if(billable_value=="true") {
+                    if(billable_value=="Billable") {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
                     }
                     else if(billable_value=="false")
                     {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
                     }
                  }
 
@@ -241,20 +243,6 @@ $( document ).ready(function() {
                                     $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
                                 }
                                  $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
-
-
-//
-//                             $("div#OtherCapacitypopupWindow").dialog({
-//                                 title: "My Dialog Title",
-//                                 open: function (event, ui) {
-//                                     $(".ui-widget-overlay").css({
-//                                         opacity: 1.0,
-//                                         filter: "Alpha(Opacity=100)",
-//                                         backgroundColor: "black"
-//                                     });
-//                                 },
-//                                 modal: true
-//                             });
 
                              $( "#OtherCapacitypopupWindow" ).dialog({
                                  resizable: false,
@@ -323,6 +311,10 @@ $(document).on('click', 'input#member_ship_check', function() {
         var member_available_value = $(this).attr("member_available_value");
 
         $("form#new_membership #member_capacity").val(member_available_value);
+        if(member_available_value > 0)
+        {
+            $("form#new_membership select#billable").attr("disabled", false);
+        }
 
         $("form#new_membership #div_member_capacity_slider").slider({
             range: "min",
@@ -402,10 +394,18 @@ $( document ).ready(function() {
             {
                 $("form#new_membership select#billable").attr("disabled", true);
                 $("form#new_membership select#billable").val("Non Billable");
+                var billable_status= false
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'billable',
+                    name: 'billable',
+                    value: billable_status
+                }).appendTo('form#new_membership');
             }
             else
             {
                 $("form#new_membership select#billable").attr("disabled", false);
+
             }
             $(this).find("input#member_capacity" ).val(ui.value);
 

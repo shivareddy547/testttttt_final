@@ -355,8 +355,15 @@ $( document ).ready(function() {
             tooltip.text(ui.value);
             if(ui.value == 0)
             {
-                $("form#new_membership select#billable").attr("disabled", true);
+//                $("form#new_membership select#billable").attr("disabled", true);
                 $("form#new_membership select#billable").val("Non Billable");
+                var billable_status= false
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'billable',
+                    name: 'billable',
+                    value: billable_status
+                }).appendTo('form#new_membership');
             }
             else
             {
@@ -378,37 +385,3 @@ $( document ).ready(function() {
     );
 });
 
-
-if(error_messages > 0)
-{
-    var current_capacity ="<%=  Member.current_project_capacity(@member) %>"
-    var billable ="<%=  @member.billable.present? ? (@member.billable=="true" ? "true" : "false") : "" %>"
-    console.log(billable)
-    $('#member-<%= @member.id %>-roles-form').show();
-    $('#member-<%= @member.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", false);
-    $('#member-<%= @member.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
-    $('#member-<%= @member.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
-    $('<input>').attr({
-        type: 'hidden',
-        id: "member_capacity_<%= @member.id %>",
-        name: 'capacity',
-        value: current_capacity
-    }).appendTo('#member-<%= @member.id %>-roles-form');
-    $('<input>').attr({
-        type: 'hidden',
-        id: "billable_<%= @member.id %>",
-        name: 'billable',
-        value: billable
-    }).appendTo('#member-<%= @member.id %>-roles-form');
-
-    $(".members #member-<%=@member.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
-
-
-}
-else
-{
-    $('#member-<%= @member.id %>-roles-form').hide();
-    $('#member-<%= @member.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", true);
-
-
-}

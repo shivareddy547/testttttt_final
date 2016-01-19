@@ -168,6 +168,63 @@ $( document ).ready(function() {
                 {
                     return false;
                 }
+//                if(ui.value == 0)
+//                {
+////                    console.log("777777777777777777777777777777")
+//                    $("form#user_new_membership select#billable").attr("disabled", true);
+//                    $("form#user_new_membership select#billable").val("Non Billable");
+//                }
+//                else
+//                {
+//                    $("form#user_new_membership select#billable").attr("disabled", false);
+//                }
+                if(ui.value == 0)
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+                }
+                else
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+//                   console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    console.log(billable_value)
+                    if(billable_value=="Billable") {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
+                    }
+                    else if(billable_value=="false")
+                    {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
+                    }
+                }
+
+
+                if(ui.value == 0)
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+                }
+                else
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
+                    console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    console.log(billable_value)
+                    if(billable_value=="true") {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                    }
+                    else if(billable_value=="false")
+                    {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    }
+                }
+
                 $(element).find("span#selected_capacity" ).text( "Selected: " + ui.value+"%" );
                 $(element).find("input#selected_capacity" ).val(ui.value);
                 $('#member-'+member_id+'-roles-form').find('#member_capacity_'+member_id).val(ui.value);
@@ -272,73 +329,6 @@ $( document ).ready(function() {
 
 /* membership checkbox */
 
-$(document).on('click', 'input#member_ship_check', function() {
-    var searchIDs = $("input:checkbox:checked").map(function(){
-        return $(this).attr("member_available");
-    }).get(); // <----
-    console.log(searchIDs.length);
-    var uniq_result=unique(searchIDs)
-//    console.log(uniq_result);
-    console.log(searchIDs.count)
-    if(searchIDs.length == 1)
-    {
-        var tooltip = $('<div id="tooltip" />').css({
-            position: 'absolute',
-            top: -25,
-            left: -10
-        }).hide();
-//        $(this).attr("member_available");
-        var member_available_value = $(this).attr("member_available_value");
-
-        $("form#user_new_membership #member_capacity").val(member_available_value);
-
-        $("form#user_new_membership #div_member_capacity_slider").slider({
-            range: "min",
-            step: 05,
-            value: member_available_value,
-            min: 0,
-            max: 100,
-            slide: function (event, ui) {
-                tooltip.text(ui.value);
-                $(this).find("input#member_capacity" ).val(ui.value);
-                $("form#user_new_membership #member_capacity").val(ui.value);
-            },
-            change: function (event, ui) {
-            }
-        }).find(".ui-slider-handle").append(tooltip).hover(function () {
-                tooltip.show();
-            }, function () {
-                tooltip.hide();
-            }
-        );
-    }
-    var member_available_value = $(this).attr("member_available_value");
-    var available_value = $("form#user_new_membership #member_capacity").val();
-    console.log(member_available_value)
-    console.log(available_value)
-
-    if(parseInt(member_available_value) < parseInt(available_value))
-    {
-        console.log(3333)
-        $(this).prop('checked', false);
-
-    }
-
-    if(uniq_result.count > 1)
-    {
-        alert("Error:Please Select available members")
-        $("#user_new_membership").find('[name=commit]').attr("disabled", true);
-    }
-
-});
-function unique(list) {
-    var result = [];
-    $.each(list, function(i, e) {
-        if ($.inArray(e, result) == -1) result.push(e);
-    });
-    return result;
-}
-
 
 
 $( document ).ready(function() {
@@ -349,7 +339,6 @@ $( document ).ready(function() {
     }).hide();
 
     var current_capacity = $(this).find("input#current_capacity").val();
-//    var available_capacity = $(this).find("input#available_capacity").val();
     var other_capacity = $(this).find("input#member_total_capacity").val();
     var available_capacity = $(this).find("input#available_capacity").val();
 
@@ -362,16 +351,27 @@ $( document ).ready(function() {
         slide: function (event, ui) {
             tooltip.text(ui.value);
             $(this).find("input#member_capacity" ).val(ui.value);
-            console.log(11111111111111111)
-            console.log(ui.value)
-            console.log(other_capacity)
-            console.log(3333333333333)
             if(ui.value < other_capacity )
             {
                 return false;
             }
+            if(ui.value == 0)
+            {
+                $("form#user_new_membership select#billable").val("Non Billable");
+                $("form#user_new_membership select#billable").attr("disabled", true);
+                var billable_status= false
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'billable',
+                    name: 'billable',
+                    value: billable_status
+                }).appendTo('#user_new_membership .capacity_slider_inline');
+           }
+            else
+            {
+                $("form#user_new_membership select#billable").attr("disabled", false);
+            }
             var current_selected_capacity=(ui.value-other_capacity);
-            console.log(current_selected_capacity);
             $("form#user_new_membership #member_capacity").val(ui.value);
             $("form#user_new_membership #capacity").val(current_selected_capacity);
 
