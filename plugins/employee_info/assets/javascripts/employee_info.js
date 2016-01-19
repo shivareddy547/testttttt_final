@@ -163,7 +163,8 @@ $( document ).ready(function() {
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+'-roles-form #member_billable_'+member_id).val("false")
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
                     $('#member-'+member_id+' '+ '#member_billable_status').val("false");
                 }
                 else

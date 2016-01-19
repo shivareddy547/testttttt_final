@@ -116,7 +116,6 @@ $(document).on('change', '#billable', function(event) {
 
 /* Loading chart Handile bar */
 
-
 $( document ).ready(function() {
     // Handler for .ready() called.
 
@@ -127,28 +126,29 @@ $( document ).ready(function() {
         var other_capacity = $(this).find("input#other_capacity").val();
         var element = $(this);
         var member_id= $(this).find("input#member_id").val();
-/* slider tooltip */
+        /* slider tooltip */
         var tooltip = $('<div id="tooltip" />').css({
             position: 'absolute',
             top: -25,
             left: -10
         }).hide();
 
-/* Google chart options */
+        /* Google chart options */
         var options = {
             width: 200,
-            height: 200,
+            height: 150,
             backgroundColor: "#ffffdd",
             pieHole: 0.4,
             pieSliceText: "value",
             text: "value",
+            tooltip: { isHtml: true },
             tooltip: {text: "percentage"},
             pieSliceTextStyle: {
                 color: 'black',
                 bold: true,
                 italic: true,
                 alignment: "center"
-                    },
+            },
             colors: ['#FF9933', '#E82D2D', '#006600'],
             legend: {
                 alignment: 'center', textStyle: {color: 'blue', fontSize: 8}
@@ -157,32 +157,20 @@ $( document ).ready(function() {
 
         $(this).find("#div_member_capacity_slider").slider({
             range: "min",
-            step: 05,
+            step: 5,
             value: current_capacity,
             min: 0,
             max: 100,
             slide: function( event, ui ) {
 
                 tooltip.text(ui.value);
-                if(ui.value > (100-other_capacity) )
-                {
-                    return false;
-                }
-//                if(ui.value == 0)
-//                {
-////                    console.log("777777777777777777777777777777")
-//                    $("form#user_new_membership select#billable").attr("disabled", true);
-//                    $("form#user_new_membership select#billable").val("Non Billable");
-//                }
-//                else
-//                {
-//                    $("form#user_new_membership select#billable").attr("disabled", false);
-//                }
+
                 if(ui.value == 0)
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+'-roles-form #member_billable_'+member_id).val("false")
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
                     $('#member-'+member_id+' '+ '#member_billable_status').val("false");
                 }
                 else
@@ -202,29 +190,10 @@ $( document ).ready(function() {
                     }
                 }
 
-
-                if(ui.value == 0)
+                if(ui.value > (100-other_capacity) )
                 {
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
-                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+                    return false;
                 }
-                else
-                {
-                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
-                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
-                    console.log('#member-'+member_id+' '+ '#member_billable_status')
-                    console.log(billable_value)
-                    if(billable_value=="true") {
-                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
-                    }
-                    else if(billable_value=="false")
-                    {
-                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
-                    }
-                }
-
                 $(element).find("span#selected_capacity" ).text( "Selected: " + ui.value+"%" );
                 $(element).find("input#selected_capacity" ).val(ui.value);
                 $('#member-'+member_id+'-roles-form').find('#member_capacity_'+member_id).val(ui.value);
@@ -253,7 +222,7 @@ $( document ).ready(function() {
             ['Other',     parseInt(other_capacity)],
             ['Assigned',     parseInt(current_capacity)],
         ]);
-/* Google chart draw */
+        /* Google chart draw */
         if(member_id) {
             var chart = new google.visualization.PieChart($("#capacity_chart_" + member_id)[0]);
             chart.draw(data, options);
@@ -263,42 +232,43 @@ $( document ).ready(function() {
                 {
                     var position = e.targetID.split("#").last
                 }
-                 if(e.targetID.split("#")[1]==1)
-                 {
+                if(e.targetID.split("#")[1]==1)
+                {
                     var position = e.targetID.split("#").last
                     $.ajax({
-                         url: "/employee_info/get_capacity_details_of_other_project", // Route to the Script Controller method
-                         type: "POST",
-                         dataType: "json",
-                         data: {member_id:member_id},
-                         // This goes to Controller in params hash, i.e. params[:file_name]
-                         complete: function () {
-                         },
-                         success: function (data) {
-                             if($("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "isOpen" ))
-                                {
-                                    $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "close" );
-                                    $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
+                        url: "/employee_info/get_capacity_details_of_other_project", // Route to the Script Controller method
+                        type: "POST",
+                        dataType: "json",
+                        data: {member_id:member_id},
+                        // This goes to Controller in params hash, i.e. params[:file_name]
+                        complete: function () {
+                        },
+                        success: function (data) {
+                            if($("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "isOpen" ))
+                            {
+                                $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "close" );
+                                $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
+                            }
+                            $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
+
+                            $( "#OtherCapacitypopupWindow" ).dialog({
+                                resizable: false,
+                                width:600,
+
+                                modal: true,
+                                buttons: {
+
+                                    Close: function() {
+                                        $( this ).dialog( "close" );
+                                    }
                                 }
-                                 $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
-                             $( "#OtherCapacitypopupWindow" ).dialog({
-                                 resizable: false,
-                                 width:600,
+                            });
+                        }
 
-                                 modal: true,
-                                 buttons: {
+                    });
+                }
 
-                                     Close: function() {
-                                         $( this ).dialog( "close" );
-                                     }
-                                 }
-                             });
-                         }
-
-                     });
-                 }
-
-           });
+            });
             google.visualization.events.addListener(chart, 'onmouseover', barMouseOver);
             google.visualization.events.addListener(chart, 'onmouseout', barMouseOut);
 
@@ -325,6 +295,215 @@ $( document ).ready(function() {
 
 
 });
+
+//$( document ).ready(function() {
+//    // Handler for .ready() called.
+//
+//    $(".list.memberships #member_capacity").each(function() {
+//
+//        var current_capacity = $(this).find("input#current_capacity").val();
+//        var available_capacity = $(this).find("input#available_capacity").val();
+//        var other_capacity = $(this).find("input#other_capacity").val();
+//        var element = $(this);
+//        var member_id= $(this).find("input#member_id").val();
+///* slider tooltip */
+//        var tooltip = $('<div id="tooltip" />').css({
+//            position: 'absolute',
+//            top: -25,
+//            left: -10
+//        }).hide();
+//
+///* Google chart options */
+//        var options = {
+//            width: 200,
+//            height: 200,
+//            backgroundColor: "#ffffdd",
+//            pieHole: 0.4,
+//            pieSliceText: "value",
+//            text: "value",
+//            tooltip: {text: "percentage"},
+//            pieSliceTextStyle: {
+//                color: 'black',
+//                bold: true,
+//                italic: true,
+//                alignment: "center"
+//                    },
+//            colors: ['#FF9933', '#E82D2D', '#006600'],
+//            legend: {
+//                alignment: 'center', textStyle: {color: 'blue', fontSize: 8}
+//            }
+//        };
+//
+//        $(this).find("#div_member_capacity_slider").slider({
+//            range: "min",
+//            step: 05,
+//            value: current_capacity,
+//            min: 0,
+//            max: 100,
+//            slide: function( event, ui ) {
+//
+//                tooltip.text(ui.value);
+//                if(ui.value > (100-other_capacity) )
+//                {
+//                    return false;
+//                }
+////                if(ui.value == 0)
+////                {
+//////                    console.log("777777777777777777777777777777")
+////                    $("form#user_new_membership select#billable").attr("disabled", true);
+////                    $("form#user_new_membership select#billable").val("Non Billable");
+////                }
+////                else
+////                {
+////                    $("form#user_new_membership select#billable").attr("disabled", false);
+////                }
+//                if(ui.value == 0)
+//                {
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+//                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+//                }
+//                else
+//                {
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+//                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+////                   console.log('#member-'+member_id+' '+ '#member_billable_status')
+//                    console.log(billable_value)
+//                    if(billable_value=="Billable") {
+//                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+//                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
+//                    }
+//                    else if(billable_value=="false")
+//                    {
+//                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+//                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
+//                    }
+//                }
+//
+//
+//                if(ui.value == 0)
+//                {
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+//                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+//                }
+//                else
+//                {
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+//                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
+//                    console.log('#member-'+member_id+' '+ '#member_billable_status')
+//                    console.log(billable_value)
+//                    if(billable_value=="true") {
+//                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+//                    }
+//                    else if(billable_value=="false")
+//                    {
+//                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+//                    }
+//                }
+//
+//                $(element).find("span#selected_capacity" ).text( "Selected: " + ui.value+"%" );
+//                $(element).find("input#selected_capacity" ).val(ui.value);
+//                $('#member-'+member_id+'-roles-form').find('#member_capacity_'+member_id).val(ui.value);
+//                var current_capacity=ui.value;
+//                var available_capacity= (100-(parseInt(current_capacity)+parseInt(other_capacity)));
+//                var data = google.visualization.arrayToDataTable([
+//                    ['Type', 'Value'],
+//                    ['Available',     parseInt(available_capacity)],
+//                    ['Other',     parseInt(other_capacity)],
+//                    ['Assigned',     parseInt(current_capacity)],
+//                ]);
+//                var chart = new google.visualization.PieChart($("#capacity_chart_"+member_id)[0]);
+//                chart.draw(data, options);
+//
+//            },
+//            change: function(event, ui) {}
+//        }).find(".ui-slider-handle").append(tooltip).hover(function() {
+//                tooltip.show();
+//            }, function() {
+//                tooltip.hide();
+//            }
+//        );
+//        var data = google.visualization.arrayToDataTable([
+//            ['Type', 'Value'],
+//            ['Available',     parseInt(available_capacity)],
+//            ['Other',     parseInt(other_capacity)],
+//            ['Assigned',     parseInt(current_capacity)],
+//        ]);
+///* Google chart draw */
+//        if(member_id) {
+//            var chart = new google.visualization.PieChart($("#capacity_chart_" + member_id)[0]);
+//            chart.draw(data, options);
+//            google.visualization.events.addListener(chart, 'click', function(e) {
+//                var match_sting = e.targetID.match(/slice#/g);
+//                if(match_sting)
+//                {
+//                    var position = e.targetID.split("#").last
+//                }
+//                 if(e.targetID.split("#")[1]==1)
+//                 {
+//                    var position = e.targetID.split("#").last
+//                    $.ajax({
+//                         url: "/employee_info/get_capacity_details_of_other_project", // Route to the Script Controller method
+//                         type: "POST",
+//                         dataType: "json",
+//                         data: {member_id:member_id},
+//                         // This goes to Controller in params hash, i.e. params[:file_name]
+//                         complete: function () {
+//                         },
+//                         success: function (data) {
+//                             if($("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "isOpen" ))
+//                                {
+//                                    $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").dialog( "close" );
+//                                    $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
+//                                }
+//                                 $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
+//                             $( "#OtherCapacitypopupWindow" ).dialog({
+//                                 resizable: false,
+//                                 width:600,
+//
+//                                 modal: true,
+//                                 buttons: {
+//
+//                                     Close: function() {
+//                                         $( this ).dialog( "close" );
+//                                     }
+//                                 }
+//                             });
+//                         }
+//
+//                     });
+//                 }
+//
+//           });
+//            google.visualization.events.addListener(chart, 'onmouseover', barMouseOver);
+//            google.visualization.events.addListener(chart, 'onmouseout', barMouseOut);
+//
+//        }
+//
+//        function barMouseOver(e) {
+//            if(e.row == 1)
+//            {
+//                $("#capacity_chart_"+member_id).css('cursor','pointer');
+//            }
+//        }
+//
+//        function barMouseOut(e) {
+//            if(e.row == 1)
+//            {
+//                $("#capacity_chart_"+member_id).css('cursor','');
+//            }
+//
+//        }
+//        $(element).find("span#selected_capacity" ).text( "Selected" + $(element).find("#div_member_capacity_slider").slider( "value" )+"%" );
+//        $(element).find("#div_member_capacity_slider").slider('disable');
+//
+//    });
+//
+//
+//});
 
 
 /* membership checkbox */

@@ -12,7 +12,6 @@ hideOnLoad();
 
 
 
-
 $( document ).ready(function() {
     // Handler for .ready() called.
 
@@ -66,19 +65,24 @@ $( document ).ready(function() {
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form #member_billable_'+member_id).val("false")
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
                 }
                 else
                 {
                     $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
-                    billable_value = $('#member-'+member_id+' '+ '#member_billable_status').val();
-                    console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+//                   console.log('#member-'+member_id+' '+ '#member_billable_status')
                     console.log(billable_value)
-                    if(billable_value=="true") {
+                    if(billable_value=="Billable") {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
                     }
                     else if(billable_value=="false")
                     {
                         $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
                     }
                 }
 
@@ -142,20 +146,6 @@ $( document ).ready(function() {
                                 $("#member-"+data.member_id+" td").last().find("#OtherCapacitypopupWindow").remove();
                             }
                             $("#member-"+data.member_id+" td").last().append(data.CapacityDetailsPartial);
-
-
-//
-//                             $("div#OtherCapacitypopupWindow").dialog({
-//                                 title: "My Dialog Title",
-//                                 open: function (event, ui) {
-//                                     $(".ui-widget-overlay").css({
-//                                         opacity: 1.0,
-//                                         filter: "Alpha(Opacity=100)",
-//                                         backgroundColor: "black"
-//                                     });
-//                                 },
-//                                 modal: true
-//                             });
 
                             $( "#OtherCapacitypopupWindow" ).dialog({
                                 resizable: false,
@@ -355,15 +345,8 @@ $( document ).ready(function() {
             tooltip.text(ui.value);
             if(ui.value == 0)
             {
-//                $("form#new_membership select#billable").attr("disabled", true);
+                $("form#new_membership select#billable").attr("disabled", true);
                 $("form#new_membership select#billable").val("Non Billable");
-                var billable_status= false
-                $('<input>').attr({
-                    type: 'hidden',
-                    id: 'billable',
-                    name: 'billable',
-                    value: billable_status
-                }).appendTo('form#new_membership');
             }
             else
             {
