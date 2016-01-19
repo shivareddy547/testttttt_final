@@ -20,7 +20,9 @@ class EmployeeInfoController < ApplicationController
      # members.each do |each_member|
      #   collect_member_emails << each_member.concat_user_name_with_mail
      # end
+
      each_project.custom_field_values.each_with_index do |c,index|
+       @user=""
        custom_field =CustomField.where(:id=>c.custom_field_id)
        if custom_field.present? && (custom_field.last.name=="Manager")
          user = each_project.custom_field_values[index].to_s
