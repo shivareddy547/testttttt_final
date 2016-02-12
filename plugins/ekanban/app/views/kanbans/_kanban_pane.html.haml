@@ -3,9 +3,19 @@
   - assignee_name = controller.assignee_name(i.assigned_to)
   - pane = KanbanPane.find(pane_id)
   -#= @pane = KanbanPane.find(pane_id)
-  .kanban-card.card-max-height.tooltip{:id=>"#{i.id}"}
+  - select_value=""
+
+
+  - if pane.kanban.color_group_type == "Assignee"
+    - select_value = i.assigned_to_id
+  - elsif pane.kanban.color_group_type == "Priority"
+    - select_value = i.priority.id
+  - elsif pane.kanban.color_group_type == "Parent"
+    - select_value = i.parent_id
+  .kanban-card.card-max-height.tooltip{:id=>"#{i.id}" }
     /,:title=>"##{i.priority_id}:#{i.subject}<br>To:#{assignee_name}<br>#{i.description}"}
-    .card-header{:style => "overflow:hidden; font-size:10px"}
+    -#.card-header1{:style => "overflow:hidden; font-size:10px",:class=>"p#{i.priority.position}-color" }
+    .card-header1{:style => "overflow:hidden; font-size:10px",:class=>"color_#{select_value.present? ? select_value : ""}" }
       = link_to "##{i.id}", issue_path(i)
       = avatar(i.assigned_to, :size => "12", :title=>assignee_name, :style=>"float:right")
       = hidden_field_tag :project_id, i.project_id
@@ -30,20 +40,59 @@
           - if pane.kanban.present?
             - card_selected_display_columns = pane.kanban.card_selected_display_columns
             - card_selected_display_columns.each do |value|
-              %p
-              %strong= find_value(value.to_sym,i)
-    .card-content{:style => "font-size:10px;position:relative",:class=>"p#{i.priority.position}-color"}
+              %p{:class=>"title"}
+                = find_value(value.to_sym,i).html_safe rescue ""
+      .percent{:title => "0%"}
+        .done{:style => "width:0%;"}
+    .card-content{:style => "font-size:10px;position:relative",:class=>""}
       -#%span{:style=>"margin:4em 0 0 0; text-align:center;font-weight:bold;color:navy;display:none"}="P#{i.priority.position - 1}"
-
       - if @project.present?
         -#- issue_settings = IssueCardConfig.find_by_project_id(@project.id)
         - if pane.kanban.present?
           - card_selected_tooltip_columns = pane.kanban.card_selected_tooltip_columns
           - card_selected_tooltip_columns.each do |value|
             %p
-              = find_value(value.to_sym,i)
+              = find_value(value.to_sym,i).html_safe rescue ""
       - close_state = KanbanState.close_state(pane.kanban)
       - if KanbanWorkflow.transition_allowed?(pane.kanban_state, close_state ,pane.kanban.id)
         .close-check-box
           = check_box_tag 'close_check_box', '', false, :style => "float:right;position:absolute;bottom:0"
+    .status{:style => "\r\n position: relative; width: 100%;\r\n"}
+      -#.plan-icon-t64.left{:title => "Investigation",:onclick=>""}
+      -#= link_to l(:label_kanban_new), new_project_kanban_path(@project.id), :class => 'plan-icon-t64 left'
+      -#%a.issue_add_icon{:href => "#",:onclick=>"openIssuePopup();return false;"}
+      -#%a.issue_edit_icon.icon-edit{:title => "Low",:id=>"#{i.id}"}
+:css
+  .kanban-card .ui-widget-header{
+  background: initial !important;
+  }
+  .ui-widget-header.p1-color{background-color: #ff6666 !important;}
+  .ui-widget-header.p2-color{background-color: #ffc1c1 !important;}
+  .ui-widget-header.p3-color{background-color: #ccff99 !important;}
+  .ui-widget-header.p4-color{background-color: #defebd !important;}
+  .ui-widget-header.p5-color{background-color: #ffffff !important;}
+
+:javascript
+  function ran_col() { //function name
+      var color = '#'; // hexadecimal starting symbol
+      var letters = ['000000','FF0000','00FF00','0000FF','FFFF00','00FFFF','FF00FF','C0C0C0']; //Set your colors here
+      color += letters[Math.floor(Math.random() * letters.length)];
+      document.getElementById('.kanban-card .ui-widget-header').style.background = color; // Setting the random color on your div element.
+  }
+
+  //$(document).ready(function() {
+  //  //$('.kanban-card .ui-widget-header').each(function () {
+  //  //console.log(11111111111111111)
+  //  //    var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
+  //  //    $(.jump-response).css("background-color", hue);
+  //  //});
+  //
+  //  $('.kanban-card').each(function () {
+  //    //console.log(11111111111)
+  //    //var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
+  //    //$(.jump-response).css("background-color", hue);
+  //  });
+  //});
+
+
 

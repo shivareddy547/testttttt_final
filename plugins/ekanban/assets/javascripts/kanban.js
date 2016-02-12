@@ -39,6 +39,7 @@ function kanban_init()
                         },
                         success: function (e, xhr, settings) {
                             find_issue_status_id();
+                            $('#ajax-indicator').hide();
 
 
                         },
@@ -173,7 +174,7 @@ function kanban_init()
             complete: function () {
             },
             success: function (e, xhr, settings) {
-
+                $('#ajax-indicator').hide();
 
             },
             error: function () {
@@ -183,6 +184,37 @@ function kanban_init()
 
 
   });
+
+
+    $(document).on('click', '.kanban-card .status .issue_edit_icon', function() {
+//        console.log(33333333333333)
+        var id= $(this).attr('id');
+        var parent = $(this).parent().parent();
+        var element = "#popupWindow";
+        var kanban_status_id=$(parent).find("#kanban_state_id").val();
+        var issue_status_id=$(parent).find("#issue_card_status_id").val();
+        var kanban_pane_id=$(parent).first().parent().attr("id").split('_')[1];
+        var project_id=$(parent).find("#project_id").val();
+        popupCard($(parent).parent(".kanban-pane"),null,$(this),$(element),"edit")
+        $.ajax({
+            url: "/kanbans/kanban_issue_show", // Route to the Script Controller method
+            type: "POST",
+            dataType: "script",
+            data: { project_id:project_id,issue_id: id,issue_status_id:issue_status_id,kanban_status_id:kanban_status_id,kanban_pane_id:kanban_pane_id  }, // This goes to Controller in params hash, i.e. params[:file_name]
+            complete: function () {
+            },
+            success: function (e, xhr, settings) {
+                console.log("Success");
+                $('#ajax-indicator').hide();
+//                $(document).ready(hideOnLoad);
+            },
+            error: function () {
+//                alert("Error in authentication")
+            }
+        });
+
+
+    });
 
     $("#popupSubmit").click(function(){
         /* Ajax update card here */
@@ -224,6 +256,7 @@ function find_issue_status_id()
         success: function (data) {
 
             $('form.edit_issue select#issue_status_id').val(data.issue_status_id)
+            $('#ajax-indicator').hide();
         }
     });
 
@@ -657,13 +690,13 @@ function kanbanPaneRole(pane_id){
 }
 
 function isValidKanbanTransition(kanban_id,from,to){
-    if (hasRole("Manager")) {return true};
+    if (hasRole("DO")) {return true};
     var t = $("#kanban-data").data("kanban_workflow").kanban_workflow;
     for (var i = 0; i < t.length; i++){
         if (t[i].kanban_workflow.old_state_id == from && to == t[i].kanban_workflow.new_state_id && t[i].kanban_workflow.kanban_id == kanban_id){
             if (t[i].kanban_workflow.check_role){
                 //Manager can perform any transition.
-                return hasRoleId(t[i].kanban_workflow.role_id) || hasRole("Manager");
+                return hasRoleId(t[i].kanban_workflow.role_id) || hasRole("DO");
             }
             return true;
         }
@@ -766,6 +799,7 @@ $(document).on('click', '#new_sprints #new_sprint_submit', function() {
             {
                 $("#sprints_sprints").prepend(data.sprintPartial);
                 $("#NewsprintpopupWindow").dialog('close');
+                $('#ajax-indicator').hide();
 
             }
 
@@ -848,6 +882,7 @@ function update_form(issue_id)
                 $("#popupWindowBody").html(data.editcardPartial)
                 $('form.edit_issue select#kanban_state_id').val(data.kanban_status_id);
                 $('form.edit_issue select#issue_status_id').val(data.issue_status_id);
+                $('#ajax-indicator').hide();
 
 
             }
@@ -909,3 +944,108 @@ function update_form(issue_id)
 //
 //
 //}
+
+//$(document).ready()
+//
+//
+//$( document ).ready(function() {
+////    alert("yes")
+//    $("#sidebar").hide();
+//
+//    if ( $( "#sidebar_btn_left" ).length == 0 ) {
+//
+//        $("#wrapper3").append( "<div id='sidebar_btn_left'></div>" )
+//
+//    }
+//
+////    $("#sidebar").hide();
+//       if ($.cookie('hide_header') == 'yes'){
+//
+//
+//           $("#main").css({
+//               'margin': '0 3% 0 15px',
+//               'padding': '80px 0 0 10px'
+//           });
+//           $("#sidebar_btn_left").css({
+//               'left': '0%'
+//           });
+//
+//           $("#sidebar_btn_left").addClass('sidebar_btn_left');
+//           $(".sidebar_btn_left").removeAttr('id');
+////            $('#main').toggleClass('nosidebar');
+//        }
+//    else{
+//
+//           $( "#header" ).show();
+//           $("#main").css({
+//               'margin': '0 30px 0 250px',
+//               'padding': '80px 0 0 10px'
+//           });
+//           $("#sidebar_btn_left").css({
+//               'left': '17%'
+//
+//           });
+//
+//           $(".sidebar_btn_left").attr('id', 'sidebar_btn_left');
+//           $("#sidebar_btn_left").removeAttr('class');
+//       }
+//
+//
+//
+//
+//
+//});
+//
+//
+//
+////    $( "#header" ).toggle("slow");
+//    $(document).on('click', '#wrapper3 #sidebar_btn_left', function() {
+//        $.cookie('hide_header', 'yes', {path: '/'});
+////        $.cookie('hide_header' ,'yes');
+////        if ($.cookie('hide_header') == 'yes'){
+////            $('#main').toggleClass('nosidebar');
+////        }
+//
+//    $( "#header" ).hide();
+//        $("#main").css({
+//          'margin': '0 3% 0 15px',
+//        'padding': '80px 0 0 10px'
+//        });
+//        $("#sidebar_btn_left").css({
+//            'left': '0%'
+//        });
+//
+//        $("#sidebar_btn_left").addClass('sidebar_btn_left');
+//        $(".sidebar_btn_left").removeAttr('id');
+//
+//
+//
+//});
+//
+//    $(document).on('click', '#wrapper3 .sidebar_btn_left', function() {
+//
+//        $.cookie('hide_header', 'no', {path: '/'});
+//        $( "#header" ).show();
+//        $("#main").css({
+//            'margin': '0 30px 0 250px',
+//            'padding': '80px 0 0 10px'
+//        });
+//        $("#sidebar_btn_left").css({
+//            'left': '17%'
+//
+//        });
+//
+//        $(".sidebar_btn_left").attr('id', 'sidebar_btn_left');
+//        $("#sidebar_btn_left").removeAttr('class');
+//
+//
+//    });
+
+//    $('wheader').toggle(
+//
+//        function() {
+//            $('#header').css('left', '0')
+//        }, function() {
+//            $('#header').css('left', '200px')
+//        });
+

@@ -344,7 +344,7 @@ module KanbansHelper
       if find_custom_id.present?
         custom_field= CustomField.find(find_custom_id.last)
         if issue.custom_field_value(custom_field.id).present?
-        "#{custom_field.name}:  #{issue.custom_field_value(custom_field.id)}"
+        "<strong>#{custom_field.name}:</strong>  #{issue.custom_field_value(custom_field.id)}"
         end
       end
     else
@@ -358,44 +358,47 @@ module KanbansHelper
       case value
 
       when :is_private
-      "Private: #{issue.is_private ==true ? "yes" : "No"}"
+      "<strong> Private: </strong>#{issue.is_private ==true ? "yes" : "No"}"
       when :subject
-      "Subject: #{issue.subject}"
+      "<strong> Subject: </strong> #{issue.subject rescue "" }"
       when :description
-      "Description: #{issue.description}"
+      "<strong> Description: </strong> #{issue.description rescue "" }"
       when :project_id
-      "Project: #{issue.project.name}" if issue.project.present?
+      "<strong> Project:</strong> #{issue.project.name rescue "" }"
       when :tracker_id
-      "Tracker: #{issue.tracker.name}" if issue.tracker.present?
+      "<strong> Tracker: </strong> #{issue.tracker.name rescue "" }"
       when :parent_id
-      "Parent: #{issue.parent.subject}" if issue.parent.present?
+      "<strong> Parent: </strong> #{issue.parent.subject rescue "" }"
       when :status_id
-      "Status: #{issue.project.name}" if issue.status.present?
+      "<strong> Status: </strong> #{issue.project.name rescue "" }"
       when :priority_id
-      "Priority: #{issue.priority.name}" if issue.priority.present?
+      "<strong> Priority: </strong> #{issue.priority.name rescue ""}"
       when :author_id
-      "Author: #{issue.author.firstname}" if issue.author.present?
+      "<strong> Author: </strong> #{issue.author.firstname rescue ""}"
       when :updated_on
-      "Updated on: #{time_ago_in_words(issue.updated_on)} ago"
+      "<strong> Updated on: </strong> #{time_ago_in_words(issue.updated_on) rescue "" } ago"
       when :category_id
-      "Category: #{issue.category.name}" if issue.category.present?
+      "<strong> Category: </strong> #{issue.category.name rescue "" }"
       when :fixed_version_id
-      "Sprint Version: #{issue.fixed_version.name}" if issue.fixed_version.present?
+      "<strong> Sprint Version: </strong> #{issue.fixed_version.name rescue ""}"
       when :start_date
-      "Started on: #{time_ago_in_words(issue.start_date)} ago" if issue.start_date.present?
+      "<strong> Started on: </strong> #{time_ago_in_words(issue.start_date) rescue ""} ago"
       when :due_date
-      "Due Date: #{time_ago_in_words(issue.due_date)}" if issue.due_date.present?
+      "<strong> Due Date: </strong> #{time_ago_in_words(issue.due_date) rescue ""}"
       when :spent_hours
-      "Spent hours: #{issue.spent_hours}"
+      "<strong> Spent hours:</strong>  #{issue.spent_hours rescue ""}"
       when :done_ratio
-      "Done #{issue.done_ratio}%"
+      "<strong> Done: </strong>#{issue.done_ratio rescue "" }%"
       when :created_on
-      "Created on: #{time_ago_in_words(issue.created_on)} ago" if issue.created_on.present?
+      "<strong> Created on: </strong> #{time_ago_in_words(issue.created_on) rescue ""} ago"
       when :estimated_hours
-      "Estimation Hours:#{issue.estimated_hours}" if issue.estimated_hours.present?
+      "<strong> Estimation Hours: </strong>#{issue.estimated_hours rescue ""}"
+      when :assigned_to
+      "<strong> Assignee: </strong>#{issue.assigned_to.firstname rescue ""} #{issue.assigned_to.lastname rescue ""}"
       end
 
     end
+
 
   end
 

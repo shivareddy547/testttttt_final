@@ -1,0 +1,43 @@
+<div class="box tabular">
+  <%= form_tag({:action => 'card_color_group_setup', :controller =>'kanban_cards'},:onsubmit => 'selectAllOptions("selected_columns");selectAllOptions("tool_tip_selected_columns");') do %>
+      <!--<fieldset class="box">-->
+        <!--<legend><%#= l(:card_tooltip_setting_issue_list_default_columns) %></legend>-->
+        <%#= render_query_columns_selection(
+#                     IssueQuery.new(:column_names => @kanban.present? && @kanban.card_selected_display_columns.present? ? @kanban.card_selected_display_columns : Setting.issue_list_default_columns),
+                    :name => 'settings[issue_color_group_default_columns]') %>
+      <!--</fieldset>-->
+      <fieldset class="box">
+        <legend><%= l(:lable_color_group_by) %></legend>
+        <%#= @kanban.color_group_type.inspect  %>
+        <% if @kanban.color_group_type == "Assignee" %>
+          <% select_value= 0 %>
+        <% elsif @kanban.color_group_type == "Priority" %>
+            <% select_value= 1 %>
+        <% elsif @kanban.color_group_type == "Parent" %>
+            <% select_value= 2 %>
+         <% end %>
+        <%= select_tag(:color_group_by, options_for_select([['Assignee', 0], ['Priority', 1], ['Parent', 2]], select_value )) %>
+        <%#= select_tag "color_group_by", "<option>Assignee</option><option>Priority</option><option>Tracker</option>".html_safe,:selected=>"Tracker" %>
+      </fieldset>
+
+      <p>
+
+
+      <%#= select_tag 'hover_values', options_for_select(KanbanQuery.new(:column_names => hover_value).available_columns.collect{|column| [column.caption, column.name]}, hover_value), :multiple => true, :include_blank => true, :size => 10, :style => "width:150px" %>
+      </p>
+      <%= hidden_field_tag "kanban_id", @kanban.id %>
+      <%= hidden_field_tag "project_id", params[:project_id] %>
+      <%= hidden_field_tag "id", params[:id] %>
+
+      <%= submit_tag l(:button_apply) %>
+  <%end%>
+  </div>
+</div>
+
+  <style>
+
+      .tabular label {
+          width: 303px !important;
+      }
+
+  </style>

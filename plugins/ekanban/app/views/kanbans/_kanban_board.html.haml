@@ -1,88 +1,86 @@
+-#%script{:src => "/themes/pixel-cookers/javascripts/theme.js?1454575409", :type => "text/javascript"}
+-#= link_to l(:label_kanban_full_screen),:href=>"#", :onclick => "fullscreen();return false;", :class => 'icon icon-setup', :style => 'float:right'
 
-.kanban-board
-  = stylesheet_link_tag 'kanban', :plugin => 'ekanban'
-  -#= link_to l(:label_kanban_full_screen),:href=>"#", :onclick => "fullscreen();return false;", :class => 'icon icon-setup', :style => 'float:right'
+= link_to l(:label_kanban_setup), edit_project_kanban_path(@project.id,kanban.id), :class => 'icon icon-setup', :style => 'float:right'
+= link_to l(:label_kanban_report), {:controller => "kanban_reports", :action => "index", :project_id => @project.id}, :class => 'icon icon-report', :style => 'float:right'
 
-  = link_to l(:label_kanban_setup), edit_project_kanban_path(@project.id,kanban.id), :class => 'icon icon-setup', :style => 'float:right'
-  = link_to l(:label_kanban_report), {:controller => "kanban_reports", :action => "index", :project_id => @project.id}, :class => 'icon icon-report', :style => 'float:right'
+-#%a.icon.icon-fullscreen{:href => "#", :style => "float:right;",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
+-#
+-#%a.icon.icon-add{:href => "#",:style => "float:right;margin-left:10px;margin-right:1px",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time
+-#%input{:onclick => "fullscreen();", :type => "button",:id=>"fullscreen", :value => "fullscreen"}/
+-#= search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
+-#= label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
+-#%p
+= search_field_tag "kanban-search", "", :class => "small find-card", :style=>"float:right;width:150px",:selector=>"#kanban_#{kanban.id}"
+= label_tag "search card:", "Find:",:style => "float:right;margin-top:5px;margin-right:5px"
+%h3{:style => "margin-top:20px"}= kanban.name
 
-  -#%a.icon.icon-fullscreen{:href => "#", :style => "float:right;",:id=>"fullscreen",:onclick => "fullscreen();"} Full Screen
-  -#
-  -#%a.icon.icon-add{:href => "#",:style => "float:right;margin-left:10px;margin-right:1px",:id=>"kanban_log_entry",:onclick => "time_entry_popup();"} Log time
-  -#%input{:onclick => "fullscreen();", :type => "button",:id=>"fullscreen", :value => "fullscreen"}/
-  -#= search_field_tag "cards_per_column_#{kanban.id}", "", :class => "small cards-per-column", :style=>"float:right;width:20px",:selector=>"#kanban_#{kanban.id}"
-  -#= label_tag "pane width:", "  Cards Per Row:", :style => "float:right;margin-top:5px;margin-left:10px;margin-right:1px", :title => "How many cards each row shown in a pane"
-  -#%p
-  = search_field_tag "kanban-search", "", :class => "small find-card", :style=>"float:right;width:150px",:selector=>"#kanban_#{kanban.id}"
-  = label_tag "search card:", "Find:",:style => "float:right;margin-top:5px;margin-right:5px"
-  %h3{:style => "margin-top:20px"}= kanban.name
+- panes = controller.panes(kanban)
+- panes_num = panes.size
 
-  - panes = controller.panes(kanban)
-  - panes_num = panes.size
-
-  %table.kanban{:id=>"kanban_#{kanban.id}"}
-    - if panes_num > 0
-      %tr{:style=>"height:30px"}
-        - stages = controller.stages_and_panes(panes)
-        - stages.each do |s|
-          - if s[:panes].size == 1
-            %th{:id=>"stage_#{s[:stage].id}", :rowspan=>"2", :name=>s[:panes].first.name}
-              .plain-text{:style => "width:80%;float:left"}
-                = s[:stage].name
-                %span.wip-text{:id => "wip_#{s[:stage].id}"}= " "
-                /%span.ui-icon.ui-icon-minus{:style=>"float:right;width:8px;height:8px"}
+%table.kanban{:id=>"kanban_#{kanban.id}"}
+  - if panes_num > 0
+    %tr{:style=>"height:30px"}
+      - stages = controller.stages_and_panes(panes)
+      - stages.each do |s|
+        - if s[:panes].size == 1
+          %th{:id=>"stage_#{s[:stage].id}", :rowspan=>"2", :name=>s[:panes].first.name}
+            .plain-text{:style => "width:80%;float:left"}
+              = s[:stage].name
+              %span.wip-text{:id => "wip_#{s[:stage].id}"}= " "
+              /%span.ui-icon.ui-icon-minus{:style=>"float:right;width:8px;height:8px"}
+            .menu-icon{:style=>"position:relative"}
+              .ui-icon-triangle-1-s.ui-icon{:style=>"position:absolute;left:80%"}
+              %ul.menu-holder{:style=>"display:none"}
+                %li{:id=>"li_collapse_all_#{s[:panes].first.id}"}
+                  %a
+                    %span.ui-icon.ui-icon-minus.menu-icon{:title=>"Collapse All"}
+                    .menu-text Collapse All
+                - if KanbanWorkflow.transition_allowed?(s[:states].first,KanbanState.close_state(kanban),kanban.id)
+                  %li{:id=>"li_check_all_#{s[:panes].first.id}"}
+                    %a
+                      %span.ui-icon.ui-icon-check.menu-icon{:title=>"Check All"}
+                      .menu-text Check All
+                  %li{:id=>"li_close_#{s[:panes].first.id}"}
+                    %a
+                      %span.ui-icon.ui-icon-seek-end.menu-icon{:title=>"Close Selected"}
+                      .menu-text Close Selected
+        - else
+          %th{:id=>"stage_#{s[:stage].id}", :colspan=>"#{s[:panes].size}", :name=>s[:stage].name}
+            =s[:stage].name
+            %span.wip-text{:id => "wip_#{s[:stage].id}"}= "  "
+    %tr
+      - stages.each do |s|
+        - if s[:panes].size > 1
+          - s[:panes].each do |pane|
+            %th{:id=>"pane_#{pane.name}"}
+              .plain-text{:style => "width:80%;float:left"}=pane.name
               .menu-icon{:style=>"position:relative"}
                 .ui-icon-triangle-1-s.ui-icon{:style=>"position:absolute;left:80%"}
                 %ul.menu-holder{:style=>"display:none"}
-                  %li{:id=>"li_collapse_all_#{s[:panes].first.id}"}
+                  %li{:id=>"li_collapse_all_#{pane.id}"}
                     %a
                       %span.ui-icon.ui-icon-minus.menu-icon{:title=>"Collapse All"}
                       .menu-text Collapse All
-                  - if KanbanWorkflow.transition_allowed?(s[:states].first,KanbanState.close_state(kanban),kanban.id)
-                    %li{:id=>"li_check_all_#{s[:panes].first.id}"}
+                  - if KanbanWorkflow.transition_allowed?(pane.kanban_state, KanbanState.close_state(kanban),kanban.id)
+                    %li{:id=>"li_check_all_#{pane.id}"}
                       %a
                         %span.ui-icon.ui-icon-check.menu-icon{:title=>"Check All"}
                         .menu-text Check All
-                    %li{:id=>"li_close_#{s[:panes].first.id}"}
+                    %li{:id=>"li_close_#{pane.id}"}
                       %a
                         %span.ui-icon.ui-icon-seek-end.menu-icon{:title=>"Close Selected"}
                         .menu-text Close Selected
-          - else
-            %th{:id=>"stage_#{s[:stage].id}", :colspan=>"#{s[:panes].size}", :name=>s[:stage].name}
-              =s[:stage].name
-              %span.wip-text{:id => "wip_#{s[:stage].id}"}= "  "
-      %tr
-        - stages.each do |s|
-          - if s[:panes].size > 1
-            - s[:panes].each do |pane|
-              %th{:id=>"pane_#{pane.name}"}
-                .plain-text{:style => "width:80%;float:left"}=pane.name
-                .menu-icon{:style=>"position:relative"}
-                  .ui-icon-triangle-1-s.ui-icon{:style=>"position:absolute;left:80%"}
-                  %ul.menu-holder{:style=>"display:none"}
-                    %li{:id=>"li_collapse_all_#{pane.id}"}
-                      %a
-                        %span.ui-icon.ui-icon-minus.menu-icon{:title=>"Collapse All"}
-                        .menu-text Collapse All
-                    - if KanbanWorkflow.transition_allowed?(pane.kanban_state, KanbanState.close_state(kanban),kanban.id)
-                      %li{:id=>"li_check_all_#{pane.id}"}
-                        %a
-                          %span.ui-icon.ui-icon-check.menu-icon{:title=>"Check All"}
-                          .menu-text Check All
-                      %li{:id=>"li_close_#{pane.id}"}
-                        %a
-                          %span.ui-icon.ui-icon-seek-end.menu-icon{:title=>"Close Selected"}
-                          .menu-text Close Selected
-      %tr{:style=>"height:90%; overflow-y:auto"}
-        - panes.inject(0) do |i,pane|
-          - if pane.kanban_state.is_closed == false
-            %td.kanban-pane{:id=>"pane_#{pane.id}",:state_id=>"#{pane.kanban_state_id}",:role_id=>"#{pane.role_id}",:check_wip=>"#{pane.in_progress}"}
-              - if pane.kanban_state.is_initial == true
-                %input#backlog-search.small{:type=>"text",:style=>"display:none;width:90%;margin:0px;align:center"}
-              = render :partial => "kanban_pane", :locals=>{:kanban_id => kanban.id, :pane_id => pane.id}
+    %tr{:style=>"height:90%; overflow-y:auto"}
+      - panes.inject(0) do |i,pane|
+        - if pane.kanban_state.is_closed == false
+          %td.kanban-pane{:id=>"pane_#{pane.id}",:state_id=>"#{pane.kanban_state_id}",:role_id=>"#{pane.role_id}",:check_wip=>"#{pane.in_progress}"}
+            - if pane.kanban_state.is_initial == true
+              %input#backlog-search.small{:type=>"text",:style=>"display:none;width:90%;margin:0px;align:center"}
+            = render :partial => "kanban_pane", :locals=>{:kanban_id => kanban.id, :pane_id => pane.id}
 
 
-  = content_tag "div", "", :id => "kanban-panes-data", :data => {:panes => panes.to_json}
+= content_tag "div", "", :id => "kanban-panes-data", :data => {:panes => panes.to_json}
 
 
 = javascript_include_tag "kanban", :plugin => :ekanban
@@ -121,7 +119,7 @@
 
   //var  d = document.getElementById('controls').style;
   var d = {};
-  var speed = 900;
+  var speed = 500;
   if(!isFullscreen){ // MAXIMIZATION
 
   /*comment to have smooth transition from centre but loose covering the header*/
@@ -130,23 +128,42 @@
   d.height="100%";
   d.left="0%";
   d.top="0%";
-  d.margin="0 0 0 0";
-  d.background="yellow";
+  d.margin="3% 0 0 0px";
+  d.background="white";
   $("#kanban_boards").animate(d,speed);
   isFullscreen = true;
   //alert("yes")
+  // #FAEBD7
+  // yellow
   $('a#fullscreen').text("Exit full screen");
+  $("#top-menu").hide();
+  $("#header").hide();
+  $("#sidebar_btn_left").hide();
+  $(".sidebar_btn_left").hide();
   $('#kanban_boards').css({
-     background: '#FAEBD7'
+     'background': 'white',
+     'float':'right',
+     'margin-right': '0%',
+     'margin-top': '0%',
+     'margin-left': '0%'
     });
     $('.kanban').css({
-        background: '#FAEBD7'
+        background: 'white'
     });
+    $('a#fullscreen').css({'float':'right',
+                                'margin-right': '2%',
+                                'margin-top': '2%',
+                                'margin-left': '2%'})
+
 
   }else{ // MINIMIZATION
   /* comment to have smooth minimze transition but not be placed below header */
   //alert("no")
   //alert(document.getElementById('kanban_boards'))
+  $("#top-menu").show();
+  $("#header").show();
+   $("#sidebar_btn_left").show();
+   $(".sidebar_btn_left").show();
    document.getElementById('kanban_boards').style.position= "relative";
    $("#kanban_boards").animate(d,speed);
    isFullscreen = false;
@@ -159,6 +176,9 @@
             background: 'white'
     });
    $('a#fullscreen').text("Full screen");
+
+
+
   }
   }
   function time_entry_popup()
@@ -190,7 +210,62 @@
 
 
   }
+  var safeColors = ['00','33','66','99','cc','ff'];
+      var rand = function() {
+          return Math.floor(Math.random()*6);
+      };
+      var randomColor = function() {
+          var r = safeColors[rand()];
+          var g = safeColors[rand()];
+          var b = safeColors[rand()];
+          return "#"+r+g+b;
+      };
+      var randomColor1 = function(index) {
+                var Colors = ["#6BFFB3", "#D0DDFF", "#C7EDFF", "#F8B17E", "#FFF83B", "#FFCCC6","#E8FF92","#F8DE7E","#FFA9F5","#F36822","#8EE8D9","#C4C480","#8EE88F","#CC9C61","Lavender"];
+                return Colors[index]
+            };
+      $(document).ready(function() {
+          var collect_ids=[]
+          //var ran_color = randomColor();
+          $('.card-header1').each(function() {
+             var id = $(this).attr("class").split(" ")[1].split("_")[1]
 
+             if(id)
+             {
+              collect_ids.push(id);
+                          //console.log(collect_ids.uniq());
+                collect_ids = deduplicate(collect_ids);
+             }
+
+
+             //console.log(collect_ids.compact().uniq());
+              //$(this).css('background',randomColor());
+          });
+          console.log(collect_ids.length);
+          //collect_ids.each(function() {
+          //
+          //
+          //});
+          if(collect_ids.length > 0)
+          {
+          $.each(collect_ids, function( index, value ) {
+                        //alert( index + ": " + value );
+                      $(".color_"+value).css('background',randomColor1(index));
+                    });
+                    function deduplicate(data){
+                        if (data.length>0){
+                            var result=[];
+                            for (var i=0; i<data.length; i++){
+                                if (result.indexOf(data[i])===-1){
+                                    result.push(data[i]);
+                                }
+                            }
+                            return result;
+                        }
+                    }
+          }
+
+      });
 
 
 

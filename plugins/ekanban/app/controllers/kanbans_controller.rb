@@ -293,7 +293,8 @@ end
     tabs = [{:name => 'General', :action => :kanban_general, :partial => 'general', :label => :label_kanban_general},
             {:name => 'Panes', :action => :kanban_pane, :partial => 'panes', :label => :label_kanban_panes},
             {:name => 'Workflow', :action => :kanban_workflow, :partial => 'workflow', :label => :label_kanban_workflow},
-            {:name => 'Config', :action => :kanban_pane, :partial => 'card_fieldssetup', :label => :label_card_fields_setup}
+            {:name => 'Config', :action => :kanban_pane, :partial => 'card_fieldssetup', :label => :label_card_fields_setup},
+            {:name => 'Group', :action => :kanban_pane, :partial => 'card_group_color_setup', :label => :label_card_group_setup}
     ]
     #tabs.select {|tab| User.current.allowed_to?(tab[:action], @project)}
   end

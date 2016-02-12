@@ -315,6 +315,15 @@ p "++++++++++++++issue errrorooooooooooo"
 
   end
 
+  def card_color_group_setup
+    @color_groups=["Assignee","Priority","Parent"]
+    kanban = Kanban.find(params[:kanban_id])
+    kanban.color_group_type = @color_groups[params[:color_group_by].to_i] if params[:color_group_by].present?
+    kanban.save
+    redirect_to edit_project_kanban_path(params[:project_id],params[:id], :tab => 'Group')
+
+  end
+
   def log_entry_new
 
     @time_entry ||= TimeEntry.new(:project => @project, :issue => @issue, :user => User.current, :spent_on => User.current.today)

@@ -39,3 +39,5 @@ en:
   card_tooltip_setting_issue_list_default_columns: "Selected columns displays in issue card tooltip..!"
   label_card_fields_setup: "Agile Board Card fields Setup"
   label_add_new_issue: "Add New Task"
+  label_card_group_setup: "Card color group setup"
+  lable_color_group_by: "Color Group By"

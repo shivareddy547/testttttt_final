@@ -41,6 +41,7 @@ RedmineApp::Application.routes.draw do
   match 'kanban_cards/log_entry_create', :controller => 'kanban_cards', :action => "log_entry_create",:via => [:get,:post]
 	match 'kanban_cards/add_new_issue', :controller => 'kanban_cards', :action => "add_new_issue",:via => [:get,:post]
 	match 'kanban_cards/create_new_issue', :controller => 'kanban_cards', :action => "create_new_issue",:via => [:get,:post]
+  match 'kanban_cards/card_color_group_setup', :controller => 'kanban_cards', :action => "card_color_group_setup"
 
 
 end
