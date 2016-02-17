@@ -365,7 +365,7 @@ class ImporterController < ApplicationController
 
 
   def result
-    p "++++++++++++++++++++++++++starting+++++++++++++++++"
+
     start_time = Time.now
     @handle_count = 0
     @update_count = 0
@@ -588,6 +588,7 @@ class ImporterController < ApplicationController
         parent_value = row[attrs_map["parent_issue"]]
         if parent_value && (parent_value.length > 0)
           issue.parent_issue_id = issue_for_unique_attr(unique_attr,parent_value,row).id
+          issue.parent_id=issue_for_unique_attr(unique_attr,parent_value,row).id
         end
       rescue NoIssueForUniqueValue
         if ignore_non_exist
@@ -679,19 +680,47 @@ class ImporterController < ApplicationController
         sql_values = sql_values + "(#{ saved_issues_values.map{ |i| '"%s"' % i }.join(', ') }),"
         sql_values=sql_values.chomp(',')
         sql_query= "VALUES#{sql_values}"
-        final_sql = "REPLACE INTO issues (#{@saved_issues_attributes}) #{sql_query}"
+        p final_sql = "REPLACE INTO issues (#{@saved_issues_attributes}) #{sql_query}"
         connection = ActiveRecord::Base.connection
         connection.execute(final_sql.to_s)
         if issue.id.present?
-          sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
-          connection.execute(sql_query_for_parent.to_s)
+
+          # sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
+          # connection.execute(sql_query_for_parent.to_s)
+          issue.self_parent_update
         else
+
           sql_for_inserted_id="SELECT LAST_INSERT_ID() from issues LIMIT 1"
           find_inserted_record =connection.execute(sql_for_inserted_id)
           if find_inserted_record.present? && find_inserted_record.first[0] != 0
             issue = Issue.find(find_inserted_record.first[0])
-            sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
-            connection.execute(sql_query_for_parent.to_s)
+
+            # if issue.parent_id.present? && issue.parent_id != 0
+            #
+            #   # issue.self_parent_update
+            #   parent = Issue.find(issue.parent_id)
+            #   if parent.present?
+            #
+            #     Issue.where(id: issue.id).update_all(:parent_id=>parent.root_id,:root_id=>parent.root_id,:lft=>parent.rgt+0,:rgt=>parent.rgt+1)
+            #     updated_issue = Issue.find(issue.id)
+            #     Issue.where(id: parent.id).update_all(:root_id=>parent.root_id,:rgt=>updated_issue.rgt+1)
+            #
+            #   end
+            #
+            # else
+            #   Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>"NULL",:lft=>Issue.maximum(:lft) + 1,:rgt=>Issue.maximum(:rgt) + 1  )
+            #
+            # end
+
+            # sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
+            # connection.execute(sql_query_for_parent.to_s)
+           if issue.parent_id.present? && issue.parent_id !=0
+            issue.self_parent_update
+
+           else
+             Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>nil,:lft=>Issue.maximum(:lft) + 1,:rgt=>Issue.maximum(:lft) + 2  )
+           end
+
           end
         end
 

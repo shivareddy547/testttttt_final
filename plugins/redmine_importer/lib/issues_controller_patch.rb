@@ -4,7 +4,7 @@ module IssuesControllerPatch
       # Insert overrides here, for example:
       # Issues Bulk update with out Activities updation
 def update
-  p "+++++++++++++++update +++++++++++++"
+
         return unless update_issue_from_params
         @issue.update_attributes(:bulk_update=>false,:imported=>false)
         @issue.save_attachments(params[:attachments] || (params[:issue] && params[:issue][:uploads]))
@@ -20,6 +20,7 @@ def update
         end
 
         if saved
+          @issue.self_parent_update
           render_attachment_warning_if_needed(@issue)
           flash[:notice] = l(:notice_successful_update) unless @issue.current_journal.new_record?
 
@@ -113,16 +114,40 @@ def bulk_update
       connection = ActiveRecord::Base.connection
       connection.execute(final_sql.to_s)
       if issue.id.present?
-         sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
-        connection.execute(sql_query_for_parent.to_s)
+
+        if params[:issue][:parent_issue_id].present?
+           # issue.save_parent_value(params[:issue][:parent_issue_id])
+
+          parent = Issue.find(params[:issue][:parent_issue_id])
+          if parent.present?
+
+            Issue.where(id: issue.id).update_all(:parent_id=>parent.id,:root_id=>parent.id,:lft=>parent.rgt+0,:rgt=>parent.rgt+1)
+            updated_issue = Issue.find(issue.id)
+            Issue.where(id: parent.id).update_all(:root_id=>parent.id,:rgt=>updated_issue.rgt+1)
+
+          end
+
+         else
+          Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>"NULL")
+        end
+        # sql_query_for_parent="UPDATE issues set root_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
+        # connection.execute(sql_query_for_parent.to_s)
       else
         sql_for_inserted_id="SELECT LAST_INSERT_ID() from issues LIMIT 1"
         find_inserted_record =connection.execute(sql_for_inserted_id)
         if find_inserted_record.present? && find_inserted_record.first[0] != 0
-          p 55555555555555555555555555555555555555555555555555555
+
           issue = Issue.find(find_inserted_record.first[0])
-          sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
-          connection.execute(sql_query_for_parent.to_s)
+          # parent_issue = Issue.find(params[:issue][:parent_issue_id]) if params[:issue][:parent_issue_id].present?
+          if params[:issue][:parent_issue_id].present?
+            # Issue.where(id: issue.id).update_all(:parent_id=>parent_issue.id,:root_id=>parent_issue.id,:lft=>parent_issue.rgt,:rgt=>parent_issue.rgt+1)
+            # Issue.where(id: parent_issue.id).update_all(:root_id=>parent_issue.id,:rgt=>issue.rgt+1)
+            issue.save_parent_value(params[:issue][:parent_issue_id])
+          else
+            Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>"NULL")
+          end
+          # sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
+          # connection.execute(sql_query_for_parent.to_s)
         end
       end
 
@@ -166,5 +191,22 @@ def bulk_update
 end
 
     end
+  end
+
+  def save_parent_value(issue,parent_id)
+    p "+++++++++++pareeeeeeeeeeeeeeeee++++++++"
+    p parent_id
+    p parent = Issue.find(parent_id)
+    issue = Issue.find(issue)
+    if parent.present?
+      p "++++++++++++++present++++++++++++++++++++++++="
+      Issue.where(id: issue.id).update_all(:parent_id=>parent.id,:root_id=>parent.id,:lft=>parent.rgt,:rgt=>parent.rgt+1)
+      Issue.where(id: parent.id).update_all(:root_id=>parent.id,:rgt=>issue.rgt+1)
     end
+    p "+++++++++++++++++++++++++updated issue +++++++++++++++++++++"
+    p parent
+    p issue
+    p "++++++++++++++++++++++++++++++++end ++++++++++++++++++++++++++++++"
+
+  end
 end
