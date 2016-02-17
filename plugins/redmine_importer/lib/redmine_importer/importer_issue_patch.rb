@@ -26,7 +26,7 @@ module RedmineImporter
 
       module InstanceMethods
         def self_parent_update
-
+          
 
            if self.parent_id.present? && self.parent_id != 0
           parent = Issue.find(self.parent_id)
@@ -39,7 +39,10 @@ module RedmineImporter
           end
            end
 
-
+          p "++++++++uuuuuuuuuuuuuuuu++isssue++++++++++"
+          p self
+          p "++++++++parent +++++++++++"
+          p self.parent
 
         end
       end
