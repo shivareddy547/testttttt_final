@@ -115,10 +115,10 @@ def bulk_update
       connection.execute(final_sql.to_s)
       if issue.id.present?
 
-        if params[:issue][:parent_issue_id].present?
+        if (issue.parent_id.present? && issue.parent_id != 0) ||  params[:issue][:parent_issue_id].present?
            # issue.save_parent_value(params[:issue][:parent_issue_id])
 
-          parent = Issue.find(params[:issue][:parent_issue_id])
+          parent = Issue.find(params[:issue][:parent_issue_id].present? ? params[:issue][:parent_issue_id] : issue.parent_id)
           if parent.present?
 
             Issue.where(id: issue.id).update_all(:parent_id=>parent.id,:root_id=>parent.id,:lft=>parent.rgt+0,:rgt=>parent.rgt+1)
@@ -128,7 +128,7 @@ def bulk_update
           end
 
          else
-          Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>"NULL")
+          Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>issue.parent_id.present? && issue.parent_id != 0 ? issue.parent_id : nil)
         end
         # sql_query_for_parent="UPDATE issues set root_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
         # connection.execute(sql_query_for_parent.to_s)
@@ -139,12 +139,23 @@ def bulk_update
 
           issue = Issue.find(find_inserted_record.first[0])
           # parent_issue = Issue.find(params[:issue][:parent_issue_id]) if params[:issue][:parent_issue_id].present?
-          if params[:issue][:parent_issue_id].present?
-            # Issue.where(id: issue.id).update_all(:parent_id=>parent_issue.id,:root_id=>parent_issue.id,:lft=>parent_issue.rgt,:rgt=>parent_issue.rgt+1)
-            # Issue.where(id: parent_issue.id).update_all(:root_id=>parent_issue.id,:rgt=>issue.rgt+1)
-            issue.save_parent_value(params[:issue][:parent_issue_id])
+          if (issue.parent_id.present? && issue.parent_id != 0) ||  params[:issue][:parent_issue_id].present?
+            # issue.save_parent_value(params[:issue][:parent_issue_id])
+
+            # parent = Issue.find(params[:issue][:parent_issue_id].present? ? params[:issue][:parent_issue_id] : issue.parent_id)
+
+            parent = Issue.find(params[:issue][:parent_issue_id].present? ? params[:issue][:parent_issue_id] : issue.parent_id)
+            if parent.present?
+
+              Issue.where(id: issue.id).update_all(:parent_id=>parent.id,:root_id=>parent.id,:lft=>parent.rgt+0,:rgt=>parent.rgt+1)
+              updated_issue = Issue.find(issue.id)
+              Issue.where(id: parent.id).update_all(:root_id=>parent.id,:rgt=>updated_issue.rgt+1)
+
+            end
+
+
           else
-            Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=>"NULL")
+            Issue.where(id: issue.id).update_all(:root_id=>issue.id,:parent_id=> issue.parent_id.present? && issue.parent_id != 0 ? issue.parent_id : nil )
           end
           # sql_query_for_parent="UPDATE issues set root_id=#{issue.id},parent_id=#{issue.parent_id.present? && issue.parent_id !=0 ? issue.parent_id : "NULL"},lft=#{Issue.maximum(:lft) + 1},rgt=#{Issue.maximum(:rgt) + 1}  where id = #{issue.id}"
           # connection.execute(sql_query_for_parent.to_s)
