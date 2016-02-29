@@ -1,0 +1,30 @@
+<div id="content">
+
+<div class="contextual">
+  <a href="/projects_locations/new" class="icon icon-add">New Location</a>
+</div>
+<h2>Locations</h2>
+<table class="list">
+<thead><tr>
+  <th>Name</th>
+  <th>Region</th>
+  <th></th>
+</tr></thead>
+<tbody>
+<% @locations.each do |each_location| %>
+<tr class="odd">
+  <td class="name"><a href="/projects_locations/edit?id=<%= each_location.id %>"><%= each_location.name %></a></td>
+  <td class="name"><a href="/projects_regions/edit?id=<%= each_location.region_id %>"><%= each_location.project_region.name %></a></td>
+  <td class="buttons">
+    <a href="/projects_locations/delete?id=<%= each_location.id %>" class="icon icon-del" data-confirm="Are you sure?" data-method="delete" rel="nofollow">Delete</a>
+    <a href="/projects_locations/edit?id=<%= each_location.id %>" class="icon icon-edit" >Edit</a>
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+
+
+
+<div style="clear:both;"></div>
+</div>

@@ -1,0 +1,57 @@
+<%#= form.select_tag "project_region", options_from_collection_for_select(ProjectRegion.all, "id", "name") %>
+<p>
+
+<%= form.select(:region_id, ProjectRegion.find(:all).collect {|u| [u.name, u.id]},:selected => @project.region_id) %>
+</p>
+<p>
+<%= form.select(:location_id, ProjectLocation.find(:all).collect {|u| [u.name, u.id]},:selected => @project.location_id) %>
+</p>
+<%#= form.select_tag "project_location", options_from_collection_for_select(ProjectLocation.all, "id", "name") %>
+
+<script>
+    $( document ).ready(function() {
+        console.log( "ready!" );
+        var region_id=$("#project_region_id").val();
+//        update_location(region_id);
+        $( "#project_region_id" ).change(function() {
+            var region_id=$("#project_region_id").val();
+            update_location(region_id);
+        });
+
+    });
+    function update_location(id)
+    {
+        $.ajax({
+            url: "/get_project_locations?id="+id, // Route to the Script Controller method
+            data: { id: id },
+            type: "POST",
+            dataType: 'json',
+
+            // This goes to Controller in params hash, i.e. params[:file_name]
+             success: function(data) {
+                 console.log("sdjfhsdjffdsf");
+                 console.log(data.locations);
+                 var options, index, select, option;
+
+                 // Get the raw DOM object for the select box
+                 select = document.getElementById('project_location_id');
+
+                 // Clear the old options
+                 select.options.length = 0;
+
+                 // Load the new options
+                 options = data.locations; // Or whatever source information you're working with
+                 for (index = 0; index < options.length; ++index) {
+                     option = options[index];
+                     console.log(option.project_location)
+                     select.options.add(new Option(option.project_location.name, option.project_location.id));
+                 }
+
+//                var foo = $.parseJSON(data);
+                // alert(foo.id); // alert(foo.name);
+                // etc.
+            }
+        });
+    }
+
+</script>

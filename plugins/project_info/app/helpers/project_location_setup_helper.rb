@@ -1,0 +1,2 @@
+module ProjectLocationSetupHelper
+end

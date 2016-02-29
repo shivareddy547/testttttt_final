@@ -1,0 +1,29 @@
+<div id="content">
+
+<div class="contextual">
+  <a href="/projects_regions/new" class="icon icon-add">New Region</a>
+</div>
+<h2>Regions</h2>
+<table class="list">
+<thead><tr>
+  <th>Name</th>
+   <th></th>
+</tr></thead>
+<tbody>
+<% @regions.each do |each_region| %>
+<tr class="odd">
+  <td class="name"><a href="/projects_regions/edit?id=<%= each_region.id %>"><%= each_region.name %></a></td>
+
+  <td class="buttons">
+    <a href="/projects_regions/delete?id=<%= each_region.id %>" class="icon icon-del" data-confirm="Are you sure?" data-method="delete" rel="nofollow">Delete</a>
+    <a href="/projects_regions/edit?id=<%= each_region.id %>" class="icon icon-edit" >Edit</a>
+  </td>
+</tr>
+<% end %>
+</tbody>
+</table>
+
+
+
+<div style="clear:both;"></div>
+</div>

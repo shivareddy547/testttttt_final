@@ -1,0 +1,17 @@
+<h1>Edit Location</h1>
+<form accept-charset="UTF-8" action="/projects_locations/update" class="update_location" id="location_update" method="post">
+  <%= hidden_field_tag  "id",params[:id] %>
+  <div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>
+  <div class="box tabular">
+    <p><label for="location_name">Name<span class="required"> *</span></label>
+      <input id="location_name" name="location[name]" size="30" value="<%= @location.name %>" type="text" required></p>
+    <p>
+      <label for="location_name">Region<span class="required"> *</span></label>
+      <%= select_tag "location[region]", options_from_collection_for_select(@regions, "id", "name"),:required=>true %>
+    </p>
+  </div>
+  <input name="commit" type="submit" value="Update">
+  <!-- - path = @pane.id.nil? ? settings_project_path(@project) : edit_project_kanban_path(@project.id,@kanban.id) -->
+  <!-- - t = @kanban.id.nil? ? {:tab => 'Kanban'} : {:tab => "states"} -->
+  <!-- = link_to l(:button_cancel), edit_tracker_kanban_state_path(@tracker.id,@state.id) -->
+</form>
