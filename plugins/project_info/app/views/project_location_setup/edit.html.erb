@@ -7,7 +7,7 @@
       <input id="location_name" name="location[name]" size="30" value="<%= @location.name %>" type="text" required></p>
     <p>
       <label for="location_name">Region<span class="required"> *</span></label>
-      <%= select_tag "location[region]", options_from_collection_for_select(@regions, "id", "name"),:required=>true %>
+      <%= select_tag "location[region]", options_from_collection_for_select(@regions, "id", "name",@location.region_id),:required=>true %>
     </p>
   </div>
   <input name="commit" type="submit" value="Update">

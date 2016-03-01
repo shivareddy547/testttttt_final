@@ -23,10 +23,11 @@ class ProjectLocationSetupController < ApplicationController
   end
 
   def create
-  @new_location = ProjectLocation.new
-  @new_location.name=params[:location][:name]
-  @new_location.region_id=params[:location][:region]
-  if @new_location.save
+  @location = ProjectLocation.new
+  @location.name=params[:location][:name]
+  @location.region_id=params[:location][:region]
+  @regions= ProjectRegion.all
+  if @location.save
     redirect_to projects_location_list_path
   else
     render "new"

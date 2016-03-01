@@ -1,3 +1,10 @@
+<% if @location.errors.any? %>
+    <ul class="errors">
+      <% @location.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+      <% end %>
+    </ul>
+<% end %>
 <h1>New Location</h1>
 <form accept-charset="UTF-8" action="/projects_locations/create" class="new_kanban_state" id="kanban-state-form" method="post">
   <div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="✓"></div>
@@ -14,3 +21,9 @@
   <!-- - t = @kanban.id.nil? ? {:tab => 'Kanban'} : {:tab => "states"} -->
   <!-- = link_to l(:button_cancel), edit_tracker_kanban_state_path(@tracker.id,@state.id) -->
 </form>
+
+<style>
+    .errors li{
+        color: red;
+    }
+</style>
