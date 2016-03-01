@@ -15,7 +15,8 @@
         </thead>
         <tbody>
 
-        <% manager_role_id = Role.where(:name=>'Manager').first.id %>
+        <%# manager_role_id = Role.where(:name=>'Manager').first.id %>
+        <% manager_role_id = Role.find_by_sql("select * from roles where permissions like '%manage_members%' limit 1").first.id %>
         <% @manager_id = members.collect{|member| member.user.id if member.member_roles.present? && member.member_roles.first.id == manager_role_id }.compact %>
         <% members.each do |member| %>
             <% next if member.new_record? %>

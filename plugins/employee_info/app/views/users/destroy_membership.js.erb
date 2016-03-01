@@ -50,7 +50,7 @@ $(document).on('change', '#user_billable', function(event) {
 
 $(document).on('click', 'table.memberships .icon-edit', function(event) {
     event.stopImmediatePropagation();
-    console.log(1111111111111111111111111)
+
     $(this).closest('tr').find("#user_billable").attr("disabled", false);
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
@@ -62,6 +62,19 @@ $(document).on('click', 'table.memberships .icon-edit', function(event) {
     $(this).closest('tr').find("#div_member_capacity_slider").show();
     //console.log(billable_status);
     //console.log(member_id);
+
+    if (billable_status == "billable")
+    {
+        billable_status = 1
+    }
+    else if(billable_status == "shadow")
+    {
+        billable_status = 2
+    }
+    else if(billable_status == "support")
+    {
+        billable_status = 3
+    }
 
     $('<input>').attr({
         type: 'hidden',
