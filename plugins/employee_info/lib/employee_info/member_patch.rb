@@ -11,19 +11,26 @@ module EmployeeInfo
           # validates :billable,:inclusion => {:in => [true, false],:message => "Choose Billable or Non Billable"},:if=>:validate_billable
           # validates_uniqueness_of :billable, :scope => [:user_id], :if => :billable
 
+          validate :validate_billable
           validates :capacity,presence:true
 
+          # enum billable: [:red, :white, :sparkling]
           # validates_numericality_of :capacity, less_than: ->(self) { (self.capacity*100+self.other_capacity) < 100  }
 
           validate :capacity_is_less_than_total
           validate :capacity_is_grater_than_total
-          validate :validate_billable
+          # validate :validate_billable
 
           def capacity_is_less_than_total
+
             errors.add(:Utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
           end
           def capacity_is_grater_than_total
-            errors.add(:Utilization, "should be greater than 0") if ((self.capacity <= 0) &&  self.billable.to_s=="true")
+
+            # p self.billable
+            # # p self.shadow?
+
+            errors.add(:Utilization, "should be greater than 0") if ((self.capacity <= 0) &&  [:"1",:"2"].include?(self.billable))
           end
 
 
@@ -40,9 +47,11 @@ module EmployeeInfo
 
           end
           def validate_billable
-            if  !["true","false"].include?(self.billable.to_s)
-              errors.add(:Choose, "billable or non billable")
+            if validate_with_class?
+            if  ![:"1",:"2",:"3"].include?(self.billable)
+              errors.add(:Choose, "billable or shadow or support")
             end
+           end
           end
           def validate_with_class?
             self.user.class.name == "User"
@@ -111,6 +120,24 @@ module EmployeeInfo
           def used_capacity
             return self.capacity*100.round
           end
+
+          # Non Billable users .
+
+          def self.update_shadow_and_support_for_nonbillable
+            non_billable_users_with_below_25_percentage = Member.find_by_sql("select * from members  where capacity > 0 and  capacity < 0.25 and billable=0")
+            non_billable_users_with_below_25_percentage.each do |each_member|
+              each_member.update_attributes(:billable=>"support",:capacity=>0)
+              # p "+++++++++++error+++++++++"
+              # p each_member.errors
+              # p "+++++++++++++++end +++++++++++++"
+
+            end
+            non_billable_users_with_above_25_percentage = Member.find_by_sql("select * from members where capacity > 0 and  capacity < 0.25 and billable=0")
+            non_billable_users_with_above_25_percentage.each do |each_member|
+              each_member.update_attributes(:billable=>"shadow")
+            end
+          end
+
 
         end
 

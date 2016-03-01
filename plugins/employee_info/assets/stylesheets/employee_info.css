@@ -31,5 +31,27 @@ tr:hover rect  {
 }
 
 
+form.new_membership p:first-of-type{
+    margin-top: 10% !important;
+}
+form.new_membership .block1{
+    float:left;
+}
+form.new_membership .block2{
+    float:right;
+    margin-right: 13%;
+}
+
+form.edit_membership p:first-of-type{
+    margin-top: 10% !important;
+}
+form.edit_membership .block1{
+    float:left;
+}
+form.edit_membership .block2{
+    float:right;
+    margin-right: 13%;
+}
+
 
 

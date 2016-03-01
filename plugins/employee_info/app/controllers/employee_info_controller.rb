@@ -9,7 +9,7 @@ class EmployeeInfoController < ApplicationController
      member = Member.find(params[:member_id])
      other_project_members = Member.find_by_sql ["SELECT * FROM members WHERE project_id != ? AND user_id =? AND capacity >?", member.project_id,member.user_id,0]
      if other_project_members.present?
-     manager_role_id= Role.find_by_name("Manager")
+     # manager_role_id= Role.find_by_name("Manager")
      project_ids_for_other_project = other_project_members.map(&:project_id) if other_project_members.present?
      other_projects = Project.where(:id=>project_ids_for_other_project)
      @collect_other_project_capacity =[]
@@ -22,7 +22,7 @@ class EmployeeInfoController < ApplicationController
      # end
 
      each_project.custom_field_values.each_with_index do |c,index|
-       @user=""
+       @user
        custom_field =CustomField.where(:id=>c.custom_field_id)
        if custom_field.present? && (custom_field.last.name=="Manager")
          user = each_project.custom_field_values[index].to_s
