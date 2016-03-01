@@ -1,11 +1,6 @@
-<div class="block1">
-  <label for="billable">Billable / Shadow / Support<span class="required"> *</span></label>
-  <%= select_tag "billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],""),prompt: "--select--" %>
-</div>
-<div class="block2">
-  <%= hidden_field_tag 'member_capacity', "" %>
-  <label for="billable">Utilization:<span class="required"> *</span></label>
-  <div id="div_member_capacity_slider"></div>
-</div>
-
+<label for="billable">Billable / Non Billable<span class="required"> *</span></label>
+<%= select_tag "billable", options_for_select(["Billable", "Non Billable" ], "") ,prompt: "--select--" %>
+<%= hidden_field_tag 'member_capacity', "" %>
+<label for="billable">Utilization:<span class="required"> *</span></label>
+<div id="div_member_capacity_slider"></div></br>
 

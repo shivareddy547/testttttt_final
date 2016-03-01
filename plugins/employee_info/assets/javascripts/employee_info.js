@@ -7,9 +7,9 @@ $(document).on('change', '#user_billable', function(event) {
     // code here
     //alert("++++")
     member_id = $(this).attr("member_id");
-   if($(this).val() == "1") {
+   if($(this).val() == "Billable") {
        //alert("billable")
-        var billable_status= 1
+        var billable_status= true
         $('<input>').attr({
             type: 'hidden',
             id: 'member_billable_'+member_id,
@@ -18,11 +18,11 @@ $(document).on('change', '#user_billable', function(event) {
         }).appendTo('#member-'+member_id+'-roles-form');
        $('#member-'+member_id+'-roles-form').find('[name=commit]').attr("disabled", false);
     }
-    else if($(this).val() == "2")
+    else if($(this).val() == "Non Billable")
     {
 
         //alert("Non billable")
-        var billable_status= 2
+        var billable_status= false
         $('<input>').attr({
             type: 'hidden',
             id: 'member_billable_'+member_id,
@@ -32,26 +32,8 @@ $(document).on('change', '#user_billable', function(event) {
         $('#member-'+member_id+'-roles-form').find('[name=commit]').attr("disabled", false);
 
     }
-
-   else if($(this).val() == "3")
-   {
-
-       //alert("Non billable")
-       var billable_status= 3
-       $('<input>').attr({
-           type: 'hidden',
-           id: 'member_billable_'+member_id,
-           name: 'billable',
-           value: billable_status
-       }).appendTo('#member-'+member_id+'-roles-form');
-       $('#member-'+member_id+'-roles-form').find('[name=commit]').attr("disabled", false);
-
-       $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-       $("#member_capacity_"+$(this).attr("member_id")).val(0);
-   }
-
     else{
-       alert("Error:Please Select Billable Or Shadow or Support")
+       alert("Error:Please Select Billable Or Non Billable")
        var billable_status= ""
        $('<input>').attr({
            type: 'hidden',
@@ -75,20 +57,8 @@ $(document).on('click', 'table.members .icon-edit', function(event) {
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
     $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
     $(this).closest('tr').find("#div_member_capacity_slider").show();
-console.log(billable_status)
-
-    if (billable_status == "billable")
-    {
-        billable_status = 1
-    }
-    else if(billable_status == "shadow")
-    {
-        billable_status = 2
-    }
-    else if(billable_status == "support")
-    {
-        billable_status = 3
-    }
+    //console.log(billable_status);
+    //console.log(member_id);
 
     $('<input>').attr({
         type: 'hidden',
@@ -122,26 +92,17 @@ $(document).on('click', '#cancel_member', function(event) {
 
 });
 
-$(document).on('change', 'form#new_membership #billable', function(event) {
+$(document).on('change', '#billable', function(event) {
 
     //$('select').on('change', function() {
     event.stopImmediatePropagation();
 
     if($(this).val()) {
-
-        if($(this).val() == "3") {
-            //alert("billable")
-            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-//            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-            $("form#new_membership #member_capacity").val(0)
-            $("form#new_membership").find('[name=commit]').attr("disabled", false);
-
-        }
+        $("#new_membership").find('[name=commit]').attr("disabled", false);
     }
     else{
-        alert("Error:Please Select Billable Or Shadow or Support")
-        $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-        $("form#new_membership").find('[name=commit]').attr("disabled", false);
+        alert("Error:Please Select Billable Or Non Billable")
+        $("#new_membership").find('[name=commit]').attr("disabled", true);
     }
 
 
@@ -196,19 +157,32 @@ $( document ).ready(function() {
             max: 100,
             slide: function( event, ui ) {
 
-                var billable_value = $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val();
+                tooltip.text(ui.value);
 
-                if(billable_value == 2 || billable_value == 1)
+                if(ui.value == 0)
                 {
-                   if(ui.value < 5 )
-                    {
-                        return false;
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", true);
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                    $('#member-'+member_id+'-roles-form #member_billable_'+member_id).val("false")
+//                    $('#member-'+member_id+'-roles-form').closest('tr').find("#billable").val("false");
+                    $('#member-'+member_id+' '+ '#member_billable_status').val("false");
+                }
+                else
+                {
+                    $('#member-'+member_id+'-roles-form').closest('tr').find("#user_billable").attr("disabled", false);
+                    billable_value = $('#member-'+member_id+' '+ '#user_billable').val();
+//                   console.log('#member-'+member_id+' '+ '#member_billable_status')
+                    console.log(billable_value)
+                    if(billable_value=="Billable") {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(true);
                     }
-
-                }
-                else{
-                    return false
-                }
+                    else if(billable_value=="false")
+                    {
+                        $('#member-' + member_id + '-roles-form').closest('tr').find("#user_billable").val("Non Billable");
+                        $('#member-'+member_id+' '+ '#member_billable_status').val(false);
+                    }
+                 }
 
                 if(ui.value > (100-other_capacity) )
                 {
@@ -216,8 +190,6 @@ $( document ).ready(function() {
                 }
                 $(element).find("span#selected_capacity" ).text( "Selected: " + ui.value+"%" );
                 $(element).find("input#selected_capacity" ).val(ui.value);
-//                $(element).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-                $(element).find("#tooltip").text(ui.value);
                 $('#member-'+member_id+'-roles-form').find('#member_capacity_'+member_id).val(ui.value);
                 var current_capacity=ui.value;
                 var available_capacity= (100-(parseInt(current_capacity)+parseInt(other_capacity)));
@@ -233,11 +205,7 @@ $( document ).ready(function() {
             },
             change: function(event, ui) {}
         }).find(".ui-slider-handle").append(tooltip).hover(function() {
-//                $(this).parent().find(".ui-slider-range").width();
                 tooltip.show();
-//                console.log($(this).parent().find(".ui-slider-range").width());
-
-                $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
             }, function() {
                 tooltip.hide();
             }
@@ -329,14 +297,11 @@ $(document).on('click', 'input#member_ship_check', function() {
     var searchIDs = $("input:checkbox:checked").map(function(){
         return $(this).attr("member_available");
     }).get(); // <----
-    var searchValues = $("input:checkbox:checked").map(function(){
-        return $(this).attr("member_available_value");
-    }).get();
-
+    console.log(searchIDs.length);
     var uniq_result=unique(searchIDs)
-
-
-    if(searchIDs.length)
+//    console.log(uniq_result);
+    console.log(searchIDs.count)
+    if(searchIDs.length == 1)
     {
         var tooltip = $('<div id="tooltip" />').css({
             position: 'absolute',
@@ -344,16 +309,7 @@ $(document).on('click', 'input#member_ship_check', function() {
             left: -10
         }).hide();
 //        $(this).attr("member_available");
-
-
-        if(searchValues.sort(function(a, b){return a-b})[0])
-        {
-            var member_available_value = searchValues.sort(function(a, b){return a-b})[0]
-        }
-        else{
-            var member_available_value = $(this).attr("member_available_value");
-        }
-
+        var member_available_value = $(this).attr("member_available_value");
 
         $("form#new_membership #member_capacity").val(member_available_value);
         if(member_available_value > 0)
@@ -361,17 +317,6 @@ $(document).on('click', 'input#member_ship_check', function() {
             $("form#new_membership select#billable").attr("disabled", false);
         }
 
-
-        var billable_value = $('form#new_membership select#billable').val();
-        if(billable_value == 3)
-        {
-            $("form#new_membership #div_member_capacity_slider").slider('value', 0);
-//            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-             member_available_value = 0;
-            $("form#new_membership #member_capacity").val(0)
-
-        }
-
         $("form#new_membership #div_member_capacity_slider").slider({
             range: "min",
             step: 5,
@@ -379,103 +324,38 @@ $(document).on('click', 'input#member_ship_check', function() {
             min: 0,
             max: 100,
             slide: function (event, ui) {
-                $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
+                tooltip.text(ui.value);
                 $(this).find("input#member_capacity" ).val(ui.value);
-//                $("form#new_membership #member_capacity").val(ui.value);
-                var billable_value = $('form#new_membership select#billable').val();
-                if(billable_value == 2 || billable_value == 1)
+                $("form#new_membership #member_capacity").val(ui.value);
+
+                if(ui.value == 0)
                 {
-                    if(ui.value < 5 )
-                    {
-                        return false;
-                    }
-
+                    $("form#new_membership select#billable").attr("disabled", true);
+                    $("form#new_membership select#billable").val("Non Billable");
                 }
-                else{
-                    return false
-                    console.log($("form#new_membership #member_capacity"))
-                    $("form#new_membership #member_capacity").val(0)
-
+                else
+                {
+                    $("form#new_membership select#billable").attr("disabled", false);
                 }
-                $("form#new_membership #member_capacity").val($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0])
-
-//                $(element).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
 
             },
             change: function (event, ui) {
             }
         }).find(".ui-slider-handle").append(tooltip).hover(function () {
                 tooltip.show();
-                $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-
             }, function () {
                 tooltip.hide();
             }
         );
-    }
-    else{
-
-        if(searchValues.length == 0)
-        {
-
-
-        var member_available_value = 0;
-        $("form#new_membership #div_member_capacity_slider").slider({
-            range: "min",
-            step: 5,
-            value: member_available_value,
-            min: 0,
-            max: 100,
-            slide: function (event, ui) {
-                $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-                $(this).find("input#member_capacity" ).val(ui.value);
-//                $("form#new_membership #member_capacity").val(ui.value);
-                var billable_value = $('form#new_membership select#billable').val();
-                if(billable_value == 2 || billable_value == 1)
-                {
-                    if(ui.value < 5 )
-                    {
-                        return false;
-                    }
-
-                }
-                else{
-                    return false
-                    console.log($("form#new_membership #member_capacity"))
-                    $("form#new_membership #member_capacity").val(0)
-
-                }
-                $("form#new_membership #member_capacity").val($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0])
-
-//                $(element).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-
-            },
-            change: function (event, ui) {
-            }
-        }).find(".ui-slider-handle").append(tooltip).hover(function () {
-                tooltip.show();
-                $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-
-            }, function () {
-                tooltip.hide();
-            }
-        );
-        }
     }
     var member_available_value = $(this).attr("member_available_value");
     var available_value = $("form#new_membership #member_capacity").val();
-
+    console.log(member_available_value)
+    console.log(available_value)
 
     if((parseInt(member_available_value) < parseInt(available_value)) || parseInt(member_available_value) <=0)
     {
          $(this).prop('checked', false);
-        var billable_value = $('form#new_membership select#billable').val();
-        if(billable_value != 3 )
-        {
-            $(this).prop('checked', false);
-
-        }
-
 
     }
 
@@ -484,8 +364,6 @@ $(document).on('click', 'input#member_ship_check', function() {
         alert("Error:Please Select available members")
         $("#new_membership").find('[name=commit]').attr("disabled", true);
     }
-
-
 
 });
 function unique(list) {
@@ -512,41 +390,34 @@ $( document ).ready(function() {
         min: 0,
         max: 100,
         slide: function (event, ui) {
+            tooltip.text(ui.value);
+            if(ui.value == 0)
+            {
+                $("form#new_membership select#billable").attr("disabled", true);
+                $("form#new_membership select#billable").val("Non Billable");
+                var billable_status= false
+                $('<input>').attr({
+                    type: 'hidden',
+                    id: 'billable',
+                    name: 'billable',
+                    value: billable_status
+                }).appendTo('form#new_membership');
+            }
+            else
+            {
+                $("form#new_membership select#billable").attr("disabled", false);
 
-
-            $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-
+            }
             $(this).find("input#member_capacity" ).val(ui.value);
+
             $("form#new_membership #member_capacity").val(ui.value);
 
-            var billable_value = $('form#new_membership select#billable').val();
-
-            if(billable_value == 2 || billable_value == 1)
-            {
-                if(ui.value < 5 )
-                {
-                    return false;
-                }
-
-            }
-            else{
-
-                $(element).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-                $("form#new_membership #member_capacity").val(0)
-//            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-//                $("form#new_membership #member_capacity").val(0)
-                return false
-            }
-//            $(this).find("input#member_capacity" ).val(ui.value);
-//            $("form#new_membership #member_capacity").val(ui.value);
 
         },
         change: function (event, ui) {
         }
     }).find(".ui-slider-handle").append(tooltip).hover(function () {
             tooltip.show();
-            $(this).find("#tooltip").text($(this).parent().find(".ui-slider-range").attr("style").split(":")[1].split("%")[0]);
-
         }, function () {
             tooltip.hide();
         }

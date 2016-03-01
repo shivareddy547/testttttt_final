@@ -89,7 +89,7 @@ module UsersControllerPatch
 
        if params[:membership].present?
          @membership.role_ids = params[:membership][:role_ids]
-         @membership.billable=params[:billable].present? ? params[:billable] : ""
+         @membership.billable=params[:billable].present? ? ((params[:billable] == "Billable" || params[:billable] == "true") ? true : false ) : ""
          @membership.capacity=params[:capacity].present? ? params[:capacity].to_f/100 : 0.0
        end
 

@@ -1,7 +1,5 @@
 <td>
-    <%#= select_tag "user_billable", options_for_select(["Billable", "Non Billable" ], !member.billable.nil? ? member.billable==true ? "Billable" : "Non Billable" : "") ,include_blank: true,:member_id=>member.id,:disabled => true %>
-  <%= select_tag "user_billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],member.billable.present?  && !member.billable != true || false ? [:billable,:shadow,:support].index(member.billable)+1 : ""),include_blank: true,:member_id=>member.id,:disabled => true %>
-
+    <%= select_tag "user_billable", options_for_select(["Billable", "Non Billable" ], !member.billable.nil? ? member.billable==true ? "Billable" : "Non Billable" : "") ,include_blank: true,:member_id=>member.id,:disabled => true %>
   <%= hidden_field_tag 'billable_status', member.billable,:id=>"member_billable_status",:member_id=>member.id,:billable_status=>member.billable %>
 
 </td>

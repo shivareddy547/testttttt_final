@@ -13,10 +13,10 @@ Redmine::Plugin.register :employee_info do
   url 'http://inia.objectfrontier.com'
   author_url 'http://inia.objectfrontier.com'
 
-  project_module :hierarchy_permissions do
-    permission :client_owner, :public => true
-    # permission :developer, :public => true
-  end
+  # project_module :billable_permissions do
+  #   permission :billable, :public => true
+  #   permission :non_billable, :public => true
+  # end
 
 end
 
