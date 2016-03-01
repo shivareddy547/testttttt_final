@@ -77,6 +77,60 @@ class UserOfficialInfo < ActiveRecord::Base
 
   end
 
+
+
+ def self.import_from_csv_ofi
+
+   
+    inia =  ActiveRecord::Base.establish_connection(:production).connection
+
+# book = Spreadsheet.open('/home/dgoadmin/redmine/cluster/Node1/employee_info.xls')
+   book = Spreadsheet.open('/home/dgoadmin/redmine/cluster/Node1/hrms_feb_25.xls')
+    sheet1 = book.worksheet('Sheet1') # can use an index or worksheet name
+    sheet1.each do |row|
+      break if row[0].nil? # if first cell empty
+      # puts row.join(',') # looks like it calls "to_s" on each cell's Value
+p row[1]
+        find_user = "select * from users where users.login='#{row[4]}'"
+        find_user_res =  inia.execute(find_user)
+
+        if find_user_res.count == 0
+          # @employee_ids << user['employee_no']
+          # @in_active_users << user['login_id']
+       #    user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
+       # VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']>=1 ? user['is_active'] : 3 }','User',NOW())"
+       #    save_user = inia.insert_sql(user_insert_query)
+       #
+       #    user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+       #    save_employee = inia.insert_sql(user_info_query)
+        else
+          # @employee_ids << user['employee_no']
+          user_update_query = "UPDATE users SET login='#{row[4]}' where login='#{row[4]}'"
+          update_user = inia.execute(user_update_query)
+
+          find_user_res.each(:as => :hash) do |each_row|
+            find_user = "select * from user_official_infos where user_official_infos.user_id='#{each_row['id']}'"
+            check_employee = inia.execute(find_user)
+            if check_employee.count == 0
+
+              user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{each_row['id']}',#{row[0].to_i})"
+              save_employee = inia.insert_sql(user_info_query)
+            else
+              update_user_official_info = "UPDATE user_official_infos SET employee_id=#{row[0].to_i} where user_id=#{each_row['id'].to_i}"
+              update_employee = inia.execute(update_user_official_info)
+
+            end
+
+          end
+        end
+        # rec.update_attributes(:last_sync=>Time.now)
+
+    end
+
+  end
+
+  
+
   def self.import_from_csv
 
     # hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
