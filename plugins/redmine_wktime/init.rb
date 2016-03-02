@@ -77,6 +77,7 @@ Redmine::Plugin.register :redmine_wktime do
   menu :top_menu, :wkTime, { :controller => 'wktime', :action => 'index' }, :caption => :label_te, :if => Proc.new { Object.new.extend(WktimeHelper).checkViewPermission }
   project_module :time_tracking do
     permission :approve_time_entries,  {:wktime => [:update]}, :require => :member
+    permission :l0,  {:wktime => [:update]}, :require => :member
     permission :l1,  {:wktime => [:update]}, :require => :member
     permission :l2,  {:wktime => [:update]}, :require => :member
     permission :l3,  {:wktime => [:update]}, :require => :member
