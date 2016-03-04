@@ -1425,9 +1425,9 @@ module WktimeHelper
   def get_biometric_hours_per_month(users,date,enddate,month_or_week)
     user_emp_code = []
      users = users.kind_of?(Array) ? users : [users]
-
+     emp_info = Redmine::Plugin.registered_plugins.keys.include?(:employee_info)
      users.flatten.each do |user|
-       if user.user_official_info.present? && user.user_official_info.employee_id.present?
+       if emp_info && user.user_official_info.present? && user.user_official_info.employee_id.present?
          user_emp_code << user.user_official_info.employee_id
        else
          user_emp_code << ""
@@ -1439,46 +1439,50 @@ module WktimeHelper
     #     end
     #   end
      end
+      p '===== 333333333333333333==========='
+     p user_emp_code
+    user_emp_code.delete('')
+    user_emp_code.delete(0)
     user_emp_code = user_emp_code.uniq.join(",")
     if month_or_week == "from_to_end"
-      start_date = date.to_date.strftime('%d%m%Y')
-      end_date = enddate.to_date.strftime('%d%m%Y')
+      start_date = date.to_date.strftime('%Y-%m-%d')
+      end_date = enddate.to_date.strftime('%Y-%m-%d')
     elsif month_or_week=="week"
-      start_date = date.to_date.strftime('%d%m%Y')
-      end_date = (date + 6).to_date.strftime('%d%m%Y')
+      start_date = date.to_date.strftime('%Y-%m-%d')
+      end_date = (date + 6).to_date.strftime('%Y-%m-%d')
     end
-    bio_user="inia"
-    bio_password="4plgI}1P"
-    url = "http://biometrics.objectfrontier.com/cosec/api.svc/attendance-daily?action=get;id="+user_emp_code+";range=user;date-range="+start_date+"-"+end_date+";field-name=WORKTIME_HHMM,USERID,PROCESSDATE;format=xml"
+
     if user_emp_code.present?
-      response = RestClient::Request.new(:method => :get,:url => url,:user => bio_user,:password => bio_password).execute
+      p '====== emp code =============='
+      # p user_emp_code = '96325'
+      p '======== raja ----------------'
+      key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
+      url1 = "https://iservstaging.objectfrontier.com/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
+      response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute 
+      p response
+      p '==== cool ====='
+      # raise
+      user_array = user_emp_code.split(',')
+      my_arrays = {}
       result =[]
-      if response.present?
-        nokogiri_xml =Nokogiri::HTML::Document.parse(response.body)
-        nokogiri_xml_attendance = nokogiri_xml.css('attendance-daily') if nokogiri_xml.present?
-        text_result = nokogiri_xml_attendance.map(&:text)
-        if text_result.count > 0
-          text_result.each do |re_each|
-            result << re_each rescue "0.0"
-          end
-          user_array = user_emp_code.split(',')
-          my_arrays = {}
-          user_array.each_with_index { |name, index| my_arrays[name] = {}   }
-          user_array.each_with_index  do |name, index|
-              result.each do|rec|
-                data = rec.split(' ')
-                if  data[1] == name
-                  my_arrays[name].merge!(data[2] => data[0])
-                end
+      if !response.include?('failed') && response.present?
+        data = JSON.parse(response)
+        user_array.each_with_index { |name, index| my_arrays[name] = {}   }
+        if data['attendance-daily'].count > 1
+          user_array.each_with_index  do |id, index|
+            data['attendance-daily'].each do |rec|
+              if rec['userid'] == id
+                my_arrays[id].merge!(rec['processdate'] => rec['worktime_hhmm'])
               end
             end
+          end
+          p my_arrays
           return my_arrays
         else
           {}
         end
       end
     end
-
   end
 
 
