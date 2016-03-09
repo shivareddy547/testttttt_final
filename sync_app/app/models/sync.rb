@@ -5,6 +5,7 @@ class Sync < ActiveRecord::Base
 
   def self.sync_sql
 
+
     hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
 
     inia_database_details = {"adapter"=>ActiveRecord::Base.configurations['development']['adapter'], "database"=>ActiveRecord::Base.configurations['development']['database'], "host"=>ActiveRecord::Base.configurations['development']['host'], "port"=>ActiveRecord::Base.configurations['development']['port'], "username"=>ActiveRecord::Base.configurations['development']['username'], "password"=>ActiveRecord::Base.configurations['development']['password'], "encoding"=>ActiveRecord::Base.configurations['development']['encoding']}
@@ -20,96 +21,95 @@ class Sync < ActiveRecord::Base
     end
     rec.save
 # hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
+    hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
+# @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+#   @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+    @user_info = hrms.execute("SELECT * FROM vw_employee where employee_no !=0 and employee_no != '' and login_id != '' and work_email !='' and login_id !='' and modified_date >= '#{@sync_time}';")
+    inia =  ActiveRecord::Base.establish_connection(:production).connection
 
 
-    p "-- User -$$$$$$$$$$$$$$$$$-"
-    hrms = ActiveRecord::Base.establish_connection(hrms_sync_details).connection
-    user_data = "SELECT first_name, last_name, login_id, work_email, employee_no, is_active, modified_date, prev_emp_no FROM vw_employee where modified_date >= '#{@sync_time}' and employee_no != 0 and work_email != '' and login_id !='' "
-    p user_data
-    @user_info = hrms.execute(user_data)
-    hr_user_count = hrms.execute("select * from employee")
-    p " Total users in HRMS : #{hr_user_count.count}"
-    p " Sync users from HRMS : #{@user_info.count}"
-    hrms.disconnect!
-    nanba = ActiveRecord::Base.establish_connection(:production).connection
-    nanba_users = nanba.execute("select * from users where type='User' and status=1")
-    p " Total users in nanba before Sync : #{nanba_users.count}"
-
-    p "-------- 123 ----------------"
     @user_info.each(:as => :hash) do |user|
-      p '-------- 0 ----------------'
-      p user
-      final_sql = "INSERT into users(login, firstname, lastname, mail, language, auth_source_id, created_on, hashed_password, status, last_login_on, type, identity_url, mail_notification, salt, must_change_passwd, passwd_changed_on, lastmodified) VALUES ('#{user['login_id']}', '#{user['first_name']}','#{user['last_name']}','#{user['work_email']}','en',1, NOW(),'','#{user['is_active']==1 ? 1 : 3}',NULL,'User', NULL,'only_my_events',NULL,false,NULL,NOW())"
 
-      emp_code_con = "select * from user_official_infos where employee_id=#{user['employee_no']}"
+      # find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['employee_no']}'"
+      find_user_with_login_id = "select * from users where users.login='#{user['login_id']}'"
 
-      last_emp_code = "INSERT into user_official_infos (user_id, employee_id) values ((select id from users where login='#{user['login_id']}' limit 1) ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+      find_user_with_employee = inia.execute(find_user_with_login_id)
 
-      update_sql = "update users set login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}',mail='#{user['work_email']}',language='en', auth_source_id=1, status='#{user['is_active']==1 ? 1 : 3}',type='User', salt=NULL ,lastmodified=NOW() where id=(select user_id from user_official_infos where employee_id=#{user['employee_no']} limit 1)"
+      if find_user_with_employee.count == 0
 
-      res1 =  nanba.execute(emp_code_con)
-      emp_up = "update user_official_infos set user_id=(select id from users where login='#{user['login_id']}' limit 1) where employee_id=#{user['employee_no']}"
-      user_count =  nanba.execute("select id from users where login='#{user['login_id']}'")
+        if user['prev_emp_no'].present?
+          find_previous_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['prev_emp_no']}'"
+          find_user_with_employee = inia.execute(find_previous_employee_id)
 
-      # p res1.count, user_count.count
-      p '--------'
-      if user['prev_emp_no'].present?
-        Rails.logger.info '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ transfer $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
-        User.establish_connection(:production)
-        UserOfficialInfo.establish_connection(:production)
-        uoi = UserOfficialInfo.find_by_employee_id(user['prev_emp_no'])
-        p uoi
-        if uoi.present?
-          usr = uoi.user
-          usr.firstname=user['first_name']
-          usr.lastname=user['last_name']
-          usr.login=user['login_id']
-          usr.mail=user['work_email']
-          usr.status =user['is_active']==1 ? 1 : 3
-          usr.save
-          uoi.employee_id = user['employee_no']
-          uoi.save rescue false
-          Rails.logger.info uoi.errors
+          if find_user_with_employee != 0
+
+            find_user_with_employee.each(:as => :hash) do |row|
+              user_update_query = "UPDATE users SET login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}'
+          ,mail='#{user['work_email']}',auth_source_id=1,status='1',updated_on=NOW() where id='#{row["user_id"]}'"
+              update_employee = inia.execute(user_update_query)
+
+              find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
+              find_user_with_employee_id = inia.execute(find_user_with_employee_id)
+              if find_user_with_employee_id==0
+                user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["user_id"].to_i}',#{user['employee_no']})"
+                save_employee = inia.insert_sql(user_info_query)
+              else
+
+                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+                save_employee = inia.execute(update_user_official_info)
+              end
+
+            end
+          end
+
+        else
+
+          user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
+      VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3}','User',NOW())"
+          save_user = inia.insert_sql(user_insert_query)
+          user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+          save_employee = inia.insert_sql(user_info_query)
+
         end
-        p '===== after ---------------------'
-        p uoi
-      end
-      if user_count.count==0 && user['prev_emp_no'].nil?
-        p '--- insert users ---'
-        nanba.execute(final_sql)
-        userid = nanba.execute("select LAST_INSERT_ID()")
-        user_id = nil
-        userid.each(:as => :hash) do |pr|
-          user_id = pr['LAST_INSERT_ID()']
-        end
-        lemp_code = "INSERT into user_official_infos (user_id, employee_id) values (#{user_id} ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
-        nanba.execute(lemp_code)
 
-      elsif user['prev_emp_no'].nil?
-        p '--- update users ---'
-        nanba.execute(last_emp_code) if res1.count == 0 && user['is_active']==1
-        nanba.execute(update_sql)
+      else
+
+        find_user_with_employee.each(:as => :hash) do |row|
+          user_update_query = "UPDATE users SET login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}'
+          ,mail='#{user['work_email']}',auth_source_id=1,status='#{ user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3 }',updated_on=NOW() where id='#{row["id"]}'"
+          update_employee = inia.execute(user_update_query)
+
+          find_user_with_employee_id1 = "select * from user_official_infos where user_official_infos.user_id='#{row["id"]}'"
+          find_user_with_employee_id = inia.execute(find_user_with_employee_id1)
+
+          p find_user_with_employee_id
+          if find_user_with_employee_id==0
+
+            user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["id"]}',#{user['employee_no']})"
+            save_employee = inia.insert_sql(user_info_query)
+          else
+
+
+            update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+            save_employee = inia.execute(update_user_official_info)
+          end
+
+        end
+
       end
+
+      rec.update_attributes(:last_sync=>Time.now)
     end
-    nanba_users_count = nanba.execute("select * from users where type='User' and status=1")
-    p " Total users in nanba after Sync : #{nanba_users_count.count}"
-
-    rec.update_attributes(:last_sync=>Time.now)
-
 
 
   end
 
+  def self.sync_exist_sql
 
-
-
-
-
-  def self.sync_exist_users
-
-   hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
+    hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
 
     inia_database_details = {"adapter"=>ActiveRecord::Base.configurations['development']['adapter'], "database"=>ActiveRecord::Base.configurations['development']['database'], "host"=>ActiveRecord::Base.configurations['development']['host'], "port"=>ActiveRecord::Base.configurations['development']['port'], "username"=>ActiveRecord::Base.configurations['development']['username'], "password"=>ActiveRecord::Base.configurations['development']['password'], "encoding"=>ActiveRecord::Base.configurations['development']['encoding']}
+
     AppSyncInfo.establish_connection(inia_database_details)
     rec = AppSyncInfo.find_or_initialize_by_name('hrms')
     rec.in_progress = true
@@ -120,84 +120,288 @@ class Sync < ActiveRecord::Base
       @sync_time = (rec.last_sync-1.minute)
     end
     rec.save
+# hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
+    hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
+# @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+#   @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+    @user_info = hrms.execute("SELECT * FROM vw_employee where employee_no !=0 and employee_no != '' and login_id != '' and work_email !='' and login_id !='' and modified_date <= '#{Time.now}';")
+    inia =  ActiveRecord::Base.establish_connection(:production).connection
 
-  p "-- User -$$$$$$$$$$$$$$$$$-"
-    hrms = ActiveRecord::Base.establish_connection(hrms_sync_details).connection
-    user_data = "SELECT first_name, last_name, login_id, work_email, employee_no, is_active, modified_date, prev_emp_no FROM vw_employee where modified_date <= '#{Time.now}' and employee_no != 0 and work_email != '' and login_id !='' "
-    p user_data
-    @user_info = hrms.execute(user_data)
-    hr_user_count = hrms.execute("select * from employee")
-    p " Total users in HRMS : #{hr_user_count.count}"
-    p " Sync users from HRMS : #{@user_info.count}"
-    hrms.disconnect!
-    nanba = ActiveRecord::Base.establish_connection(:production).connection
-    nanba_users = nanba.execute("select * from users where type='User' and status=1")
-    p " Total users in nanba before Sync : #{nanba_users.count}"
 
-    p "-------- 123 ----------------"
     @user_info.each(:as => :hash) do |user|
-      p '-------- 0 ----------------'
-      p user
-      final_sql = "INSERT into users(login, firstname, lastname, mail, language, auth_source_id, created_on, hashed_password, status, last_login_on, type, identity_url, mail_notification, salt, must_change_passwd, passwd_changed_on, lastmodified) VALUES ('#{user['login_id']}', '#{user['first_name']}','#{user['last_name']}','#{user['work_email']}','en',1, NOW(),'','#{user['is_active']==1 ? 1 : 3}',NULL,'User', NULL,'only_my_events',NULL,false,NULL,NOW())"
 
-      emp_code_con = "select * from user_official_infos where employee_id=#{user['employee_no']}"
+      # find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['employee_no']}'"
+      find_user_with_login_id = "select * from users where users.login='#{user['login_id']}'"
 
-      last_emp_code = "INSERT into user_official_infos (user_id, employee_id) values ((select id from users where login='#{user['login_id']}' limit 1) ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+      find_user_with_employee = inia.execute(find_user_with_login_id)
 
-      update_sql = "update users set login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}',mail='#{user['work_email']}',language='en', auth_source_id=1, status='#{user['is_active']==1 ? 1 : 3}',type='User', salt=NULL ,lastmodified=NOW() where id=(select user_id from user_official_infos where employee_id=#{user['employee_no']} limit 1)"
+      if find_user_with_employee.count == 0
 
-      res1 =  nanba.execute(emp_code_con)
-      emp_up = "update user_official_infos set user_id=(select id from users where login='#{user['login_id']}' limit 1) where employee_id=#{user['employee_no']}"
-      user_count =  nanba.execute("select id from users where login='#{user['login_id']}'")
+        if user['prev_emp_no'].present?
+          find_previous_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['prev_emp_no']}'"
+          find_user_with_employee = inia.execute(find_previous_employee_id)
 
-      # p res1.count, user_count.count
-      p '--------'
-      if user['prev_emp_no'].present?
-        Rails.logger.info '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ transfer $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
-        User.establish_connection(:production)
-        UserOfficialInfo.establish_connection(:production)
-        uoi = UserOfficialInfo.find_by_employee_id(user['prev_emp_no'])
-        p uoi
-        if uoi.present?
-          usr = uoi.user
-          usr.firstname=user['first_name']
-          usr.lastname=user['last_name']
-          usr.login=user['login_id']
-          usr.mail=user['work_email']
-          usr.status =user['is_active']==1 ? 1 : 3
-          usr.save
-          uoi.employee_id = user['employee_no']
-          uoi.save rescue false
-          Rails.logger.info uoi.errors
+          if find_user_with_employee != 0
+
+            find_user_with_employee.each(:as => :hash) do |row|
+              user_update_query = "UPDATE users SET login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}'
+          ,mail='#{user['work_email']}',auth_source_id=1,status='1',updated_on=NOW() where id='#{row["user_id"]}'"
+              update_employee = inia.execute(user_update_query)
+
+              find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
+              find_user_with_employee_id = inia.execute(find_user_with_employee_id)
+              if find_user_with_employee_id==0
+                user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["user_id"].to_i}',#{user['employee_no']})"
+                save_employee = inia.insert_sql(user_info_query)
+              else
+
+                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+                save_employee = inia.execute(update_user_official_info)
+              end
+
+            end
+          end
+
+        else
+
+          user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
+      VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3}','User',NOW())"
+          save_user = inia.insert_sql(user_insert_query)
+          user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+          save_employee = inia.insert_sql(user_info_query)
+
         end
-        p '===== after ---------------------'
-        p uoi
-      end
-      if user_count.count==0 && user['prev_emp_no'].nil?
-        p '--- insert users ---'
-        nanba.execute(final_sql)
-        userid = nanba.execute("select LAST_INSERT_ID()")
-        user_id = nil
-        userid.each(:as => :hash) do |pr|
-          user_id = pr['LAST_INSERT_ID()']
-        end
-        lemp_code = "INSERT into user_official_infos (user_id, employee_id) values (#{user_id} ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
-        nanba.execute(lemp_code)
 
-      elsif user['prev_emp_no'].nil?
-        p '--- update users ---'
-        nanba.execute(last_emp_code) if res1.count == 0 && user['is_active']==1
-        nanba.execute(update_sql)
+      else
+        p 22222222222222222222222222222222222222222
+        find_user_with_employee.each(:as => :hash) do |row|
+          user_update_query = "UPDATE users SET login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}'
+          ,mail='#{user['work_email']}',auth_source_id=1,status='#{ user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3 }',updated_on=NOW() where id='#{row["id"]}'"
+          update_employee = inia.execute(user_update_query)
+
+          find_user_with_employee_id1 = "select * from user_official_infos where user_official_infos.user_id='#{row["id"]}'"
+          find_user_with_employee_id = inia.execute(find_user_with_employee_id1)
+          p 666666666666666666666666666666666
+          p find_user_with_employee_id
+          if find_user_with_employee_id==0
+            p 333333333333333333333333333333333333
+            user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["id"]}',#{user['employee_no']})"
+            save_employee = inia.insert_sql(user_info_query)
+          else
+            p 44444444444444444444444444444444444444444
+            p user['employee_no']
+            p row["id"]
+            p 555555555555555555555
+            update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+            save_employee = inia.execute(update_user_official_info)
+          end
+
+        end
+
       end
+
+      # rec.update_attributes(:last_sync=>Time.now)
     end
-    nanba_users_count = nanba.execute("select * from users where type='User' and status=1")
-    p " Total users in nanba after Sync : #{nanba_users_count.count}"
-
-    rec.update_attributes(:last_sync=>Time.now)
-
-
 
   end
+
+
+
+#   def self.sync_sql
+
+#     hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
+
+#     inia_database_details = {"adapter"=>ActiveRecord::Base.configurations['development']['adapter'], "database"=>ActiveRecord::Base.configurations['development']['database'], "host"=>ActiveRecord::Base.configurations['development']['host'], "port"=>ActiveRecord::Base.configurations['development']['port'], "username"=>ActiveRecord::Base.configurations['development']['username'], "password"=>ActiveRecord::Base.configurations['development']['password'], "encoding"=>ActiveRecord::Base.configurations['development']['encoding']}
+
+#     AppSyncInfo.establish_connection(inia_database_details)
+#     rec = AppSyncInfo.find_or_initialize_by_name('hrms')
+#     rec.in_progress = true
+#     if !rec.last_sync.present?
+#       rec.last_sync=Time.now
+#       @sync_time = (Time.now - 1.minute)
+#     else
+#       @sync_time = (rec.last_sync-1.minute)
+#     end
+#     rec.save
+# # hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
+
+
+#     p "-- User -$$$$$$$$$$$$$$$$$-"
+#     hrms = ActiveRecord::Base.establish_connection(hrms_sync_details).connection
+#     user_data = "SELECT first_name, last_name, login_id, work_email, employee_no, is_active, modified_date, prev_emp_no FROM vw_employee where modified_date >= '#{@sync_time}' and employee_no != 0 and work_email != '' and login_id !='' "
+#     p user_data
+#     @user_info = hrms.execute(user_data)
+#     hr_user_count = hrms.execute("select * from employee")
+#     p " Total users in HRMS : #{hr_user_count.count}"
+#     p " Sync users from HRMS : #{@user_info.count}"
+#     hrms.disconnect!
+#     nanba = ActiveRecord::Base.establish_connection(:production).connection
+#     nanba_users = nanba.execute("select * from users where type='User' and status=1")
+#     p " Total users in nanba before Sync : #{nanba_users.count}"
+
+#     p "-------- 123 ----------------"
+#     @user_info.each(:as => :hash) do |user|
+#       p '-------- 0 ----------------'
+#       p user
+#       final_sql = "INSERT into users(login, firstname, lastname, mail, language, auth_source_id, created_on, hashed_password, status, last_login_on, type, identity_url, mail_notification, salt, must_change_passwd, passwd_changed_on, lastmodified) VALUES ('#{user['login_id']}', '#{user['first_name']}','#{user['last_name']}','#{user['work_email']}','en',1, NOW(),'','#{user['is_active']==1 ? 1 : 3}',NULL,'User', NULL,'only_my_events',NULL,false,NULL,NOW())"
+
+#       emp_code_con = "select * from user_official_infos where employee_id=#{user['employee_no']}"
+
+#       last_emp_code = "INSERT into user_official_infos (user_id, employee_id) values ((select id from users where login='#{user['login_id']}' limit 1) ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+
+#       update_sql = "update users set login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}',mail='#{user['work_email']}',language='en', auth_source_id=1, status='#{user['is_active']==1 ? 1 : 3}',type='User', salt=NULL ,lastmodified=NOW() where id=(select user_id from user_official_infos where employee_id=#{user['employee_no']} limit 1)"
+
+#       res1 =  nanba.execute(emp_code_con)
+#       emp_up = "update user_official_infos set user_id=(select id from users where login='#{user['login_id']}' limit 1) where employee_id=#{user['employee_no']}"
+#       user_count =  nanba.execute("select id from users where login='#{user['login_id']}'")
+
+#       # p res1.count, user_count.count
+#       p '--------'
+#       if user['prev_emp_no'].present?
+#         Rails.logger.info '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ transfer $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+#         User.establish_connection(:production)
+#         UserOfficialInfo.establish_connection(:production)
+#         uoi = UserOfficialInfo.find_by_employee_id(user['prev_emp_no'])
+#         p uoi
+#         if uoi.present?
+#           usr = uoi.user
+#           usr.firstname=user['first_name']
+#           usr.lastname=user['last_name']
+#           usr.login=user['login_id']
+#           usr.mail=user['work_email']
+#           usr.status =user['is_active']==1 ? 1 : 3
+#           usr.save
+#           uoi.employee_id = user['employee_no']
+#           uoi.save rescue false
+#           Rails.logger.info uoi.errors
+#         end
+#         p '===== after ---------------------'
+#         p uoi
+#       end
+#       if user_count.count==0 && user['prev_emp_no'].nil?
+#         p '--- insert users ---'
+#         nanba.execute(final_sql)
+#         userid = nanba.execute("select LAST_INSERT_ID()")
+#         user_id = nil
+#         userid.each(:as => :hash) do |pr|
+#           user_id = pr['LAST_INSERT_ID()']
+#         end
+#         lemp_code = "INSERT into user_official_infos (user_id, employee_id) values (#{user_id} ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+#         nanba.execute(lemp_code)
+
+#       elsif user['prev_emp_no'].nil?
+#         p '--- update users ---'
+#         nanba.execute(last_emp_code) if res1.count == 0 && user['is_active']==1
+#         nanba.execute(update_sql)
+#       end
+#     end
+#     nanba_users_count = nanba.execute("select * from users where type='User' and status=1")
+#     p " Total users in nanba after Sync : #{nanba_users_count.count}"
+
+#     rec.update_attributes(:last_sync=>Time.now)
+
+
+
+#   end
+
+
+
+
+
+
+#   def self.sync_exist_users
+
+#    hrms_sync_details={"adapter"=>ActiveRecord::Base.configurations['hrms_user_sync']['adapter_sync'], "database"=>ActiveRecord::Base.configurations['hrms_user_sync']['database_sync'], "host"=>ActiveRecord::Base.configurations['hrms_user_sync']['host_sync'], "port"=>ActiveRecord::Base.configurations['hrms_user_sync']['port_sync'], "username"=>ActiveRecord::Base.configurations['hrms_user_sync']['username_sync'], "password"=>ActiveRecord::Base.configurations['hrms_user_sync']['password_sync'], "encoding"=>ActiveRecord::Base.configurations['hrms_user_sync']['encoding_sync']}
+
+#     inia_database_details = {"adapter"=>ActiveRecord::Base.configurations['development']['adapter'], "database"=>ActiveRecord::Base.configurations['development']['database'], "host"=>ActiveRecord::Base.configurations['development']['host'], "port"=>ActiveRecord::Base.configurations['development']['port'], "username"=>ActiveRecord::Base.configurations['development']['username'], "password"=>ActiveRecord::Base.configurations['development']['password'], "encoding"=>ActiveRecord::Base.configurations['development']['encoding']}
+#     AppSyncInfo.establish_connection(inia_database_details)
+#     rec = AppSyncInfo.find_or_initialize_by_name('hrms')
+#     rec.in_progress = true
+#     if !rec.last_sync.present?
+#       rec.last_sync=Time.now
+#       @sync_time = (Time.now - 1.minute)
+#     else
+#       @sync_time = (rec.last_sync-1.minute)
+#     end
+#     rec.save
+
+#   p "-- User -$$$$$$$$$$$$$$$$$-"
+#     hrms = ActiveRecord::Base.establish_connection(hrms_sync_details).connection
+#     user_data = "SELECT first_name, last_name, login_id, work_email, employee_no, is_active, modified_date, prev_emp_no FROM vw_employee where modified_date <= '#{Time.now}' and employee_no != 0 and work_email != '' and login_id !='' "
+#     p user_data
+#     @user_info = hrms.execute(user_data)
+#     hr_user_count = hrms.execute("select * from employee")
+#     p " Total users in HRMS : #{hr_user_count.count}"
+#     p " Sync users from HRMS : #{@user_info.count}"
+#     hrms.disconnect!
+#     nanba = ActiveRecord::Base.establish_connection(:production).connection
+#     nanba_users = nanba.execute("select * from users where type='User' and status=1")
+#     p " Total users in nanba before Sync : #{nanba_users.count}"
+
+#     p "-------- 123 ----------------"
+#     @user_info.each(:as => :hash) do |user|
+#       p '-------- 0 ----------------'
+#       p user
+#       final_sql = "INSERT into users(login, firstname, lastname, mail, language, auth_source_id, created_on, hashed_password, status, last_login_on, type, identity_url, mail_notification, salt, must_change_passwd, passwd_changed_on, lastmodified) VALUES ('#{user['login_id']}', '#{user['first_name']}','#{user['last_name']}','#{user['work_email']}','en',1, NOW(),'','#{user['is_active']==1 ? 1 : 3}',NULL,'User', NULL,'only_my_events',NULL,false,NULL,NOW())"
+
+#       emp_code_con = "select * from user_official_infos where employee_id=#{user['employee_no']}"
+
+#       last_emp_code = "INSERT into user_official_infos (user_id, employee_id) values ((select id from users where login='#{user['login_id']}' limit 1) ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+
+#       update_sql = "update users set login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}',mail='#{user['work_email']}',language='en', auth_source_id=1, status='#{user['is_active']==1 ? 1 : 3}',type='User', salt=NULL ,lastmodified=NOW() where id=(select user_id from user_official_infos where employee_id=#{user['employee_no']} limit 1)"
+
+#       res1 =  nanba.execute(emp_code_con)
+#       emp_up = "update user_official_infos set user_id=(select id from users where login='#{user['login_id']}' limit 1) where employee_id=#{user['employee_no']}"
+#       user_count =  nanba.execute("select id from users where login='#{user['login_id']}'")
+
+#       # p res1.count, user_count.count
+#       p '--------'
+#       if user['prev_emp_no'].present?
+#         Rails.logger.info '$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ transfer $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$'
+#         User.establish_connection(:production)
+#         UserOfficialInfo.establish_connection(:production)
+#         uoi = UserOfficialInfo.find_by_employee_id(user['prev_emp_no'])
+#         p uoi
+#         if uoi.present?
+#           usr = uoi.user
+#           usr.firstname=user['first_name']
+#           usr.lastname=user['last_name']
+#           usr.login=user['login_id']
+#           usr.mail=user['work_email']
+#           usr.status =user['is_active']==1 ? 1 : 3
+#           usr.save
+#           uoi.employee_id = user['employee_no']
+#           uoi.save rescue false
+#           Rails.logger.info uoi.errors
+#         end
+#         p '===== after ---------------------'
+#         p uoi
+#       end
+#       if user_count.count==0 && user['prev_emp_no'].nil?
+#         p '--- insert users ---'
+#         nanba.execute(final_sql)
+#         userid = nanba.execute("select LAST_INSERT_ID()")
+#         user_id = nil
+#         userid.each(:as => :hash) do |pr|
+#           user_id = pr['LAST_INSERT_ID()']
+#         end
+#         lemp_code = "INSERT into user_official_infos (user_id, employee_id) values (#{user_id} ,#{user['employee_no']})ON DUPLICATE KEY UPDATE employee_id=VALUES(employee_id),user_id=VALUES(user_id)"
+#         nanba.execute(lemp_code)
+
+#       elsif user['prev_emp_no'].nil?
+#         p '--- update users ---'
+#         nanba.execute(last_emp_code) if res1.count == 0 && user['is_active']==1
+#         nanba.execute(update_sql)
+#       end
+#     end
+#     nanba_users_count = nanba.execute("select * from users where type='User' and status=1")
+#     p " Total users in nanba after Sync : #{nanba_users_count.count}"
+
+#     rec.update_attributes(:last_sync=>Time.now)
+
+
+
+#   end
 
 
 #   def self.sync_exist_users
