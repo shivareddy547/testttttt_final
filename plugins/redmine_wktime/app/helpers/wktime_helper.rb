@@ -1439,8 +1439,7 @@ module WktimeHelper
     #     end
     #   end
      end
-      p '===== 333333333333333333==========='
-     p user_emp_code
+    
     user_emp_code.delete('')
     user_emp_code.delete(0)
     user_emp_code = user_emp_code.uniq.join(",")
@@ -1453,19 +1452,16 @@ module WktimeHelper
     end
 
     if user_emp_code.present?
-      p '====== emp code =============='
-      # p user_emp_code = '96325'
-      p '======== raja ----------------'
+    
       key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
       url1 = "https://iservstaging.objectfrontier.com/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
       response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute 
-      p response
-      p '==== cool ====='
+     
       # raise
       user_array = user_emp_code.split(',')
       my_arrays = {}
       result =[]
-      if !response.include?('failed') && response.present?
+      if !response.include?('failed') && !response.include?('No records found') && response.present?
         data = JSON.parse(response)
         user_array.each_with_index { |name, index| my_arrays[name] = {}   }
         if data['attendance-daily'].count > 1
