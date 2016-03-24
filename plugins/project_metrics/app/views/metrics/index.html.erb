@@ -14,15 +14,15 @@
     <div id="query_form_with_buttons" class="hide-when-print">
       <%= hidden_field_tag 'set_filter', '1' %>
       <%= hidden_field_tag 'metrics_filter', '1' %>
-      <%= radio_button("role_for_xl", "role_for_manager", "Manager",:checked=>true) %>
-      <lable>Manager</lable>
-       <%= radio_button("role_for_xl", "role_for_manager", "SeniorManager") %>
-      <lable>Senior Manager</lable>
+      <div class="box tabular">
+      <lable>Select Reports: </lable>
       <% if User.current.admin? %>
-      <%= radio_button("role_for_xl", "role_for_manager", "IniaObservation") %>
-      <lable>Inia Observation</lable>
-        <% end %>
-      <div id="query_form_content">
+      <%= select_tag "role_for_xl","<option>Manager</option><option>Senior Manager</option><option>Inia Observation</option><option>Resource Measurements</option>".html_safe %>
+      <% else %>
+          <%= select_tag "role_for_xl","<option>Manager</option><option>Senior Manager</option><option>Resource Measurements</option>".html_safe %>
+       <% end %>
+        </div>
+          <div id="query_form_content">
         <fieldset id="filters" class="collapsible <%= @query.new_record? ? "" : "collapsed" %>">
           <legend onclick="toggleFieldset(this);"><%= l(:label_filter_plural) %></legend>
           <div style="<%= @query.new_record? ? "" : "display: none;" %>">
@@ -102,3 +102,15 @@
 
 
 
+<style>
+
+    form#query_form .box{
+        width: 21%;
+        /* text-align: center; */
+        margin-left: 1%;
+
+    }
+    form#query_form .box lable{
+        font-weight: bold;
+    }
+</style>

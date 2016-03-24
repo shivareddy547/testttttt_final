@@ -20,3 +20,25 @@ Redmine::Plugin.register :project_metrics do
   end
   menu :project_menu, :metrics, { :controller => 'metrics', :action => 'index' }, :caption => :label_metrics, :before => :settings, :param => :project_id
 end
+
+
+Rails.configuration.to_prepare do
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  #time="5 8 * * Sat"
+  time="*/1 * * * *"
+  scheduler.cron time do
+    begin
+      Rails.logger.info "==========Scheduler Started=========="
+      p 111111111111111111111
+      Metric.get_issues_for_excel
+    rescue Exception => e
+      Rails.logger.info "Scheduler failed: #{e.message}"
+    end
+  end
+
+  # scheduler.every '1s' do
+  #   puts "change the oil filter!"
+  # end
+
+end
