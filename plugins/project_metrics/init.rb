@@ -25,8 +25,8 @@ end
 Rails.configuration.to_prepare do
   require 'rufus/scheduler'
   scheduler = Rufus::Scheduler.new
-  #time="5 8 * * Sat"
-  time="*/1 * * * *"
+  time="0 14 * * 1"
+  # time="*/5 * * * *"
   scheduler.cron time do
     begin
       Rails.logger.info "==========Scheduler Started=========="
