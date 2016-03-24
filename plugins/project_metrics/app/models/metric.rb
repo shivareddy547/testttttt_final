@@ -213,9 +213,12 @@ class Metric < ActiveRecord::Base
     encoding    = l(:general_csv_encoding)
    @project = Project.find_by_identifier('dmo')
    # @child_projects = @project.children
-   @find_target_version = Sprints.where(:project_id=>@project.id).order('created_on ASC').last
+   start_date=(Date.today-3).at_beginning_of_week
+   end_date=start_date.at_end_of_week-2
+   @find_target_version = Sprints.where(:project_id=>@project.id,:ir_start_date=> start_date,:ir_end_date=> end_date).last
    # departments = CustomField.find_by_sql("select possible_values from custom_fields where name='department'").last.possible_values
     # directory_name =  File.join(Rails.root, "/home/dgoadmin/Dropbox/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}")
+   if @find_target_version.present?
    directory_name = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}"
     Dir.mkdir(directory_name) unless File.exists?(directory_name)
     @issue_query = IssueQuery.new
@@ -268,6 +271,11 @@ class Metric < ActiveRecord::Base
     end
     path  = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}/DMO_Weekly_Report.xlsx"
      workbook.write(path)
+else
+
+  p "++++++Target Version Not found for #{start_date} and #{end_date}"
+
+   end
 
 
     # departments.each_with_index do |each_department,index|
