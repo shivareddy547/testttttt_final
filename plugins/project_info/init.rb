@@ -3,7 +3,7 @@ require 'project_info/project_patch'
 require 'projects_info_controller_patch'
 
 require 'project_info/member_patch_for_history'
-require 'project_info/role_patch'
+# require 'project_info/role_patch'
 
 Redmine::Plugin.register :project_info do
   name 'Project Info plugin'
