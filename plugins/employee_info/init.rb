@@ -17,7 +17,6 @@ Redmine::Plugin.register :employee_info do
     permission :client_owner, :public => true
     permission :do, :public => true
     permission :co, :public => true
-    permission :rmo, :public => true
     # permission :developer, :public => true
   end
 

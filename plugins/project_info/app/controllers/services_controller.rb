@@ -108,7 +108,7 @@ class ServicesController < ApplicationController
 
     if user_for_member.present? && find_project.present?
      find_member = Member.find_by_user_id_and_project_id(user_for_member.id,find_project.id)
-      if find_member.present? && find_member.capacity > 0  
+      if find_member.present?
         errors << "Member already exist..!"
       end
     end
