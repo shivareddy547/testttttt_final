@@ -18,8 +18,12 @@ class ServicesController < ApplicationController
       member = Member.find_or_initialize_by_user_id_and_project_id(user.user_id,@project.id)
       member.capacity = params[:capacity].to_f
       member.billable = params[:billingType].present? && params[:billingType]=='billable' ? params[:billingType] : 'shadow'
-      member.role_ids = [params[:roleId]] 
-      # member.save
+      # member.role_ids = [params[:roleId]] 
+      if member.save
+      member_role = MemberRole.find_or_initialize_by_member_id_and_project_id(member.id,@project.id)
+      member_role.role_id=[params[:roleId]]
+      member_role.save 
+    end
     end
     if user.present? && member.save
       mem = MemberHistory.find_or_initialize_by_user_id_and_project_id(user.user_id,@project.id)
