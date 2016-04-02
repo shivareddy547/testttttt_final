@@ -40,6 +40,7 @@ GEM
     childprocess (0.5.6)
       ffi (~> 1.0, >= 1.0.11)
     coderay (1.1.0)
+    dalli (2.7.6)
     dav4rack (0.3.0)
       nokogiri (>= 1.4.2)
       rack (>= 1.1.0)
@@ -190,6 +191,7 @@ DEPENDENCIES
   builder (>= 3.0.4)
   capybara
   coderay (~> 1.1.0)
+  dalli
   dav4rack (~> 0.3.0)
   enum_column3
   fastercsv (~> 1.5.0)
