@@ -2,8 +2,6 @@ require 'csv'
 class Sync < ActiveRecord::Base
 
 
-
-
   def self.sync_sql
 
 
@@ -56,11 +54,11 @@ class Sync < ActiveRecord::Base
               find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
               find_user_with_employee_id = inia.execute(find_user_with_employee_id)
               if find_user_with_employee_id.count ==0
-                user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["user_id"].to_i}',#{user['employee_no']})"
+                user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{row["user_id"].to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
                 save_employee = inia.insert_sql(user_info_query)
               else
 
-                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']},department='#{user['dep_name']}',location_name='#{user['loc_name']}',region_name='#{user['region_name']}',location_type='#{user['location_type']}' where user_id=#{row["id"]}"
                 save_employee = inia.execute(update_user_official_info)
               end
 
@@ -72,7 +70,7 @@ class Sync < ActiveRecord::Base
           user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
       VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3}','User',NOW())"
           save_user = inia.insert_sql(user_insert_query)
-          user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+          user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{save_user.to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
           save_employee = inia.insert_sql(user_info_query)
 
         end
@@ -160,11 +158,11 @@ class Sync < ActiveRecord::Base
               find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
               find_user_with_employee_id = inia.execute(find_user_with_employee_id)
               if find_user_with_employee_id.count ==0
-                user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["user_id"].to_i}',#{user['employee_no']})"
+                user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{row["user_id"].to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
                 save_employee = inia.insert_sql(user_info_query)
               else
 
-                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']},department='#{user['dep_name']}',location_name='#{user['loc_name']}',region_name='#{user['region_name']}',location_type='#{user['location_type']}' where user_id=#{row["id"]}"
                 save_employee = inia.execute(update_user_official_info)
               end
 
@@ -175,8 +173,9 @@ class Sync < ActiveRecord::Base
 
           user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
       VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3}','User',NOW())"
+
           save_user = inia.insert_sql(user_insert_query)
-          user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+          user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{save_user.to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
           save_employee = inia.insert_sql(user_info_query)
 
         end
@@ -194,12 +193,12 @@ class Sync < ActiveRecord::Base
           p find_user_with_employee_id
           if find_user_with_employee_id.count ==0
 
-            user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["id"]}',#{user['employee_no']})"
+            user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{row["id"].to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
             save_employee = inia.insert_sql(user_info_query)
           else
 
 
-            update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+            update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']},department='#{user['dep_name']}',location_name='#{user['loc_name']}',region_name='#{user['region_name']}',location_type='#{user['location_type']}' where user_id=#{row["id"]}"
             save_employee = inia.execute(update_user_official_info)
           end
 
@@ -267,11 +266,11 @@ class Sync < ActiveRecord::Base
               find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
               find_user_with_employee_id = inia.execute(find_user_with_employee_id)
               if find_user_with_employee_id.count ==0
-                user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{row["user_id"].to_i}',#{user['employee_no']})"
+                user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{row["user_id"].to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
                 save_employee = inia.insert_sql(user_info_query)
               else
 
-                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']} where user_id=#{row["id"]}"
+                update_user_official_info = "UPDATE user_official_infos SET employee_id=#{user['employee_no']},department='#{user['dep_name']}',location_name='#{user['loc_name']}',region_name='#{user['region_name']}',location_type='#{user['location_type']}' where user_id=#{row["id"]}"
                 save_employee = inia.execute(update_user_official_info)
               end
 
@@ -283,7 +282,7 @@ class Sync < ActiveRecord::Base
           user_insert_query = "INSERT into users(login,firstname,lastname,mail,auth_source_id,created_on,status,type,updated_on)
       VALUES ('#{user['login_id']}','#{user['first_name']}','#{user['last_name']}','#{user['work_email']}',1, NOW(),'#{user['is_active'].present? && user['is_active']==1 ? user['is_active'].to_i : 3}','User',NOW())"
           save_user = inia.insert_sql(user_insert_query)
-          user_info_query = "INSERT into user_official_infos (user_id, employee_id) values ('#{save_user.to_i}',#{user['employee_no']})"
+          user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{save_user.to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
           save_employee = inia.insert_sql(user_info_query)
 
         end

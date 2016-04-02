@@ -87,54 +87,54 @@ class KanbansController < ApplicationController
 
    kanbans = @project.kanban
 
-    if kanbans.present?
-      kanbans.each do |each_kanban|
-      @kanban = each_kanban
-      if @kanban.is_valid == true
-      if @project.issues.present?
-        @kanban.kanban_pane.each do |each_pane|
-          #issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
-          KanbanCard.where(:kanban_pane_id=>each_pane.id).delete_all
-          # cards
-          p issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.map(&:id),:tracker_id=>@kanban.tracker_id) if each_pane.kanban_state.issue_status.present?
-          if issues.present?
-            issues.each do |each_issue|
-              kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
-              kanban_new.issue_id = each_issue.id
-              kanban_new.developer_id= each_issue.assigned_to_id
-              kanban_new.verifier_id=each_issue.assigned_to_id
-              kanban_new.kanban_pane_id=each_pane.id
-              kanban_new.save
-            end
-          end
-        end
-      end
-      if @kanban.subproject_enable == true
-          @kanban.kanban_pane.each do |each_pane|
-            KanbanCard.where(:kanban_pane_id=>each_pane.id).delete_all
-          @subprojects = @project.descendants.active
-          @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
-          issues=[]
-          if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
-            issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.map(&:id).join(',')}) and tracker_id in (#{@kanban.tracker_id});");
-          end
-             if issues.present?
-            issues.each do |each_issue|
-              # kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
-              kanban_new = KanbanCard.where(:issue_id=>each_issue.id,:kanban_pane_id=>each_pane.id).first_or_initialize
-              kanban_new.issue_id = each_issue.id
-              kanban_new.developer_id= each_issue.assigned_to_id
-              kanban_new.verifier_id=each_issue.assigned_to_id
-              kanban_new.kanban_pane_id=each_pane.id
-              kanban_new.save
-            end
-          end
-        end
-      end
-
-      end
-    end
-end
+#     if kanbans.present?
+#       kanbans.each do |each_kanban|
+#       @kanban = each_kanban
+#       if @kanban.is_valid == true
+#       if @project.issues.present? && params[:project_cards_update].present?
+#         # @kanban.kanban_pane.each do |each_pane|
+#         #   #issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
+#         #   KanbanCard.where(:kanban_pane_id=>each_pane.id).delete_all
+#         #   # cards
+#         #   p issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.map(&:id),:tracker_id=>@kanban.tracker_id) if each_pane.kanban_state.issue_status.present?
+#         #   if issues.present?
+#         #     issues.each do |each_issue|
+#         #       kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
+#         #       kanban_new.issue_id = each_issue.id
+#         #       kanban_new.developer_id= each_issue.assigned_to_id
+#         #       kanban_new.verifier_id=each_issue.assigned_to_id
+#         #       kanban_new.kanban_pane_id=each_pane.id
+#         #       kanban_new.save
+#         #     end
+#         #   end
+#         # end
+#       end
+#       if @kanban.subproject_enable == true
+#           @kanban.kanban_pane.each do |each_pane|
+#             KanbanCard.where(:kanban_pane_id=>each_pane.id).delete_all
+#           @subprojects = @project.descendants.active
+#           @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
+#           issues=[]
+#           if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
+#             issues = Issue.find_by_sql("select * from issues where project_id in (#{@subprojects_ids}) and status_id in (#{each_pane.kanban_state.issue_status.map(&:id).join(',')}) and tracker_id in (#{@kanban.tracker_id});");
+#           end
+#              if issues.present?
+#             issues.each do |each_issue|
+#               # kanban_new = KanbanCard.find_or_initialize_by_issue_id_and_kanban_pane_id(each_issue.id,each_pane.id)
+#               kanban_new = KanbanCard.where(:issue_id=>each_issue.id,:kanban_pane_id=>each_pane.id).first_or_initialize
+#               kanban_new.issue_id = each_issue.id
+#               kanban_new.developer_id= each_issue.assigned_to_id
+#               kanban_new.verifier_id=each_issue.assigned_to_id
+#               kanban_new.kanban_pane_id=each_pane.id
+#               kanban_new.save
+#             end
+#           end
+#         end
+#       end
+#
+#       end
+#     end
+# end
     #Get all kanbans's name
     @kanban_names = @kanbans.collect{|k| k.name}
 
@@ -314,7 +314,7 @@ end
       @kanban.save
     end
     if @kanban.is_valid == true
-      if @project.issues.present?
+      if @project.issues.present? && params[:project_cards_update].present?
         @kanban.kanban_pane.each do |each_pane|
           #issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
           issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.map(&:id),:tracker_id=>@kanban.tracker_id) if each_pane.kanban_state.issue_status.present?

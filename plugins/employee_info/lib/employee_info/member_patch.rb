@@ -127,11 +127,7 @@ module EmployeeInfo
             non_billable_users_with_below_25_percentage = Member.find_by_sql("select * from members  where capacity > 0 and  capacity < 0.25 and billable=0")
             non_billable_users_with_below_25_percentage.each do |each_member|
               each_member.update_attributes(:billable=>"support",:capacity=>0)
-              # p "+++++++++++error+++++++++"
-              # p each_member.errors
-              # p "+++++++++++++++end +++++++++++++"
-
-            end
+           end
             non_billable_users_with_above_25_percentage = Member.find_by_sql("select * from members where capacity > 0 and  capacity < 0.25 and billable=0")
             non_billable_users_with_above_25_percentage.each do |each_member|
               each_member.update_attributes(:billable=>"shadow")
@@ -139,7 +135,52 @@ module EmployeeInfo
           end
 
 
-        end
+
+          def self.update_billable_non_billable_and_capacity
+
+             find_users = Member.find_by_sql("select user_id from members group by user_id");
+             find_users.each do |each_user|
+               find_members = Member.find_by_sql("select * from members group by project_id HAVING  sum(capacity) <= 0 and user_id=#{each_user.user_id.to_i}  limit 2")
+               find_members.each do |each_member|
+
+                 mem = MemberHistory.find_or_initialize_by_user_id_and_project_id(each_member.user_id,each_member.project_id)
+                  mem.capacity = 0.25
+                  mem.billable = "billbale"
+                  mem.start_date = Date.today
+                  mem.end_date =   Date.today.end_of_year
+                  # mem.created_by = each_member.user_id
+                  mem.member_id=each_member.id
+                  mem.save
+
+                  each_member.capacity = 0.25
+                  each_member.billable = "billbale"
+                  each_member.save
+                  # mem.created_by = each_member.user_id
+                end 
+              end 
+
+          end
+
+          def self.update_histories
+            
+                find_members = Member.find_by_sql("select * from members")
+               find_members.each do |each_member|
+
+                 mem = MemberHistory.find_or_initialize_by_user_id_and_project_id(each_member.user_id,each_member.project_id)
+                  mem.capacity = each_member.capacity
+                  mem.billable = each_member.billable
+                  mem.start_date = Date.today
+                  mem.end_date =   Date.today.end_of_year
+                  # mem.created_by = each_member.user_id
+                  mem.member_id=each_member.id
+                  mem.save
+                  
+                  # mem.created_by = each_member.user_id
+                end 
+           
+          end
+
+       end
 
 
       end

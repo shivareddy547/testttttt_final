@@ -16,3 +16,5 @@ match '/projects_regions/edit', :to => 'project_region_setup#edit', :as => 'proj
 match '/projects_regions/create', :to => 'project_region_setup#create', :as => 'projects_region_edit', :via => [:post]
 match '/projects_regions/update', :to => 'project_region_setup#update', :as => 'projects_region_update', :via => [:put,:post]
 match '/projects_regions/delete', :to => 'project_region_setup#destroy', :as => 'projects_region_delete', :via => [:delete]
+
+match '/services/append_members', :to => 'services#append_members', :as => 'append_members', :via => [:post,:get]

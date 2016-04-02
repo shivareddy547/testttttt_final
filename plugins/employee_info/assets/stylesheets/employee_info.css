@@ -54,4 +54,26 @@ form.edit_membership .block2{
 }
 
 
+/* avatar css */
 
+.gravatar { transition: all .2s ease-in-out; }
+
+.gravatar:hover {
+    transform: scale(2.0);
+    /*transform-origin: top left;*/
+    transform-origin: 0% 40%;
+    position: relative;
+    z-index: 2;
+}
+
+td.assigned-to .gravatar:hover {
+    transform: scale(5.0) !important;
+
+}
+
+table.list{
+    margin-bottom: 38px !important;
+}
+.journal h4 img.gravatar{
+    margin: 20px 4px -4px 0 !important;
+}

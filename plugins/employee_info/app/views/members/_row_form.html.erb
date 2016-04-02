@@ -1,3 +1,12 @@
+<% empinfo_helper = Object.new.extend(EmployeeInfoHelper) %>
+<% if request.xhr? %>
+    <input type="hidden" id="get_role" value="<%=  empinfo_helper.get_role_with_member(params[:id]) %>">
+<% else %>
+    <input type="hidden" id="get_role" value="<%=  empinfo_helper.get_role(params[:id]) %>">
+<% end %>
+
+<%#= params.inspect %>
+
 <td>
   <%#= ([:billable,:shadow,:support].index(member.billable).to_i
       )+1 %>
@@ -28,6 +37,7 @@
   <!--<label for="amount">Used:</label>-->
 
    <div id="div_member_capacity_slider" style="display:none"></div>
+
   <%= hidden_field_tag 'member_capacity', member.capacity,:member_id=>member.id %>
 </div>
 

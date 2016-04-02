@@ -1,6 +1,6 @@
 production:
   adapter: mysql2
-  database:  new5
+  database:  inia_qc
   server: vm1033
   host:  vm1033
   port:  3306
@@ -9,7 +9,7 @@ production:
   encoding: utf8
 development:
   adapter: mysql2
-  database:  new5
+  database:  inia_qc
   server: vm1033
   host:  vm1033
   port:  3306

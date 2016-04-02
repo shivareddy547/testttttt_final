@@ -1,5 +1,6 @@
 
 
 gem 'enum_column3'
+gem 'dalli'
 #gem 'rack-mini-profiler'
 # gem 'rack-ssl-enforcer'

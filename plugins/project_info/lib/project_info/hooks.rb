@@ -17,6 +17,8 @@ module ProjectInfo
     # (there's no way to add them on specific existing page)
     render_on :view_projects_form,
       :partial => "projects_info/form"
+    render_on :view_layouts_base_html_head,
+              :partial => "projects_info/header_render_js"
 
     # Render image paste form on every page,
     # javascript allows the form to show on issues, news, files, documents, wiki

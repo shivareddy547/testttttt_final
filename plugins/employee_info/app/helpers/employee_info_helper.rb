@@ -10,6 +10,30 @@ module EmployeeInfoHelper
     available_capacity = (1-total_capacity)*100
     return available_capacity.round
   end
+  def get_role(project_id)
+  find_member =  Member.find_by_sql("select m.id from members m
+join member_roles mr on mr.member_id=m.id
+join roles r on r.id=mr.role_id
+where r.name in ('co','do')  and m.user_id=#{User.current.id} and m.project_id=#{Project.find_by_identifier(project_id).id} limit 1")
+    if find_member.present? || User.current.admin?
+      return "yes"
+    else
+      return "no"
+    end
+  end
 
+  def get_role_with_member(member_id)
 
+    find_member = Member.find(member_id)
+     project_id=find_member.project_id
+    find_member =  Member.find_by_sql("select m.id from members m
+join member_roles mr on mr.member_id=m.id
+join roles r on r.id=mr.role_id
+where r.name in ('co','do')  and m.user_id=#{User.current.id} and m.project_id=#{project_id} limit 1")
+    if find_member.present? || User.current.admin?
+      return "yes"
+    else
+      return "no"
+    end
+  end
 end

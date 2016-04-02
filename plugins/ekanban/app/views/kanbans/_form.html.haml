@@ -9,6 +9,10 @@
     %p
       = f.check_box :is_valid, :label => "Enabled?"
       %em.info "Check it will display the new kanban in the kanban index page"
+      %label{:for => "kanban_project_cards_update"} Update Project Cards?
+      -#%input{:name => "kanban[project_cards_update]", :type => "hidden", :value => ""}/
+      %input#project_cards_update{:name => "kanban[project_cards_update]", :type => "checkbox", :value => "0"}/
+      %em.info "Check it will update the project cards."
       = f.check_box :subproject_enable, :label => "Subprojects Enabled?"
       %em.info "Check it will enable the subprojects."
   = submit_tag @kanban.id.nil? ? l(:button_create) : l(:button_save)
