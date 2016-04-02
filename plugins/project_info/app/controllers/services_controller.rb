@@ -27,7 +27,7 @@ class ServicesController < ApplicationController
       mem.billable = params[:billingType].present? && params[:billingType]=='billable' ? params[:billingType] : 'shadow'
       mem.start_date = params[:fromDate]
       mem.end_date = params[:toDate]
-      mem.role_ids => [params[:roleId]] 
+      mem.role_ids = [params[:roleId]] 
       mem.created_by = author.user_id
       mem.member_id=member.id
       mem.save
