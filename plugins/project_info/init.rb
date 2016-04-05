@@ -3,6 +3,7 @@ require 'project_info/project_patch'
 require 'projects_info_controller_patch'
 
 require 'project_info/member_patch_for_history'
+require 'project_info/role_patch'
 
 Redmine::Plugin.register :project_info do
   name 'Project Info plugin'
@@ -26,6 +27,9 @@ Redmine::Plugin.register :project_info do
     unless Member.included_modules.include? ProjectInfo::Patches::MemberPatchForHistory
       Member.send(:include, ProjectInfo::Patches::MemberPatchForHistory)
     end
+    unless Role.included_modules.include? ProjectInfo::Patches::RolePatch
+      Role.send(:include, ProjectInfo::Patches::RolePatch)
+    end
 
     unless ProjectsController.included_modules.include? ProjectsInfoControllerPatch
       ProjectsController.send(:include,ProjectsInfoControllerPatch)
@@ -40,3 +44,4 @@ Redmine::Plugin.register :project_info do
   end
 
 end
+

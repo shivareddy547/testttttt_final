@@ -3,3 +3,4 @@ en:
   # my_label: "My label"
   field_region: "Region"
   field_location: "Location"
+  field_internal: "Is Internal?"

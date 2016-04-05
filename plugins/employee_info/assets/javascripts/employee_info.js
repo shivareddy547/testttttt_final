@@ -67,13 +67,13 @@ $(document).on('change', '#user_billable', function(event) {
 
 $(document).on('click', 'table.members .icon-edit', function(event) {
     event.stopImmediatePropagation();
-    $(this).closest('tr').find("#user_billable").attr("disabled", false);
+//    $(this).closest('tr').find("#user_billable").attr("disabled", false);
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
     var member_id = $(this).closest('tr').find("#member_billable_status").attr("member_id");
     $('#member-'+member_id+'-roles-form').find('a').attr('id', 'cancel_member');
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
-    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
+//    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
     $(this).closest('tr').find("#div_member_capacity_slider").show();
 console.log(billable_status)
 
@@ -469,16 +469,23 @@ $(document).on('click', 'input#member_ship_check', function() {
 
     if((parseInt(member_available_value) < parseInt(available_value)) || parseInt(member_available_value) <=0)
     {
-         $(this).prop('checked', false);
+//        alert('yes')
+//         $(this).prop('checked', false);
         var billable_value = $('form#new_membership select#billable').val();
-        if(billable_value != 3 )
+        if(billable_value == 3 )
         {
-            $(this).prop('checked', false);
+//            $(this).prop('checked', tru);
+            $("form#new_membership #billable").attr("disabled", false);
+            $("form#new_membership #member_capacity").val(0);
 
         }
-
+        else{
+            $(this).prop('checked', false);
+        }
 
     }
+
+//    console.log(uniq_result.count);
 
     if(uniq_result.count > 1)
     {
@@ -552,3 +559,37 @@ $( document ).ready(function() {
         }
     );
 });
+
+
+
+$( document ).ready(function() {
+    // GET CO DO ROle
+
+    var co_do_role = $("#get_co_do_role").val();
+    if(co_do_role=="false")
+    {
+        $("#tab-content-members").hide();
+        $(".buttons").hide();
+    }
+
+
+// Hiding the roles
+
+    $("input[name='membership[role_ids][]']").each( function () {
+
+        console.log($("#get_internal_role").val())
+        if($.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
+        {
+        $(this).prop("disabled", true);
+        }
+        else
+        {
+
+            $(this).prop("disabled", false);
+        }
+
+    });
+
+});
+
+

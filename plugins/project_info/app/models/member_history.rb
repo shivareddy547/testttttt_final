@@ -22,6 +22,13 @@ class MemberHistory < ActiveRecord::Base
 #
 #   end
 
+  def self.update_billable_non_billable_for_two_projects
+
+
+    Member.find_by_sql("y")
+
+  end
+
 
 
 end

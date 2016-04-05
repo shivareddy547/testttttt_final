@@ -1,6 +1,8 @@
 <div class="block1">
   <label for="billable">Billable / Shadow / Support<span class="required"> *</span></label>
-  <%= select_tag "billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],""),prompt: "--select--" %>
+  <%#= select_tag "billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],3),prompt: "--select--" %>
+  <%= select_tag "billable", options_for_select([["Support",3]],3) %>
+
 </div>
 <div class="block2">
   <%= hidden_field_tag 'member_capacity', "" %>
