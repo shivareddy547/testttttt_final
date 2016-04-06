@@ -21,10 +21,7 @@ class ServicesController < ApplicationController
       member.user_id = user.user_id
       member.project_id=@project.id
       member.capacity=params[:capacity].to_f
-      member.billable=params[:billingType].present? && params[:billingType]=='billable' ? params[:billingType] : 'shadow'
-
-
-
+      member.billable=params[:billingType].present? && params[:billingType]=='billable' ? "1" : "2"
     end
     if user.present? && member.save
       mem = MemberHistory.find_or_initialize_by_user_id_and_project_id(user.user_id,@project.id)
@@ -99,7 +96,9 @@ class ServicesController < ApplicationController
     end
 
     if params[:roleId].present?
-    find_role = Role.find(params[:roleId])
+   
+    find_role = Role.where(:id=> params[:roleId])
+  
       if !find_role.present?
         errors << "roleId not valid.!"
       end
