@@ -570,7 +570,7 @@ $( document ).ready(function() {
     var co_do_role = $("#get_co_do_role").val();
     if(co_do_role=="false")
     {
-        $("#tab-content-members").hide();
+        $("#tab-content-members .splitcontentright").hide();
         $(".buttons").hide();
     }
 
