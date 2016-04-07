@@ -651,6 +651,39 @@ $( document ).ready(function() {
 });
 
 
+
+$( document ).ready(function() {
+    // GET CO DO ROle
+
+    var co_do_role = $("#get_co_do_role").val();
+    if(co_do_role=="false")
+    {
+        $("#tab-content-members").hide();
+        $(".buttons").hide();
+    }
+
+    $("form#user_new_membership #div_member_capacity_slider").slider('disable');
+// Hiding the roles
+
+    $("input[name='membership[role_ids][]']").each( function () {
+
+        console.log($("#get_internal_role").val())
+
+        if($("#get_internal_role").val() && $.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
+        {
+            $(this).prop("disabled", true);
+        }
+        else
+        {
+
+            $(this).prop("disabled", false);
+        }
+
+    });
+
+});
+
+
 if(error_messages > 0)
 {
     var current_capacity ="<%=  Member.current_project_capacity(@membership) %>"

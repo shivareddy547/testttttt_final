@@ -562,6 +562,8 @@ $( document ).ready(function() {
 
 
 
+
+
 $( document ).ready(function() {
     // GET CO DO ROle
 
@@ -578,9 +580,10 @@ $( document ).ready(function() {
     $("input[name='membership[role_ids][]']").each( function () {
 
         console.log($("#get_internal_role").val())
-        if($.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
+
+        if($("#get_internal_role").val() && $.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
         {
-        $(this).prop("disabled", true);
+            $(this).prop("disabled", true);
         }
         else
         {
@@ -591,5 +594,4 @@ $( document ).ready(function() {
     });
 
 });
-
 

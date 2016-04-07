@@ -468,20 +468,39 @@ $(document).on('click', 'input#member_ship_check', function() {
             );
         }
     }
+
+
+
     var member_available_value = $(this).attr("member_available_value");
     var available_value = $("form#edit_membership #member_capacity").val();
 
 
     if((parseInt(member_available_value) < parseInt(available_value)) || parseInt(member_available_value) <=0)
     {
-        $(this).prop('checked', false);
+//        alert('yes')
+//         $(this).prop('checked', false);
+        var billable_value = $('form#edit_membership select#billable').val();
+
+        if(billable_value == 3 )
+        {
+//            $(this).prop('checked', true);
+            $("form#edit_membership #billable").attr("disabled", false);
+            $("form#edit_membership #member_capacity").val(0);
+
+            if($(this).prop('checked') === true){
+                $(this).prop('checked', false);
+            }else{
+                $(this).prop('checked', true);
+            }
+
+        }
+        else{
+            $(this).prop('checked', false);
+        }
+
     }
 
-    if(uniq_result.count > 1)
-    {
-        alert("Error:Please Select available members")
-        $("#edit_membership").find('[name=commit]').attr("disabled", false);
-    }
+
 
 
 
@@ -549,6 +568,40 @@ $( document ).ready(function() {
             }
     );
 });
+
+
+
+$( document ).ready(function() {
+    // GET CO DO ROle
+
+    var co_do_role = $("#get_co_do_role").val();
+    if(co_do_role=="false")
+    {
+        $("#tab-content-members").hide();
+        $(".buttons").hide();
+    }
+
+
+// Hiding the roles
+
+    $("input[name='membership[role_ids][]']").each( function () {
+
+        console.log($("#get_internal_role").val())
+
+        if($("#get_internal_role").val() && $.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
+        {
+            $(this).prop("disabled", true);
+        }
+        else
+        {
+
+            $(this).prop("disabled", false);
+        }
+
+    });
+
+});
+
 
 
 

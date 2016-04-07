@@ -67,13 +67,13 @@ $(document).on('change', '#user_billable', function(event) {
 
 $(document).on('click', 'table.memberships .icon-edit', function(event) {
     event.stopImmediatePropagation();
-    $(this).closest('tr').find("#user_billable").attr("disabled", false);
+    $(this).closest('tr').find("#user_billable").attr("disabled", true);
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
     var member_id = $(this).closest('tr').find("#member_billable_status").attr("member_id");
     $('#member-'+member_id+'-roles-form').find('a').attr('id', 'cancel_member');
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
-    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
+//    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
     $(this).closest('tr').find("#div_member_capacity_slider").show();
 
     if (billable_status == "billable")
@@ -633,4 +633,36 @@ $( document ).ready(function() {
             tooltip.hide();
         }
     );
+});
+
+
+$( document ).ready(function() {
+    // GET CO DO ROle
+
+    var co_do_role = $("#get_co_do_role").val();
+    if(co_do_role=="false")
+    {
+        $("#tab-content-members").hide();
+        $(".buttons").hide();
+    }
+
+    $("form#user_new_membership #div_member_capacity_slider").slider('disable');
+// Hiding the roles
+
+    $("input[name='membership[role_ids][]']").each( function () {
+
+        console.log($("#get_internal_role").val())
+
+        if($("#get_internal_role").val() && $.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
+        {
+            $(this).prop("disabled", true);
+        }
+        else
+        {
+
+            $(this).prop("disabled", false);
+        }
+
+    });
+
 });
