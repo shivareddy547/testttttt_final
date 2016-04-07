@@ -583,11 +583,13 @@ $( document ).ready(function() {
 
         if($("#get_internal_role").val() && $.inArray( parseInt($(this).val()), $("#get_internal_role").val().split(',').map(Number) ) == -1 )
         {
-            $(this).prop("disabled", true);
+//            $(this).prop("disabled", true);
+//            $(this).parent().hide();
+            $(this).hide();
         }
         else
         {
-
+//            $(this).parent().hide();
             $(this).prop("disabled", false);
         }
 
