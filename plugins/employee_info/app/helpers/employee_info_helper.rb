@@ -17,9 +17,9 @@ module EmployeeInfoHelper
  join roles r on r.id=mr.role_id
  where r.name in ('CO','DO','Manager')  and m.user_id=#{User.current.id} and m.project_id=#{project.id} limit 1")
      if find_member.present? || User.current.admin?
-       return "yes"
+       return "true"
      else
-       return "no"
+       return "false"
      end
   end
 
