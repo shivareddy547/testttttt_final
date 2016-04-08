@@ -1454,7 +1454,7 @@ module WktimeHelper
     if user_emp_code.present?
     
       key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
-      url1 = "https://iservstaging.objectfrontier.com/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
+      url1 = "https://iserv.objectfrontier.com/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
       response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute 
      
       # raise

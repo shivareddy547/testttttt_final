@@ -64,7 +64,6 @@ default:
   nalan_api_key: "HZ6EkgQdGgPVTOJuXwef"
   iserv_api_key: "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
   iserv_base_url: "https://iserv.objectfrontier.com"
-
   # Configuration of the autologin cookie.
   # autologin_cookie_name: the name of the cookie (default: autologin)
   # autologin_cookie_path: the cookie path (default: /)
