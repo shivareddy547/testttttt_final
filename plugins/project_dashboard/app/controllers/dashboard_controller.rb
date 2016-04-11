@@ -219,7 +219,7 @@ class DashboardController < ApplicationController
   end
   def graphs_settings
     @project=Project.find(params[:project_id])
-    project_preference = OverdueUnmanageTasksSetting.projkanban_boardsect_user_preference_settings(User.current.id,@project.id,params[:block_id],params[:tracker_id],params[:status_id])
+    project_preference = OverdueUnmanageTasksSetting.project_user_preference_settings(User.current.id,@project.id,params[:block_id],params[:tracker_id],params[:status_id])
     project_preference.trackers = params[:tracker_id]
     project_preference.statuses =   params[:status_id]
 

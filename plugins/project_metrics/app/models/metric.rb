@@ -219,7 +219,7 @@ class Metric < ActiveRecord::Base
    # departments = CustomField.find_by_sql("select possible_values from custom_fields where name='department'").last.possible_values
     # directory_name =  File.join(Rails.root, "/home/dgoadmin/Dropbox/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}")
    if @find_target_version.present?
-   directory_name = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}"
+   directory_name = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}"
     Dir.mkdir(directory_name) unless File.exists?(directory_name)
     @issue_query = IssueQuery.new
     @issue_query.project_id=@project.id
@@ -269,7 +269,7 @@ class Metric < ActiveRecord::Base
 
 
     end
-    path  = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}_#{@find_target_version.ir_start_date}_to_#{@find_target_version.ir_end_date}/DMO_Weekly_Report.xlsx"
+    path  = "/home/dgoadmin/Dropbox/DU.DAO/#{@find_target_version.name}/DMO_Weekly_Report.xlsx"
      workbook.write(path)
 else
 
