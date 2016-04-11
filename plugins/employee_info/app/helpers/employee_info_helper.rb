@@ -12,15 +12,16 @@ module EmployeeInfoHelper
   end
   def get_role(project)
     # return "yes"
-   find_member =  Member.find_by_sql("select m.id from members m
- join member_roles mr on mr.member_id=m.id
- join roles r on r.id=mr.role_id
- where r.name in ('CO','DO','Manager')  and m.user_id=#{User.current.id} and m.project_id=#{project.id} limit 1")
-     if find_member.present? || User.current.admin?
-       return "true"
-     else
-       return "false"
-     end
+ #   find_member =  Member.find_by_sql("select m.id from members m
+ # join member_roles mr on mr.member_id=m.id
+ # join roles r on r.id=mr.role_id
+ # where r.name in ('CO','DO','Manager')  and m.user_id=#{User.current.id} and m.project_id=#{project.id} limit 1")
+ #     if find_member.present? || User.current.admin?
+ #       return "true"
+ #     else
+ #       return "false"
+ #     end
+ return "true"
   end
 
   def get_internal_role()
