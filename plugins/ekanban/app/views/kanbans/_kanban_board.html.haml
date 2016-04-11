@@ -130,7 +130,7 @@
   d.height="100%";
   d.left="0%";
   d.top="0%";
-  d.margin="3% 0 0 0px";
+  d.margin="0 0 0 0px";
   d.background="white";
   $("#kanban_boards").animate(d,speed);
   isFullscreen = true;
@@ -227,44 +227,45 @@
                 return Colors[index]
             };
       $(document).ready(function() {
+
+
           var collect_ids=[]
           //var ran_color = randomColor();
           $('.card-header1').each(function() {
              var id = $(this).attr("class").split(" ")[1].split("_")[1]
-
+              console.log(id);
              if(id)
              {
               collect_ids.push(id);
-                          //console.log(collect_ids.uniq());
-                collect_ids = deduplicate(collect_ids);
+              //console.log(collect_ids)
+              //console.log(collect_ids.uniq());
+              collect_ids = deduplicate(collect_ids);
              }
 
 
              //console.log(collect_ids.compact().uniq());
               //$(this).css('background',randomColor());
           });
-          console.log(collect_ids.length);
-          //collect_ids.each(function() {
-          //
-          //
-          //});
+
+           function deduplicate(data){
+              if (data.length>0){
+                  var result=[];
+                  for (var i=0; i<data.length; i++){
+                      if (result.indexOf(data[i])===-1){
+                          result.push(data[i]);
+                      }
+                  }
+                  return result;
+              }
+          }
+
           if(collect_ids.length > 0)
           {
           $.each(collect_ids, function( index, value ) {
                         //alert( index + ": " + value );
-                      $(".color_"+value).css('background',randomColor1(index));
-                    });
-                    function deduplicate(data){
-                        if (data.length>0){
-                            var result=[];
-                            for (var i=0; i<data.length; i++){
-                                if (result.indexOf(data[i])===-1){
-                                    result.push(data[i]);
-                                }
-                            }
-                            return result;
-                        }
-                    }
+            $(".color_"+value).css('background',randomColor1(index));
+          });
+
           }
 
       });

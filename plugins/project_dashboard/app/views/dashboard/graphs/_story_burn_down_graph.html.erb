@@ -87,9 +87,9 @@
 <script>
     $('.story_burn_down_chart_settings_model').click(function (e) {
         $('#ajax-modal').html('<%= escape_javascript(render :partial => 'dashboard/graphs/setting_modal') %>');
-        $('#block_id').attr("value","issues_burndown_chart")
+        $('#block_id').attr("value","story_burndown_chart")
         $('.unmanagement_overdue_tasks').empty();
-        child =$('.issues_burn_down_trackers_statuses').children().clone();
+        child =$('.story_burn_down_trackers_statuses').children().clone();
         $('.unmanagement_overdue_tasks').append(child);
         showModal('ajax-modal', '450px');
         return false;

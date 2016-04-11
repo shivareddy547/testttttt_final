@@ -12,7 +12,7 @@ module ProjectDashboard
 
           #validates_length_of :notes, :maximum => 255, :allow_nil => true
           has_one :project_preference, :dependent => :destroy, :class_name => 'ProjectUserPreference',:foreign_key => 'project_id'
-          has_one :dashboard_filter_query, :dependent => :destroy, :class_name => 'DashboardFilterQuery',:foreign_key => 'project_id'
+          has_one :dashboard_filter_query, :dependent => :destroy, :class_name => 'DashboardQuery',:foreign_key => 'project_id'
           has_one :query, :class_name => 'DashboardQuery', :dependent => :destroy,:foreign_key => 'project_id'
           def project_user_pref1
             ProjectUserPreference.new(:project => self)

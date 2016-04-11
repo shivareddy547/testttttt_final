@@ -52,6 +52,8 @@
           - card_selected_tooltip_columns = pane.kanban.card_selected_tooltip_columns
           - card_selected_tooltip_columns.each do |value|
             %p
+              -#= truncate(find_value(value.to_sym,i).present? ? find_value(value.to_sym,i).html_safe : "".html_safe, length: 17,escape: false)
+              -#= truncate find_value(value.to_sym,i).present? ? find_value(value.to_sym,i).html_safe : "".html_safe , length: 2
               = find_value(value.to_sym,i).html_safe rescue ""
       - close_state = KanbanState.close_state(pane.kanban)
       - if KanbanWorkflow.transition_allowed?(pane.kanban_state, close_state ,pane.kanban.id)
@@ -98,19 +100,19 @@
     });
   });
 
-  //$(document).ready(function() {
-  //  //$('.kanban-card .ui-widget-header').each(function () {
-  //  //console.log(11111111111111111)
-  //  //    var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
-  //  //    $(.jump-response).css("background-color", hue);
-  //  //});
-  //
-  //  $('.kanban-card').each(function () {
-  //    //console.log(11111111111)
-  //    //var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
-  //    //$(.jump-response).css("background-color", hue);
-  //  });
-  //});
+  $(document).ready(function() {
+    //$('.kanban-card .ui-widget-header').each(function () {
+    //console.log(11111111111111111)
+    //    var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
+    //    $(.jump-response).css("background-color", hue);
+    //});
+
+    $('.kanban-card').each(function () {
+      //console.log(11111111111)
+      //var hue = 'rgb(' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ',' + (Math.floor((256-199)*Math.random()) + 200) + ')';
+      //$(.jump-response).css("background-color", hue);
+    });
+  });
 
 
 

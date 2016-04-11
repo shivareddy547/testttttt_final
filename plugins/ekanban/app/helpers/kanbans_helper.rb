@@ -344,7 +344,8 @@ module KanbansHelper
       if find_custom_id.present?
         custom_field= CustomField.find(find_custom_id.last)
         if issue.custom_field_value(custom_field.id).present?
-        "<strong>#{custom_field.name}:</strong>  #{issue.custom_field_value(custom_field.id)}"
+
+        "<strong>#{custom_field.name}:</strong>  #{ issue.custom_field_value(custom_field.id).gsub(/^(.{30,}?).*$/m,'\1...')}"
         end
       end
     else
@@ -360,9 +361,9 @@ module KanbansHelper
       when :is_private
       "<strong> Private: </strong>#{issue.is_private ==true ? "yes" : "No"}"
       when :subject
-      "<strong> Subject: </strong> #{issue.subject rescue "" }"
+      "<strong> Subject: </strong> #{ issue.subject.gsub(/^(.{30,}?).*$/m,'\1...') }"
       when :description
-      "<strong> Description: </strong> #{issue.description rescue "" }"
+      "<strong> Description: </strong> #{issue.description.gsub(/^(.{30,}?).*$/m,'\1...') rescue "" }"
       when :project_id
       "<strong> Project:</strong> #{issue.project.name rescue "" }"
       when :tracker_id
