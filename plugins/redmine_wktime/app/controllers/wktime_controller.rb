@@ -41,6 +41,7 @@ class WktimeController < ApplicationController
       else
         userList = getMembers
       end
+
       userList.each_with_index do |users,i|
         if i == 0
           ids =  users.id.to_s
@@ -84,7 +85,7 @@ class WktimeController < ApplicationController
       end
     end
 
-    findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr)
+    findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr,@from,@to,ids)
     if params[:project_id].present? && params[:user_id].to_i > 0
       @total_days=0
       params[:user_id].to_i > 0
@@ -1671,13 +1672,39 @@ class WktimeController < ApplicationController
     ["#{Wktime.table_name}", "#{TimeEntry.table_name}"]
   end
 
-  def findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr)
+  def findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr,from,to,ids)
+
+
     spField = getSpecificField()
     result = TimeEntry.find_by_sql("select count(*) as id from (" + selectStr + sqlStr + ") as v2")
     @entry_count = result[0].id
     setLimitAndOffset()
     rangeStr = formPaginationCondition()
+   
+    collect_mondays=[]
+    (from..to).each do |each_date|
+      if each_date.wday == 0
+        collect_mondays << each_date
+      end
+    end
     @entries = TimeEntry.find_by_sql(wkSelectStr + sqlStr + wkSqlStr + rangeStr)
+    pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")]  }
+    collect_entries_per_user=[]
+   collect_entries_per_week = []
+    ids.present? && ids.split(',').each do |each_member|
+      collect_mondays.each do |each_monday|
+        if !pluck_entries.include?([each_member.to_i,each_monday.strftime("%F")])
+          sql = "select #{each_member} as user_id,'#{each_monday}' as spent_on, 0 as hours,'not available' as status from time_entries limit 1"
+          collect_entries_per_week = TimeEntry.find_by_sql(sql)
+        # collect_entries << select 1 as user_id,"2016-01-04" as spent_on, 0 as hours from time_entries
+
+      end
+   collect_entries_per_user << collect_entries_per_week
+    end
+
+end
+     collect_entries_per_user = collect_entries_per_user.flatten!
+     @entries = @entries +  collect_entries_per_user
     @entries = @entries.uniq{|x| [x.spent_on,x.user_id] } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
 
