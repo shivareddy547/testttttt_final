@@ -17,7 +17,7 @@ module RedmineWktime
           where("1=0")
         else
           ids = projects.map(&:id)
-          active.where("#{Principal.table_name}.id IN (SELECT DISTINCT user_id FROM #{Member.table_name} WHERE project_id IN (?))", ids)
+          active.where("users.id IN (SELECT DISTINCT user_id FROM members WHERE project_id IN (?))", ids)
         end
       }
           # has_many :rejections, :class_name => 'Rejection', :foreign_key => 'project_id'
