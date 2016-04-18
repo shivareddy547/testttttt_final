@@ -29,8 +29,10 @@
   </thead>
   <tbody>
   <% @entries.each do |entry| -%>
+  <%- if entry.user.present? %>
       <tr class="time-entry <%= cycle("odd", "even") %>">
         <!--<td class="checkbox hide-when-print"><%#= check_box_tag("ids[]", entry.spent_on, false, :id => nil) %></td>-->
+        
         <td class="start_date"><%=h format_date(entry.spent_on) %></td>
         <td class="user"><%=h entry.user.login %></td>
         <td class="user"><%= controller.getUnit(entry) %>&nbsp;<%=h html_hours("%.2f" % entry.hours) %></td>
@@ -46,6 +48,7 @@
                       :title => l(:button_edit) %>
         </td>
       </tr>
+       <% end -%>
   <% end -%>
   </tbody>
 </table>

@@ -30,6 +30,7 @@ class WktimeController < ApplicationController
       @selected_project = getSelectedProject(@manage_view_spenttime_projects)
       setgroups
     end
+   
     ids = nil
     if user_id.blank?
       ids = User.current.id.to_s
@@ -37,7 +38,11 @@ class WktimeController < ApplicationController
       #all users
       userList=[]
       if group_id.blank?
-        userList = Principal.member_of(@selected_project)
+      
+        if @selected_project.descendants.present?
+          @selected_projects = @selected_project.self_and_descendants
+         end 
+        userList = Principal.member_of(@selected_projects)
       else
         userList = getMembers
       end
@@ -1524,12 +1529,7 @@ class WktimeController < ApplicationController
 
     @from, @to = @to, @from if @from && @to && @from > @to
 
-    p "++++++==@from+++++++@from++++"
-    p @from
-    p "+++++to ++++to ++++"
-    p @to
-
-  end
+   end
 
   # show all groups and project/group members show
   def setgroups
@@ -1688,7 +1688,7 @@ class WktimeController < ApplicationController
       end
     end
     @entries = TimeEntry.find_by_sql(wkSelectStr + sqlStr + wkSqlStr + rangeStr)
-    pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")]  }
+    pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")] if e.user_id.present?  }
     collect_entries_per_user=[]
    collect_entries_per_week = []
     ids.present? && ids.split(',').each do |each_member|
@@ -1699,13 +1699,13 @@ class WktimeController < ApplicationController
         # collect_entries << select 1 as user_id,"2016-01-04" as spent_on, 0 as hours from time_entries
 
       end
-   collect_entries_per_user << collect_entries_per_week
+   collect_entries_per_user << collect_entries_per_week if collect_entries_per_week.present?
     end
 
 end
      collect_entries_per_user = collect_entries_per_user.flatten!
      @entries = @entries +  collect_entries_per_user
-    @entries = @entries.uniq{|x| [x.spent_on,x.user_id] } if @entries.present?
+    @entries = @entries.uniq{|x| [x.spent_on,x.user_id] if x.user_id.present? } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
 
     @unit = nil

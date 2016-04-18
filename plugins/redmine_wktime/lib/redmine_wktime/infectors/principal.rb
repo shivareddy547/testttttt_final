@@ -1,0 +1,29 @@
+module RedmineWktime
+  module Infectors
+    module Principal
+      module ClassMethods; end
+  
+      module InstanceMethods; end
+
+      def self.included(receiver)
+        receiver.extend(ClassMethods)
+        receiver.send(:include, InstanceMethods)
+        receiver.class_eval do
+          unloadable
+
+    scope :member_of, lambda {|projects|
+        projects = [projects].flatten! unless projects.is_a?(Array)
+        if projects.empty?
+          where("1=0")
+        else
+          ids = projects.map(&:id)
+          active.where("#{Principal.table_name}.id IN (SELECT DISTINCT user_id FROM #{Member.table_name} WHERE project_id IN (?))", ids)
+        end
+      }
+          # has_many :rejections, :class_name => 'Rejection', :foreign_key => 'project_id'
+        end
+      end
+      
+    end
+  end
+end
