@@ -1,9 +1,11 @@
 module ApplicationControllerOverridePatch
   def self.included(base)
     base.class_eval do
-      before_filter CASClient::Frameworks::Rails::Filter
-
-
+      
+      # before_filter  
+      before_filter CASClient::Frameworks::Rails::Filter, :if => proc {|c| !request.xhr?}
+      # before_filter { |c| CASClient::Frameworks::Rails::Filter }
+      
       before_filter :session_expiration, :user_setup, :force_logout_if_password_changed, :check_if_login_required, :check_password_change, :set_localization
 
       rescue_from ::Unauthorized, :with => :deny_access
@@ -13,6 +15,7 @@ module ApplicationControllerOverridePatch
       include Redmine::MenuManager::MenuController
       helper Redmine::MenuManager::MenuHelper
 
+     
       def session_expiration
         if session[:user_id]
           if session_expired? && !try_to_autologin
