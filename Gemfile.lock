@@ -1,3 +1,9 @@
+PATH
+  remote: rubycas-client
+  specs:
+    rubycas-client (2.3.10.rc1)
+      activesupport
+
 GEM
   remote: https://rubygems.org/
   remote: http://rubygems.org/
@@ -217,6 +223,7 @@ DEPENDENCIES
   rspec-rails (~> 3.0.0)
   ruby-openid (~> 2.3.0)
   rubyXL
+  rubycas-client!
   rubyzip (>= 1.0.0)
   rufus-scheduler (= 3.0.3)
   selenium-webdriver
