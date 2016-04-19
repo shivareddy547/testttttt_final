@@ -12,8 +12,10 @@ module RedmineWktime
           unloadable
 
     scope :member_of, lambda {|projects|
-        projects = [projects].flatten! unless projects.is_a?(Array)
-        if projects.empty?
+        projects = [projects].flatten unless projects.is_a?(Array)
+        p 3333333333333333333333333333333333
+        p projects
+        if (projects.all? &:nil?) || projects.empty? 
           where("1=0")
         else
           ids = projects.map(&:id)
