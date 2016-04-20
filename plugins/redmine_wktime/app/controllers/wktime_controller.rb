@@ -793,8 +793,14 @@ class WktimeController < ApplicationController
   def getusers
     project = Project.find(params[:project_id])
     userStr =""
-    projmembers = project.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
-    projmembers.each do |m|
+    # projects=[]
+    projmembers=[]
+    projects = project.self_and_descendants
+    projects.each do |each_pro|
+      projmembers << each_pro.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
+
+    end
+    projmembers.flatten.each do |m|
       userStr << m.user_id.to_s() + ',' + m.name + "\n"
     end
 
@@ -1546,8 +1552,18 @@ class WktimeController < ApplicationController
     else
       @use_group=false
       #@members=@selected_project.members.collect{|m| [ m.name, m.user_id ] }.sort
-      projmem= @selected_project.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
-      @members=projmem.collect{|m| [ m.name, m.user_id ] }
+      # projmem= @selected_project.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
+      
+      projmembers=[]
+    projects = @selected_project.self_and_descendants
+    projects.each do |each_pro|
+      projmembers << each_pro.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
+
+    end
+    # projmembers.flatten.each do |m|
+    #   userStr << m.user_id.to_s() + ',' + m.name + "\n"
+    # end
+      @members=projmembers.flatten.collect{|m| [ m.name, m.user_id ] }
     end
   end
 
