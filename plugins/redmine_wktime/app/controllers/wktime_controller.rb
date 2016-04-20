@@ -42,7 +42,8 @@ class WktimeController < ApplicationController
         if @selected_project.descendants.present?
           @selected_projects = @selected_project.self_and_descendants
          end 
-        userList = Principal.member_of(@selected_projects)
+      
+        userList = Principal.member_of(@selected_projects.present? ? @selected_projects : @selected_project)
       else
         userList = getMembers
       end
@@ -1691,6 +1692,9 @@ class WktimeController < ApplicationController
     pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")] if e.user_id.present?  }
     collect_entries_per_user=[]
    collect_entries_per_week = []
+   p "+++++++++++++++++idsidsidsids++++++++++="
+   p ids
+   p "++++++++++++++++end ++++++++++++++"
     ids.present? && ids.split(',').each do |each_member|
       collect_mondays.each do |each_monday|
         if !pluck_entries.include?([each_member.to_i,each_monday.strftime("%F")])
@@ -1705,6 +1709,9 @@ class WktimeController < ApplicationController
 end
      collect_entries_per_user = collect_entries_per_user.flatten!
      @entries = @entries +  collect_entries_per_user
+     p "++++++++++++@entries@entries@entries+++++++++++++++="
+     p @entries
+     p "++++++++++++++++++++++Edn +++++++++++++++++++"
     @entries = @entries.uniq{|x| [x.spent_on,x.user_id] if x.user_id.present? } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
 
