@@ -26,7 +26,7 @@ class AdsprintinlController < ApplicationController
 
   def inplace
     # element_id filtered too!
-    p "+++++++++++=ajax++++++++++"
+    
     p params[:ir_start_date]
     p params[:ir_end_date] = DateTime.parse(params[:ir_end_date]).beginning_of_day if params[:ir_end_date].present?
     p params[:ir_start_date] = DateTime.parse(params[:ir_start_date]).beginning_of_day if params[:ir_start_date].present?
@@ -37,7 +37,9 @@ class AdsprintinlController < ApplicationController
     sprint = Sprints.find(params[:id])
     begin
       result = sprint.update_attributes(attribs)
+
     rescue => e
+     
       render :text => e.message.blank? ? e.to_s : e.message, :status => 400
       return
     end
@@ -46,8 +48,15 @@ class AdsprintinlController < ApplicationController
     sprint.reload
 
     text = sprint[param_id]
+ 
+    if sprint.errors.present?
+     text = sprint.errors.full_messages
+    end
     respond_to do |format|
-      format.html { render :text => text, :status => status }
+     
+      # format.html { render :text => text, :status => status,:errors=>sprint.errors.full_messages }
+      format.html { render :text => text, :status => status}
+      
     end
   end
 

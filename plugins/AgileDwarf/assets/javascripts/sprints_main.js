@@ -414,6 +414,7 @@
         });
 
         // "close sprint" button
+
         $('.close_sprint', el).on('click', function ()
         {
             var self = $(this);
@@ -430,6 +431,7 @@
                     },
                     success: function (data)
                     {
+                        alert(data);
                         // was not changed
                         if (data != status)
                             return ;
@@ -442,6 +444,13 @@
                             self.prop('src', Sprints.getPluginUrl('images', 'closed_sprint.png'));
                             el.addClass('closed_sprint');
                         }
+                    },
+                    error: function (errors)
+                    {
+                        // console.log(errors.responseText)
+                    alert(errors.responseText);
+                    // alert(errors.text);
+                    
                     }
                 });
             }
