@@ -146,19 +146,45 @@ class WktimeController < ApplicationController
            days_count = (@startday..@endday).to_a.count
 
            project_users = []
-           @project.users.collect do |user|
-             time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
-             if time_entries.present?
-               project_users << user
-               wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
-               l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
-               l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
-               l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
-               reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
-               lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
-               @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+
+           # if @project.descendants.present?
+           #   @projects = @project.self_and_descendants
+           # end
+           @project.self_and_descendants.each do |each_proj|
+
+             each_proj.users.collect do |user|
+               time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>each_proj.id).group('spent_on').sum('hours')
+               if time_entries.present?
+                 project_users << user
+                 wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
+                 l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
+                 l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
+                 l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
+                 reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
+                 lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
+                 @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+               end
              end
+
+
            end
+
+           @new_entries = @new_entries.flatten
+           # @new_entries = @new_entries.flatten.uniq{|x| [x.project_id,x.user_id] if x.user_id.present? } if @new_entries.present?
+
+           # @project.users.collect do |user|
+           #   time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
+           #   if time_entries.present?
+           #     project_users << user
+           #     wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
+           #     l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
+           #     l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
+           #     l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
+           #     reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
+           #     lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
+           #     @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+           #   end
+           # end
 
            #users_id_list = @project.users
            #if users_ids.count > 100
@@ -1708,9 +1734,7 @@ class WktimeController < ApplicationController
     pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")] if e.user_id.present?  }
     collect_entries_per_user=[]
    collect_entries_per_week = []
-   p "+++++++++++++++++idsidsidsids++++++++++="
-   p ids
-   p "++++++++++++++++end ++++++++++++++"
+
     ids.present? && ids.split(',').each do |each_member|
       collect_mondays.each do |each_monday|
         if !pluck_entries.include?([each_member.to_i,each_monday.strftime("%F")])
@@ -1724,10 +1748,8 @@ class WktimeController < ApplicationController
 
 end
      collect_entries_per_user = collect_entries_per_user.flatten!
-     @entries = @entries +  collect_entries_per_user
-     p "++++++++++++@entries@entries@entries+++++++++++++++="
-     p @entries
-     p "++++++++++++++++++++++Edn +++++++++++++++++++"
+     @entries = @entries + collect_entries_per_user if collect_entries_per_user.present?
+
     @entries = @entries.uniq{|x| [x.spent_on,x.user_id] if x.user_id.present? } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
 
