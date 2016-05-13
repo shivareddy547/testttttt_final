@@ -8,8 +8,26 @@ module SettingsControllerPatch
           render_404
           return
         end
+
+
+
         if request.post?
           Setting.send "plugin_#{@plugin.id}=", params[:settings]
+ if Setting.send "plugin_#{@plugin.id}=", params[:settings]
+
+params[:settings][:wktime_public_holiday].each do |each_day|
+p 33333333333333
+p each_day.split('|')[0]
+# p values = each_day.split('|')[0].spilt(',')
+ public_holiday = PublicHolyday.find_or_initialize_by_date_and_location(each_day.split('|')[0],each_day.split('|')[2])
+ public_holiday.save
+p 888888888888888888888
+
+
+end
+
+ end
+
           wktime_helper = Object.new.extend(WktimeHelper)
           #wktime_helper.sendNonLogTimeMail()
           #wktime_helper.lock_unlock_users()
