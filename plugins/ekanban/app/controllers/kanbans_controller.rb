@@ -333,7 +333,7 @@ class KanbansController < ApplicationController
 
       if params[:kanban].present? && params[:kanban][:subproject_enable].present? && params[:kanban][:subproject_enable] == "1"
         @kanban.kanban_pane.each do |each_pane|
-          @subprojects = @project.descendants.active
+          @subprojects = @project.self_and_descendants.active
           @subprojects_ids = @subprojects.map(&:id).join(',') if @subprojects.present?
           issues=[]
           if each_pane.kanban_state.present? && each_pane.kanban_state.issue_status.present? && each_pane.kanban_state.issue_status.last.id.present? && @subprojects_ids.present?
