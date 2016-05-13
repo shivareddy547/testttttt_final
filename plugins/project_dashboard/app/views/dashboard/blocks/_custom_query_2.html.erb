@@ -1,0 +1,61 @@
+<%#= render_agile_chart(@chart, @issues) if @query.valid? %>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<% @setting_custom_query_id,assigned_issues,@custom_query_title=dashboard_helper.get_selected_custom_query(@project.id,block_name) %>
+<% @sidebar_queries = IssueQuery.visible.
+        order("#{Query.table_name}.name ASC").
+# Project specific queries and global queries
+        where(@project.nil? ? ["project_id IS NULL"] : ["project_id IS NULL OR project_id = ?", @project.id]).
+        all %>
+
+
+<h3>
+  <%= link_to @custom_query_title.present? ? "#{@custom_query_title}" : l(:label_custom_query_2),"#" %>
+  <% if controller.action_name =='page_layout' %>
+      <%= link_to image_tag("settings.png", :plugin => 'project_dashboard',:border=>0),'#', :class => 'custom_query_2_settings_model' %>
+  <% end %>
+</h3>
+<%#= @assigned_issues.id.inspect rescue "" %>
+<%#= @sidebar_queries.map(&:name) %>
+
+<%#= assigned_issues.issues.where(:project_id=>@project.id).inspect %>
+<div id="resource_custom_query">
+  <%= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:conditions=>["project_id in (#{@project.id})"]) : [] } %>
+</div>
+<div class="custom_queries_list2" style="display:none">
+  <p>
+
+    <label for="custom query selection" id="custom_queries">
+
+      <%= l(:lable_custom_query_title) %></label> <span class="required">*</span>
+    <%= text_field_tag 'custom_query_title', nil, placeholder: 'Enter title...',:required => true,:value=>@custom_query_title %>
+  </p>
+  <p><label for="custom query selection" id="custom_queries">
+
+    <%= l(:lable_select_custom_query_list) %></label> <span class="required">*</span>
+
+    <%= select_tag "custom_query_id", options_from_collection_for_select(@sidebar_queries, "id", "name",:selected =>@setting_custom_query_id) %>
+  </p>
+
+  <!--<p><label for="status_selection" id="status_select"><%#= l(:lable_select_status) %></label> <span class="required">*</span>  <%#= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>-->
+</div>
+
+
+<script>
+    $('.custom_query_2_settings_model').click(function (e) {
+        $('#ajax-modal').html('<%= escape_javascript(render :partial => 'dashboard/graphs/custom_query_setting_modal') %>');
+        $('#block_id').attr("value","custom_query_2")
+        $('.unmanagement_overdue_tasks').empty();
+        child =$('.custom_queries_list2').children().clone();
+        $('.unmanagement_overdue_tasks').append(child);
+        showModal('ajax-modal', '450px');
+        return false;
+    });
+
+</script>
+<style>
+    #resource_custom_query{
+
+        height: 222px;
+        overflow: scroll;
+    }
+</style>

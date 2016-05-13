@@ -1,12 +1,14 @@
 require_dependency 'attachments_controller_patch'
 require_dependency 'projects_controller_patch'
 require_dependency 'previews_controller_patch'
+require_dependency 'application_helper_patch'
 RedmineApp::Application.config.after_initialize do
   require_dependency 'project_dashboard/infectors'
 end
 
 ProjectsController.send(:include, ProjectsControllerPatch)
 AttachmentsController.send(:include, AttachmentsControllerPatch)
+ApplicationHelper.send(:include, ApplicationHelperPatch)
 
 
 Redmine::Plugin.register :project_dashboard do

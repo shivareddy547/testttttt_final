@@ -12,5 +12,6 @@ post '/dashboard/order_blocks', to: 'dashboard#order_blocks'
 get '/dashboard/graphs_settings', to: 'dashboard#graphs_settings'
 get '/dashboard/filter_query', to: 'dashboard#filter_query'
 get '/dashboard/save_text_editor', to: 'dashboard#save_text_editor'
+get '/dashboard/custom_queries_settings', to: 'dashboard#custom_queries_settings'
 
 match '/dashboard/editor/preview/new/:project_id', :to => 'dashboard#preview_text_editor', :as => 'dashboard_preview_text_editor', :via => [:get, :post, :put]

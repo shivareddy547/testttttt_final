@@ -18,7 +18,11 @@
             update_location(region_id);
         });
 
+        var region_id=$("#project_region_id").val();
+        update_location(region_id);
+
     });
+
     function update_location(id)
     {
         $.ajax({

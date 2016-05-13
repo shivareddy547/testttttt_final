@@ -1,0 +1,21 @@
+<%#= render_agile_chart(@chart, @issues) if @query.valid? %>
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<h3>
+  <%= link_to l(:label_resource_allocation_chart),"#" %>
+
+
+</h3>
+<%= javascript_include_tag 'highcharts', :plugin => 'project_dashboard' %>
+
+<% result = dashboard_helper.get_resource_allocation(@project,@query) %>
+<% @cats=result.map{|each_r| each_r["login"] } %>
+<% @billable=result.map{|each_r| each_r["billable_working_hours"] } %>
+<% @allocated_hours=result.map{|each_r| each_r["allocated_hours"] } %>
+<% @available_hours=result.map{|each_r| each_r["available_hours"] } %>
+<% @spent_hours=result.map{|each_r| each_r["spent_hours"] } %>
+
+<%= render :partial => 'dashboard/graphs/resource_allocation_graph' %>
+
+
+
+

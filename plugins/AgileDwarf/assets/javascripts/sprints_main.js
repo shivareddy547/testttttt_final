@@ -431,7 +431,7 @@
                     },
                     success: function (data)
                     {
-                        // alert(data);
+                        alert(data);
                         // was not changed
                         if (data != status)
                             return ;

@@ -36,6 +36,13 @@ class DashboardController < ApplicationController
              'issues_burndown_chart' => :label_issues_burndown_chart,
              'work_burndown_chart' => :label_work_burndown_chart,
              'story_burndown_chart' => :label_story_burndown_chart,
+             'resource_allocation_chart' => :label_resource_allocation_chart,
+             'risk_issue_chart' => :label_risk_issues_chart,
+             'custom_query_1' => :label_custom_query_1,
+             'custom_query_2' => :label_custom_query_2,
+             'custom_query_3' => :label_custom_query_3,
+             'custom_query_4' => :label_custom_query_4,
+
              'texteditor' => :label_texteditor
   }.freeze
 
@@ -153,6 +160,8 @@ class DashboardController < ApplicationController
     @project= Project.find(params[:project_id])
     @user = User.current
     @project_preference = ProjectUserPreference.project_user_preference(User.current.id,@project.id)
+
+
     @blocks = @project_preference[:my_page_layout] || DEFAULT_LAYOUT
     # @blocks = @user.pref[:my_page_layout] || DEFAULT_LAYOUT.dup
     @block_options = []
@@ -224,6 +233,23 @@ class DashboardController < ApplicationController
     project_preference.statuses =   params[:status_id]
 
     project_preference.save
+    redirect_to dashboard_page_layout_path(:project_id=>@project.id)
+    # render "projects/show"
+ end
+
+  def custom_queries_settings
+
+    @project=Project.find(params[:project_id])
+    project_preference = OverdueUnmanageTasksSetting.project_user_preference_settings(User.current.id,@project.id,params[:block_id],"","")
+
+    project_preference.custom_query_id = [params[:custom_query_id]]
+    project_preference.custom_query_name = params[:custom_query_title]
+    project_preference.trackers = []
+    project_preference.statuses = []
+    project_preference.save
+    p "++++++++project_preferenceproject_preferenceproject_preference+++++++++++++++"
+    p project_preference
+    p "++++++++++end ++++++++++++++"
     redirect_to dashboard_page_layout_path(:project_id=>@project.id)
     # render "projects/show"
   end
