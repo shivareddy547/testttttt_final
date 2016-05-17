@@ -58,6 +58,7 @@
         <%= link_to l(:button_clear), { :set_filter => 1, :project_id => @project }, :class => 'icon icon-reload'  %>
         <% other_formats_links do |f| %>
             <%= f.link_to 'XLS', :url => params %>
+            <%= f.link_to 'PDF', :url => params %>
             <%#= f.link_to 'XLS', :url => params, :onclick => "showModal('xls-export-options', '350px'); return false;" %>
         <% end %>
       </p>

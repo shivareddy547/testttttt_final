@@ -7,3 +7,4 @@ gem "rufus-scheduler", "3.0.3"
 # gem 'rubyXL', :git => 'https://github.com/weshatheleopard/rubyXL'
 #  gem 'wrap_excel'
 gem 'rubyXL'
+gem 'excel_rails'

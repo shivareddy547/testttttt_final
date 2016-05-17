@@ -48,7 +48,7 @@ class MetricsController < ApplicationController
 
 
     if @query.valid?
-      
+
       @limit = per_page_option
       @issue_count = @query.issue_count
       @issue_pages = Paginator.new @issue_count, @limit, params['page']
@@ -74,7 +74,9 @@ class MetricsController < ApplicationController
         }
         # format.atom #{ render_feed(@issues, :title => "#{@project || Setting.app_title}: #{l(:label_issue_plural)}") }
         # format.csv  { send_data(query_to_csv(@issues, @query, params), :type => 'text/csv; header=present', :filename => 'issues.csv') }
-        # format.pdf  { send_data(issues_to_pdf(@issues, @project, @query), :type => 'application/pdf', :filename => 'issues.pdf') }
+        #  format.pdf  { send_data(issues_to_pdf(@issues, @project, @query), :type => 'application/pdf', :filename => 'issues.pdf') }
+        format.pdf  { send_data(issues_to_pdf(@issues, @project, @query), :type => 'application/pdf', :filename => 'issues.pdf') }
+
         # format.xls  { send_data spreadsheet.string, :filename => "metrics.xls", :type =>  "application/vnd.ms-excel" }
          format.xlsx  { send_data Metric.query_to_excelx(@issues, @query, params,@project.identifier, params[:role_for_xl]), :filename => "#{@project.identifier}.xlsx", :type =>  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
         # format.xlsx do
@@ -100,11 +102,6 @@ class MetricsController < ApplicationController
   def get_issues_for_excel
 
     retrieve_query
-
-    p "++++++++++query ++++++++++"
-    p @query
-
-    p "++++++++++++++++endf ++++++++++++++="
     @project = Project.find_by_identifier('dmo')
     @child_projects = @project.children
     # @child_projects.each do |each_project|
