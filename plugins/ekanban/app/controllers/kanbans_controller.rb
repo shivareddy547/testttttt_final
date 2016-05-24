@@ -314,7 +314,7 @@ class KanbansController < ApplicationController
       @kanban.save
     end
     if @kanban.is_valid == true
-      if @project.issues.present? && params[:project_cards_update].present?
+      if @project.issues.present? && params[:kanban][:project_cards_update].present?
         @kanban.kanban_pane.each do |each_pane|
           #issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.last.id) if each_pane.kanban_state.issue_status.present?
           issues = @project.issues.where(:status_id=>each_pane.kanban_state.issue_status.map(&:id),:tracker_id=>@kanban.tracker_id) if each_pane.kanban_state.issue_status.present?
