@@ -228,14 +228,34 @@ class DashboardController < ApplicationController
   end
   def graphs_settings
     @project=Project.find(params[:project_id])
-    project_preference = OverdueUnmanageTasksSetting.project_user_preference_settings(User.current.id,@project.id,params[:block_id],params[:tracker_id],params[:status_id])
-    project_preference.trackers = params[:tracker_id]
-    project_preference.statuses =   params[:status_id]
 
-    project_preference.save
+    if params[:block_id]== "resource_allocation_chart"
+      project_preference = OverdueUnmanageTasksSetting.project_user_preference_settings(User.current.id,@project.id,params[:block_id],params[:tracker_id],params[:status_id])
+
+      project_preference.trackers = []
+      project_preference.statuses =   []
+      project_preference.custom_query_id = []
+      project_preference.custom_query_name =   []
+      project_preference.allocation_type = params[:resource_billable_select]
+      project_preference.save
+
+    else
+
+    project_preference = OverdueUnmanageTasksSetting.project_user_preference_settings(User.current.id,@project.id,params[:block_id],params[:tracker_id],params[:status_id])
+      project_preference.trackers = params[:tracker_id]
+      project_preference.statuses =   params[:status_id]
+      project_preference.custom_query_id = []
+     project_preference.custom_query_name =   []
+     project_preference.allocation_type = []
+      project_preference.save
+
+    end
     redirect_to dashboard_page_layout_path(:project_id=>@project.id)
     # render "projects/show"
  end
+
+
+
 
   def custom_queries_settings
 
@@ -246,10 +266,9 @@ class DashboardController < ApplicationController
     project_preference.custom_query_name = params[:custom_query_title]
     project_preference.trackers = []
     project_preference.statuses = []
+    project_preference.allocation_type = []
     project_preference.save
-    p "++++++++project_preferenceproject_preferenceproject_preference+++++++++++++++"
-    p project_preference
-    p "++++++++++end ++++++++++++++"
+
     redirect_to dashboard_page_layout_path(:project_id=>@project.id)
     # render "projects/show"
   end

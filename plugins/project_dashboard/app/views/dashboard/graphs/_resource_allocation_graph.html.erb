@@ -130,12 +130,13 @@
 
 
 <script>
-    $('.work_burn_down_chart_settings_model').click(function (e) {
+    $('.resource_allocation_settings_model').click(function (e) {
         $('#ajax-modal').html('<%= escape_javascript(render :partial => 'dashboard/graphs/setting_modal') %>');
-        $('#block_id').attr("value","work_burndown_chart")
+        $('#block_id').attr("value","resource_allocation_chart")
         $('.unmanagement_overdue_tasks').empty();
-        child =$('.work_burn_down_trackers_statuses').children().clone();
+        child =$('.resource_allocation_values').children().clone();
         $('.unmanagement_overdue_tasks').append(child);
+        $("h3.title").text("Select Biilable or Shadow or Support");
         showModal('ajax-modal', '450px');
         return false;
     });

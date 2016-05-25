@@ -38,9 +38,7 @@ module ProjectsControllerPatch
 
         @user = User.current
         @project_preference = ProjectUserPreference.project_user_preference(User.current.id,@project.id)
-        p "+++++++++++++++++@project_preference+++++++++++++++++"
-        p @project_preference
-        p "++++++++++=end ++++++++++++++++="
+
         @blocks = @project_preference[:my_page_layout] || DEFAULT_LAYOUT
         # try to redirect to the requested menu item
         if params[:jump] && redirect_to_project_menu_item(@project, params[:jump])

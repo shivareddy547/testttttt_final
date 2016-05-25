@@ -321,6 +321,20 @@ module DashboardHelper
 
   end
 
+  def get_selected_resource_allocation_type(project_id,graph_type)
+    project_user_preference = ProjectUserPreference.where(:user_id => User.current.id,:project_id=> project_id)
+    if project_user_preference.present?
+      setting = project_user_preference.last.overdue_unmanage_tasks_settings.where(:name=>graph_type)
+      if setting.present?
+        @allocation_type = setting.last.allocation_type.present? ? setting.last.allocation_type : []
+
+        # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(setting.trackers.join(","),setting.statuses.join(","))
+      end
+    end
+    return @allocation_type
+
+  end
+
 
   def get_selected_custom_query(project_id,graph_type)
     project_user_preference = ProjectUserPreference.where(:user_id => User.current.id,:project_id=> project_id)
@@ -665,12 +679,20 @@ end
     sprint_id=''
     start_date=''
     end_date=''
+    get_allocation_type="billable,shadow,support"
 
     if query.filters["fixed_version_id"].present?
        sprint_id = query.filters["fixed_version_id"][:values].last
        find_sprint = Version.find(sprint_id)
        start_date = find_sprint.ir_start_date
        end_date = find_sprint.ir_end_date
+
+       if find_sprint.present?
+         get_allocation_type= get_selected_resource_allocation_type(find_sprint.project_id,"resource_allocation_chart")
+
+          get_allocation_type = get_allocation_type.join(',')
+        
+      end
     end
 
    #   find_sql='select id,client_name,project_name,offshore_count,onsite_count,billable_working_hours,(billable_working_hours-pto_hours) as
@@ -717,7 +739,7 @@ end
 # result = User.find_by_sql("call getAllocationUsersReports('','','','')")
 # ActiveRecord::Base.connection.execute("call getAllocationUsersReports('','','','')")
 #  sql="call getAllocationUsersReports('','#{sprint_id}','#{start_date}','#{end_date}')"
-    sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}')"
+    sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}','#{get_allocation_type}')"
 
  # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
    connection = ActiveRecord::Base.connection

@@ -2,20 +2,27 @@
 <%  dashboard_helper = Object.new.extend(DashboardHelper) %>
 <h3>
   <%= link_to l(:label_resource_allocation_chart),"#" %>
-
+  <% if controller.action_name =='page_layout' %>
+      <%= link_to image_tag("settings.png" , :plugin => 'project_dashboard', :border=>0),'#', :class => 'resource_allocation_settings_model' %>
+  <% end %>
 
 </h3>
 <%= javascript_include_tag 'highcharts', :plugin => 'project_dashboard' %>
 
 <% result = dashboard_helper.get_resource_allocation(@project,@query) %>
-<% @cats=result.map{|each_r| each_r["login"] } %>
+<% @cats=result.map{|each_r| each_r["name"] } %>
 <% @billable=result.map{|each_r| each_r["billable_working_hours"] } %>
 <% @allocated_hours=result.map{|each_r| each_r["allocated_hours"] } %>
 <% @available_hours=result.map{|each_r| each_r["available_hours"] } %>
 <% @spent_hours=result.map{|each_r| each_r["spent_hours"] } %>
+<% @setting_resource_allocation_type=dashboard_helper.get_selected_resource_allocation_type(@project.id,block_name) %>
+
 
 <%= render :partial => 'dashboard/graphs/resource_allocation_graph' %>
 
 
 
-
+<div class="resource_allocation_values" style="display:none">
+  <p><label for="resource_billable selection" id="resource_billable_select"><%= l(:lable_resource_billable_select) %></label> <span class="required">*</span>   <%= select_tag "resource_billable_select", options_for_select([ "Billable", "Shadow","Support" ], @setting_resource_allocation_type ),:multiple => true,prompt: " Select Type" %></p>
+  <!--<p><label for="status_selection" id="status_select"><%#= l(:lable_select_status) %></label> <span class="required">*</span>  <%#= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>-->
+</div>
