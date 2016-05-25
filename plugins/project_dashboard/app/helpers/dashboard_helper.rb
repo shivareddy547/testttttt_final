@@ -690,8 +690,8 @@ end
        if find_sprint.present?
          get_allocation_type= get_selected_resource_allocation_type(find_sprint.project_id,"resource_allocation_chart")
 
-          get_allocation_type = get_allocation_type.join(',')
-        
+          get_allocation_type = get_allocation_type.present? ? get_allocation_type.join(',') : "billable,shadow,support"
+
       end
     end
 
