@@ -82,7 +82,8 @@
 //                                mytotal = parseInt(mychart.series[0].yData[0]);
 //                            }
                             mytotal =parseInt(mychart.series[0].yData[0]);
-                            var pcnt = (this.y / 80) * 100;
+                            console.log(billable.split(',')[0])
+                            var pcnt = (this.y / billable.split(',')[0]) * 100;
                             return Highcharts.numberFormat(pcnt) + '%';
                         }
                     }
