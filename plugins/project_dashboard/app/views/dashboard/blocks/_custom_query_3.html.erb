@@ -19,7 +19,8 @@
 
 <%#= assigned_issues.issues.where(:project_id=>@project.id).inspect %>
 <div id="resource_custom_query">
-  <%= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:conditions=>["project_id in (#{@project.id})"]) : [] } %>
+  <%= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],:conditions=>["issues.project_id in (#{@project.id})"]) : [] } %>
+  <%#= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:conditions=>["project_id in (#{@project.id})"]) : [] } %>
 </div>
 <div class="custom_queries_list3" style="display:none">
   <p>
