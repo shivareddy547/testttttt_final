@@ -1,3 +1,4 @@
+require 'custom_value'
 class IniaServiceController < ApplicationController
   unloadable
 
@@ -26,20 +27,26 @@ class IniaServiceController < ApplicationController
       (params[:fromDate].to_date..params[:toDate].to_date).each do |each_day|
         @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on(@project.first.id,@author.id,@find_activity_id,each_day )
         @time_entry.issue_id=@find_issue_id
-        if params[:fn_or_an].present?
-          if params[:fn_or_an] == "Full day"
+        @time_entry.comments=params[:leaveDescription]
+        if params[:leaveDuration].present?
+          if params[:leaveDuration] == "Full day"
             @time_entry.hours = 8
-          elsif params[:fn_or_an] == "Half day"
+          elsif params[:leaveDuration] == "Half day"
             @time_entry.hours = 4
           end
 
         end
         if @time_entry.save
+         find_leave_type = Project.find_by_sql("select id from custom_fields where type='TimeEntryCustomField' and name='type'")
+         if find_leave_type.present?
+           cv = CustomValue.find_or_initialize_by_custom_field_id_and_customized_id_and_customized_type(find_leave_type.first.id,@time_entry.id,"TimeEntry")
+               # :custom_field_id=>find_leave_type.first.id,:customized_type=>"TimeEntry",:customized_id=>@time_entry.id,:value=>params[:leaveType])
+           cv.value=params[:leaveType]
+           cv.save
 
-
+         end
         end
       end
-
     else
       errors << " Leave can not create for the category..!"
 
@@ -48,7 +55,7 @@ class IniaServiceController < ApplicationController
     if errors.present?
       render_json_errors(errors)
     else
-      render_json_ok("Success")
+      render_json_ok(@time_entry)
     end
 
   end
@@ -78,9 +85,6 @@ class IniaServiceController < ApplicationController
         @author = author.user
         if @author.present?
           @project = Project.find_by_sql("select p.id,p.name from projects p join members m on m.project_id=p.id where m.user_id in ('#{@author.id}') and m.capacity > 0  group by project_id order by max(capacity) limit 1")
-p "+++++++++=@author@author+++++++"
-          p @author
-          p "+++++++end ++++++"
         end
 
       else
@@ -133,8 +137,8 @@ p "+++++++++=@author@author+++++++"
 
        find_activity = Enumeration.where(:name=>'PTO')
        if find_activity.present?
-         p "+++++++============sdfhsjdfsk=========="
-         p @find_activity_id = find_activity.last.id
+
+         @find_activity_id = find_activity.last.id
        else
          errors << "Unable apply for Leave, PTO Activity Not Found .!"
 
@@ -150,17 +154,8 @@ p "+++++++++=@author@author+++++++"
          errors << "Unable apply for Leave, PTO Activity Not Found .!"
 
        end
-
-       p "++++==@find_tracker_id@find_tracker_id+++++++++"
-       p @find_tracker_id
-       p @project
-       p "+++++++++++++==end ++++++++"
-
-
        find_issue = Issue.where(:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
-       p "++++++++==issue +++"
-       p find_issue
-       if find_issue.present?
+         if find_issue.present?
          @find_issue_id = find_issue.first.id
        else
          errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
