@@ -531,10 +531,14 @@ class DashboardQuery < ActiveRecord::Base
   end
 
   def project_statement
+    p 2222222222222222222222222222222222222
     project_clauses = []
+    p project
     if project && !project.descendants.active.empty?
+      p 33333333333333333
       ids = [project.id]
       if has_filter?("subproject_id")
+        p 444444444444444
         case operator_for("subproject_id")
           when '='
             # include the selected subprojects
@@ -542,14 +546,18 @@ class DashboardQuery < ActiveRecord::Base
           when '!*'
             # main project only
           else
+            p 77777777777777777
             # all subprojects
-            ids += project.descendants.collect(&:id)
+           p ids += project.descendants.collect(&:id)
         end
       elsif Setting.display_subprojects_issues?
+        p 5555555555555555
         ids += project.descendants.collect(&:id)
       end
+      p 6666666666666666666
       project_clauses << "#{Project.table_name}.id IN (%s)" % ids.join(',')
     elsif project
+      p 888888888888888888888
       project_clauses << "#{Project.table_name}.id = %d" % project.id
     end
     project_clauses.any? ? project_clauses.join(' AND ') : nil
