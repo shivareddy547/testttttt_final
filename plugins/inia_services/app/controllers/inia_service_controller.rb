@@ -22,13 +22,13 @@ class IniaServiceController < ApplicationController
     p @find_issue_id
     p "+++++++=end +++"
 
-    if params[:fromDate].present? && params[:toDate].present? && @find_activity_id.present? && @find_issue_id.present? && params[:leaveCategory]=="Leave"
+    if params[:fromDate].present? && params[:toDate].present? && @find_activity_id.present? && @find_issue_id.present? && (params[:leaveCategory]=="Leave" || params[:leaveCategory]=="OnDuty" )
 
       (params[:fromDate].to_date..params[:toDate].to_date).each do |each_day|
         if !check_lock_status_for_week(each_day,@author.id).present?
          errors << " Leave can not apply for the #{each_day} , it's locked.!"
         end
-        @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on(@project.first.id,@author.id,@find_activity_id,each_day )
+        @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(@project.first.id,@author.id,@find_activity_id,each_day,@find_issue_id )
         @time_entry.issue_id=@find_issue_id
         @time_entry.comments=params[:leaveDescription]
         if params[:leaveDuration].present?
@@ -36,7 +36,7 @@ class IniaServiceController < ApplicationController
             @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 8 : check_lock_status_for_week(each_day,@author.id).present? ?  8 : 0
 
           elsif params[:leaveDuration] == "Half day"
-            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 8 : check_lock_status_for_week(each_day,@author.id).present? ?  4 : 0
+            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 4 : check_lock_status_for_week(each_day,@author.id).present? ?  4 : 0
           elsif params[:leaveDuration] == "Hours"
             @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? params[:leaveHours].to_f : check_lock_status_for_week(each_day,@author.id).present? ?  params[:leaveHours].to_f : 0
 
@@ -44,7 +44,7 @@ class IniaServiceController < ApplicationController
 
         end
         if @time_entry.save
-          if params[:leaveDuration] != "Hours"
+          if params[:leaveCategory] != "OnDuty"
          find_leave_type = Project.find_by_sql("select id from custom_fields where type='TimeEntryCustomField' and name='type'")
          if find_leave_type.present?
            cv = CustomValue.find_or_initialize_by_custom_field_id_and_customized_id_and_customized_type(find_leave_type.first.id,@time_entry.id,"TimeEntry")
@@ -193,7 +193,7 @@ class IniaServiceController < ApplicationController
 
        if params[:leaveDuration].present?
 
-       if params[:leaveDuration] != "Hours"
+       if params[:leaveCategory] != "OnDuty"
 
        find_issue = Issue.where(:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
       
