@@ -43,7 +43,7 @@ class IniaServiceController < ApplicationController
           end
 
         end
-        if @time_entry.save
+        if !errors.present? && @time_entry.save
           if params[:leaveCategory] != "OnDuty"
          find_leave_type = Project.find_by_sql("select id from custom_fields where type='TimeEntryCustomField' and name='type'")
          if find_leave_type.present?
