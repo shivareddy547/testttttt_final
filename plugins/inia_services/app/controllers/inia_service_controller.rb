@@ -30,15 +30,15 @@ class IniaServiceController < ApplicationController
         end
         @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(@project.first.id,@author.id,@find_activity_id,each_day,@find_issue_id )
         @time_entry.issue_id=@find_issue_id
-        @time_entry.comments=params[:leaveDescription]
+        @time_entry.comments=  params[:leaveStatus].present?  && params[:leaveStatus]=="Approved" ? params[:leaveDescription] : ""
         if params[:leaveDuration].present?
           if params[:leaveDuration] == "Full day"
-            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 8 : check_lock_status_for_week(each_day,@author.id).present? ?  8 : 0
+            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 8 : check_lock_status_for_week(each_day,@author.id).present? ?  0 : 8
 
           elsif params[:leaveDuration] == "Half day"
-            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 4 : check_lock_status_for_week(each_day,@author.id).present? ?  4 : 0
+            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 4 : check_lock_status_for_week(each_day,@author.id).present? ?  0 : 8
           elsif params[:leaveDuration] == "Hours"
-            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? params[:leaveHours].to_f : check_lock_status_for_week(each_day,@author.id).present? ?  params[:leaveHours].to_f : 0
+            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? params[:leaveHours].to_f : check_lock_status_for_week(each_day,@author.id).present? ?  0 : params[:leaveHours].to_f
 
           end
 
