@@ -298,10 +298,7 @@ module DashboardHelper
   def get_sql_for_filter_query(project_id)
     get_sql_for_filter_query = ""
     @find_dashboard_query = DashboardQuery.where(:project_id=>project_id,:user_id=>User.current.id)
-    p "+++++++==@find_dashboard_query@find_dashboard_query+++++++++"
-    p @find_dashboard_query
-    p get_sql_for_filter_query
-    p @find_dashboard_query.last.project_statement
+   
     p "+++++++++++=end +++++++++"
     if @find_dashboard_query.present?
       get_sql_for_filter_query = @find_dashboard_query.last.statement
@@ -311,7 +308,12 @@ module DashboardHelper
         p "===============5======5555555555555555============="
         p @find_dashboard_query.last.project_statement
         p 88888888888888888888888888888888
+        if @find_dashboard_query.last.project_statement.present?
        p  get_sql_for_filter_query =  " AND " + @find_dashboard_query.last.project_statement + "AND " + get_sql_for_filter_query
+        else
+          get_sql_for_filter_query =  "AND " + get_sql_for_filter_query
+
+       end
         p 99999999999999999999999999999999999
       end
     end
