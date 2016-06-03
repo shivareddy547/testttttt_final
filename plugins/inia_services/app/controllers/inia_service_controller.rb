@@ -161,6 +161,13 @@ class IniaServiceController < ApplicationController
       errors << "From date required..!"
     end
 
+    if !params[:leaveStatus].blank?
+
+
+    else
+      errors << "leaveStatus required..!"
+    end
+
     if !params[:leaveCategory].blank?
 
     else
