@@ -182,10 +182,11 @@ class IniaServiceController < ApplicationController
     else
       errors << "Leave Category required..!"
     end
-    if !params[:leaveType].blank?
 
-    else
+    if params[:leaveCategory] == "Leave" && params[:leaveType].blank?
       errors << "Leave Type required..!"
+    else
+
     end
 
     if !params[:leaveDuration].blank?
