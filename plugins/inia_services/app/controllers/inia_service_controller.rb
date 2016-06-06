@@ -58,7 +58,7 @@ class IniaServiceController < ApplicationController
     end
 
     if errors.present?
-      render_json_errors(errors)
+      render_json_errors(errors.join(','))
     else
       render_json_ok(@time_entry)
     end
@@ -263,7 +263,7 @@ p "++++++++++++=@find_issue_id@find_issue_id+++++++++++++="
 
     end
     if errors.present?
-      render_json_errors(errors)
+      render_json_errors(errors.join(','))
     end
 
   end
