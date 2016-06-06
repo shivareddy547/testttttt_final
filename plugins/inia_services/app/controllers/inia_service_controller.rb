@@ -16,11 +16,6 @@ class IniaServiceController < ApplicationController
   def create_ptos
     errors=[]
 
-    p "+++++++=@find_activity_id++++++++"
-    p @find_activity_id
-    p "+++++++++++++"
-    p @find_issue_id
-    p "+++++++=end +++"
 
     if params[:fromDate].present? && params[:toDate].present? && @find_activity_id.present? && @find_issue_id.present? && (params[:leaveCategory]=="Leave" || params[:leaveCategory]=="OnDuty" )
 
@@ -161,6 +156,20 @@ class IniaServiceController < ApplicationController
       errors << "From date required..!"
     end
 
+    if !params[:toDate].blank?
+
+
+    else
+      errors << "To date required..!"
+    end
+
+    if !params[:leaveDescription].blank?
+
+
+    else
+      errors << "Leave Reason required..!"
+    end
+
     if !params[:leaveStatus].blank?
 
 
@@ -169,6 +178,11 @@ class IniaServiceController < ApplicationController
     end
 
     if !params[:leaveCategory].blank?
+
+    else
+      errors << "Leave Category required..!"
+    end
+    if !params[:leaveType].blank?
 
     else
       errors << "Leave Type required..!"
