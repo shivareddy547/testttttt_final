@@ -1975,11 +1975,10 @@ module WktimeHelper
 
 
   def is_pto_activity(entry)
-    p 66666666666666666666666666
-    p entry
+
     if entry.present?
       find_entry = TimeEntry.find(entry.id)
-      if find_entry.activity.name=="PTO"
+      if find_entry.activity.name=="PTO" and find_entry.hours > 0
         return true
       else
         return false
@@ -1988,7 +1987,7 @@ module WktimeHelper
       return false
     end
 
-    p 55555555555555555555555
+
     return true
 
   end
