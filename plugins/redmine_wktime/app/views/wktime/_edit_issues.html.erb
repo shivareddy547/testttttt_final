@@ -217,3 +217,9 @@
   </div>
 </div>
 <%= context_menu time_entries_context_menu_path %>
+<script>
+        $(".time-entry .activity:contains('PTO')").each(function() { $(this).parent().find('td.hours').each(function() {
+            $( this ).find("input").prop('disabled', true);$( this ).find("input").css('display', "none");$( this ).find("a").attr("href", "javascript:void(0)");
+        });});
+
+</script>
