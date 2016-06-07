@@ -1,3 +1,5 @@
+<%#= @startday.inspect %>
+<%#= entry.inspect %>
 <% if @trOpen %>
     <% # close the previously opened tr %>
     <% while @wday_index < padTill %>
@@ -58,10 +60,17 @@
         %>
         <%#if this is from a previous template, don't print the hours%>
         <td class="hours" style="<%= color %>">
-          <%=h text_field_tag('hours' + @row.to_s() +'[]', entry.nil? || @prev_template ? '' : ("%.2f" % entry.hours) ,:size => 7,
-                              :disabled => status,:class=>"row_#{@wday_index}",
-                              :onchange => "validateTotal(this, #{@wday_index},'#{controller.maxHour}');") %>
+        <% if  is_pto_activity(entry) %>
+                  <%= entry.hours unless entry.nil?%>
+                      <%=h text_field_tag('hours' + @row.to_s() +'[]', entry.nil? || @prev_template ? '' : ("%.2f" % entry.hours) ,:size => 7,
+                                          :disabled => status,:class=>"row_#{@wday_index}",
+                                          :onchange => "validateTotal(this, #{@wday_index},'#{controller.maxHour}')",:style=>"display:none;") %>
+        <% else %>
 
+                  <%=h text_field_tag('hours' + @row.to_s() +'[]', entry.nil? || @prev_template ? '' : ("%.2f" % entry.hours) ,:size => 7,
+                                      :disabled => status,:class=>"row_#{@wday_index}",
+                                      :onchange => "validateTotal(this, #{@wday_index},'#{controller.maxHour}')") %>
+        <% end %>
           <%=h hidden_field_tag('ids' + @row.to_s() +'[]', entry.nil? || @prev_template ? '' : entry.id) %>
           <%=h hidden_field_tag('disabled' + @row.to_s() +'[]', status ) %>
 

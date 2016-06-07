@@ -1,0 +1,62 @@
+<h1> Weekly Time sheet status: </h1><br>
+
+<style>
+    table, td, th {
+        border: 1px solid #ddd;
+        text-align: left;
+
+    }
+    table th{
+        padding-top: 11px;
+        padding-bottom: 11px;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 70%;
+    }
+
+    th, td {
+        padding: 15px;
+    }
+
+</style>
+  <table  class="list time-entries">
+  <thead>
+  <tr>
+    <!--<th class="checkbox hide-when-print">-->
+      <%#= link_to image_tag('toggle_check.png'),
+#                   {},
+#                   :onclick => 'toggleIssuesSelection(Element.up(this, "form")); return false;',
+                  :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" %>
+    <!--</th>-->
+    <th><%= l(:field_week) %></th>
+    <th><%= l(:field_user) %></th>
+    <th><%= l(:field_hours) %></th>
+    <th><%= l(:field_status) %></th>
+    <th><%= l(:field_project) %></th>
+
+  </tr>
+  </thead>
+  <tbody>
+  <%#= @entries.inspect %>
+  <% @user_entries.each do |entry| -%>
+
+      <tr class="time-entry <%= cycle("odd", "even") %>">
+        <!--<td class="checkbox hide-when-print"><%#= check_box_tag("ids[]", entry.spent_on, false, :id => nil) %></td>-->
+
+        <td class="start_date"><%=h entry.spent_on.to_date.strftime("%F") %></td>
+        <td class="user"><%=h User.find(entry.user_id).login %></td>
+        <td class="user"><%= entry.hours.round(2) %></td>
+        <td class="status">
+<%#= entry.status.inspect %>
+          <%=h entry.status.present? ? (entry.status=="1" || entry.status=="not available" ?  "New" : (entry.status=="2" ? "L1" : "L2")  ) : "New" %>
+        </td>
+        <td class="user"><%=h Project.find(entry.project_id).name rescue "" %></td>
+      </tr>
+       <% end -%>
+
+  </tbody>
+</table>

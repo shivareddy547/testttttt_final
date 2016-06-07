@@ -118,6 +118,65 @@ Rails.configuration.to_prepare do
   end
 end
 
+Rails.configuration.to_prepare do
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  time="0 22 * * 2"
+  time1 = "59 16 * * 3 *"
+  # time="*/5 * * * *"
+  # scheduler.cron time do
+  #   begin
+  #     Rails.logger.info "==========Scheduler Started for attendance report=========="
+  #
+  #     wktime_helper = Object.new.extend(WktimeHelper)
+  #     start_date=(Date.today-3).at_beginning_of_week
+  #     end_date=start_date.at_end_of_week-2
+  #     wktime_helper.get_new_attendance(start_date,end_date)
+  #
+  #   rescue Exception => e
+  #     Rails.logger.info "Scheduler failed for attendance report: #{e.message}"
+  #   end
+  # end
+
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  month_time = '0 22 26 * *'
+  # month_time = '06 18 6 * *'
+  scheduler.cron  month_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    p "==========Scheduler Started for attendance report month========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today - 1.month)-1
+    end_date=Date.today
+    wktime_helper.get_new_attendance(start_date,end_date)
+    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  week_time = '0 22 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    p "==========Scheduler Started for attendance report week=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    wktime_helper.get_new_attendance(start_date,end_date)
+    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+  # scheduler.every '1s' do
+  #   puts "change the oil filter!"
+  # end
+
+end
+
+
+
 class WktimeHook < Redmine::Hook::ViewListener
   def controller_timelog_edit_before_save(context={ })
     if !context[:time_entry].hours.blank? && !context[:time_entry].activity_id.blank?

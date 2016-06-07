@@ -1131,6 +1131,8 @@ module WktimeHelper
       return true
     end
   end
+
+
   def set_time_zone(time)
     return_time_zone
     Time.zone.at(time)
@@ -1483,6 +1485,243 @@ module WktimeHelper
   end
 
 
+  def all_users_get_biometric_hours_per_month(start_date,end_date)
+    user_emp_code = []
+    start_date = start_date.to_date.strftime('%Y-%m-%d')
+    end_date = end_date.to_date.strftime('%Y-%m-%d')
+    # if user_emp_code.present?
+      key = Redmine::Configuration['iserv_api_key']
+      url = Redmine::Configuration['iserv_base_url']
+       url1 = "#{url}/services/employees/dailyattendance?fromDate=#{start_date}&toDate=#{end_date}"
+      response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute
+      # raise
+      my_arrays = {}
+      data = JSON.parse(response)
+
+  end
+
+
+
+  def get_new_attendance(start_date,end_date)
+
+
+    # @total_user_hours =  wktime_helper.all_users_get_biometric_hours_per_month(bio_user,@startday,@endday,"from_to_end")
+
+    require 'writeexcel'
+    wktime_helper = Object.new.extend(WktimeHelper)
+
+    start_date1 =start_date.to_date.strftime("%F")
+    end_date1 = end_date.to_date.strftime("%F")
+    result1 = wktime_helper.all_users_get_biometric_hours_per_month(start_date1,end_date1)
+    sql="call getAttendenceReport('#{start_date1}','#{end_date1}')"
+
+    # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
+    connection = ActiveRecord::Base.connection
+    begin
+      result = connection.select_all(sql)
+    rescue NoMethodError
+    ensure
+      connection.reconnect! unless connection.active?
+    end
+
+    result2=[]
+    result3=[]
+    result1.present? && result1['attendance-daily'].each do |each_rec|
+      if result.select {|h| h["day"].to_date.strftime("%F") == each_rec["processdate"].to_date.strftime("%F") && h["employee_id"].to_s == each_rec["userid"].to_s}.present?
+        get_result = result.select {|h| h["day"].to_date.strftime("%F") == each_rec["processdate"].to_date.strftime("%F") && h["employee_id"].to_s == each_rec["userid"].to_s}.first
+        get_result["bio_hours"]= each_rec["worktime_hhmm"]
+        result2 << get_result
+      else
+        s={}
+        s["employee_id"]=each_rec["userid"].to_i
+        s["day"]=each_rec["processdate"].to_date
+        s["login"]=each_rec["username"]
+        s["approval_status"]="n"
+        s["spent_hours"]=0
+        s["bio_hours"]=each_rec["worktime_hhmm"]
+
+        result3 << s
+
+      end
+
+    end
+
+    result = result3 + result2
+    result= result.sort_by { |hsh| hsh["employee_id"].to_i }
+    start_date = Date.today-3
+    end_date = Date.today
+
+    workbook = WriteExcel.new('ruby.xls')
+    worksheet  = workbook.add_worksheet
+    format = workbook.add_format
+    format.set_bold
+    format.set_color('red')
+    format.set_align('right')
+
+    spent_exced_format = workbook.add_format
+    spent_exced_format.set_bold
+    spent_exced_format.set_bg_color('orange')
+    spent_exced_format.set_color('blue')
+    format.set_align('right')
+
+    bio_format = workbook.add_format
+    bio_format.set_color('red')
+    bio_format.set_bold
+    bio_format.set_align('right')
+
+    worksheet.write(0,0,"User")
+    worksheet.write(0,1,"Project Name")
+    worksheet.write(0,2,"Client Name")
+    worksheet.write(0,3,"Employee Id")
+    worksheet.write(0,4,"Approved Status")
+    worksheet.write(0,5,"Approved By")
+    # worksheet.write(0,6,"CL(Hours)")
+    # worksheet.write(0,7,"PL(Hours)")
+    # worksheet.write(0,8,"DL(Hours)")
+
+    i=0
+
+    format = workbook.add_format
+    format.set_bold
+    format.set_color('red')
+    format.set_align('right')
+    j=''
+
+    a=(start_date1.to_date..end_date1.to_date).to_a+(start_date1.to_date..end_date1.to_date).to_a
+
+    a.sort_by{|d| m,d,y=d.to_date.strftime("%F").split("-");[y,m,d]}.each_with_index do |each_result,index |
+
+      worksheet.write(0,6+index,each_result.to_date.strftime("%d/%m/%Y"))
+    end
+    title_format = workbook.add_format
+    format.set_bold
+    format.set_align('left')
+    format = workbook.add_format
+    format.set_bold
+    format.set_align('right')
+
+    # worksheet.write(0,1,"PTO HOURS")
+    worksheet.write(0,a.count+6,"PTO HOURS")
+    worksheet.write(0,a.count+6+1,"Non Approve Hours")
+    worksheet.write(0,a.count+6+2,"Flexi Off")
+    worksheet.write(0,a.count+6+3,"CL(Hours)")
+    worksheet.write(0,a.count+6+4,"PL(Hours)")
+    worksheet.write(0,a.count+6+5,"DL(Hours)")
+    worksheet.write(0,a.count+6+6,"Department")
+
+
+    k=0
+    m=0
+    result.each_with_index do |each_rec,index1|
+      if index1==0
+        k=index1
+      end
+      if each_rec["employee_id"]==j
+        title_format = workbook.add_format
+        title_format.set_bold
+        title_format.set_align('left')
+        worksheet.write(k,0,each_rec["login"],title_format)
+        worksheet.write(k,1,each_rec["project_name"],title_format)
+        worksheet.write(k,2,each_rec["client_name"],title_format)
+        worksheet.write(k,3,each_rec["employee_id"],title_format)
+        worksheet.write(k,4,each_rec["approver_status"],title_format)
+        worksheet.write(k,5,each_rec["approved_by"],title_format)
+
+        worksheet.write(k,a.count+6,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+6+6, each_rec["department"],format )
+        check_date='2016-01-01'.to_date
+        a.sort_by{|d| m,d,y=d.to_date.strftime("%F").split("-");[y,m,d]}.each_with_index do |each_result,index|
+
+          if check_date.present? && check_date.to_date.strftime("%F") != each_result.to_date.strftime("%F") && each_rec["day"].to_date.strftime("%F")==each_result.to_s
+            # worksheet.write(k,index+1,each_rec["spent_hours"])
+            f = each_rec["bio_hours"].to_s.split(':').first
+            s = each_rec["bio_hours"].to_s.split(':').last
+            total=(f.to_i*60+s.to_i).to_f/60.to_f
+
+            if each_rec["spent_hours"].to_f > total.to_f
+              worksheet.write(k,index+6,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+            else
+              worksheet.write(k,index+6,each_rec["spent_hours"].to_f.round(2),format)
+            end
+            # worksheet.write(k,index+6+1,each_rec["bio_hours"].to_f.round(2),bio_format)
+            worksheet.write(k,index+1+6,total.to_f.round(2),bio_format)
+            #
+            # hrs = each_rec["bio_hours"].to_f.to_s.split(':').first
+            # min = each_rec["bio_hours"].to_f.to_s.split(':').last
+            # total=((hrs.to_i*60+min.to_i*10).to_f/60.to_f)
+            #
+            # worksheet.write(k,index+1+6,total.to_f.round(2),bio_format)
+          else
+            # p  worksheet.get_cell(k,index+1)
+            # worksheet.write(k+1,index+1,0)
+            # worksheet.write(k+1,index+1+1,"0")
+            # worksheet.write(k,index+1,0)
+            # worksheet.write(k,index+1,each_rec["bio_hours"])
+          end
+          check_date = each_result
+
+        end
+
+        # k=index1
+      else
+        worksheet.write(k+1,0,each_rec["login"],title_format)
+        worksheet.write(k+1,1,each_rec["project_name"],title_format)
+        worksheet.write(k+1,2,each_rec["client_name"],title_format)
+        worksheet.write(k+1,3,each_rec["employee_id"],title_format)
+        worksheet.write(k+1,4,each_rec["approver_status"],title_format)
+        worksheet.write(k+1,5,each_rec["approved_by"],title_format)
+        # worksheet.write(k+1,a.count+1,each_rec["pto_hours"])
+        worksheet.write(k+1,a.count+6,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+6+6, each_rec["department"],format )
+
+
+        check_date='2016-01-01'.to_date
+        a.sort_by{|d| m,d,y=d.to_date.strftime("%F").split("-");[y,m,d]}.each_with_index do |each_result,index|
+          if check_date.present? && check_date.to_date.strftime("%F") != each_result.to_date.strftime("%F") && each_rec["day"].to_date.strftime("%F") == each_result.to_s
+
+            f = each_rec["bio_hours"].to_s.split(':').first
+            s = each_rec["bio_hours"].to_s.split(':').last
+            total=(f.to_i*60+s.to_i).to_f/60.to_f
+
+            if each_rec["spent_hours"].to_f > total.to_f
+
+
+              worksheet.write(k+1,index+6,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+            else
+              worksheet.write(k+1,index+6,each_rec["spent_hours"].to_f.round(2),format)
+            end
+            # worksheet.write(k,index+6+1,each_rec["bio_hours"].to_f.round(2),bio_format)
+
+           worksheet.write(k+1,index+1+6,total.to_f.round(2),bio_format)
+
+          else
+
+          end
+          check_date = each_result
+        end
+        k=k+1
+
+      end
+      j=each_rec["employee_id"]
+    end
+    if workbook.close
+    WkMailer.send_attendance_report(start_date,end_date).deliver
+    end
+
+  end
+
+
+
   def check_bio_permission_list_user_id_project_id(l,user_id,project_ids)
     @all_roles=[]
 
@@ -1733,5 +1972,27 @@ module WktimeHelper
     end
 
   end
+
+
+  def is_pto_activity(entry)
+    p 66666666666666666666666666
+    p entry
+    if entry.present?
+      find_entry = TimeEntry.find(entry.id)
+      if find_entry.activity.name=="PTO"
+        return true
+      else
+        return false
+      end
+    else
+      return false
+    end
+
+    p 55555555555555555555555
+    return true
+
+  end
+
+
 
 end

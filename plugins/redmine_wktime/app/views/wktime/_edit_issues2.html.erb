@@ -15,10 +15,19 @@
   %>
 
       <td class="project" align="left">
-        <% if @editable %>
-            <%=h select_tag(isTemplate ? '__template__time_entry[][project_id]' : 'time_entry[][project_id]',
-                            options_for_select(projects, :selected =>  project_id),
-                            :onchange => "projectChanged(this,#{@row.to_s()});", :style=> "width:#{Setting.plugin_redmine_wktime['wktime_project_dd_width']}px" ) %>
+        <% if @editable  %>
+            <% if !is_pto_activity(entry) %>
+
+                <%=h select_tag(isTemplate ? '__template__time_entry[][project_id]' : 'time_entry[][project_id]',
+                                options_for_select(projects, :selected =>  project_id),
+                                :onchange => "projectChanged(this,#{@row.to_s()});", :style=> "width:#{Setting.plugin_redmine_wktime['wktime_project_dd_width']}px" ) %>
+                <% else %>
+                <%= entry.project.name if !entry.nil? && !entry.project.nil? %>
+                <%=h select_tag(isTemplate ? '__template__time_entry[][project_id]' : 'time_entry[][project_id]',
+                                options_for_select(projects, :selected =>  project_id),
+                                :onchange => "projectChanged(this,#{@row.to_s()});", :style=> "width:#{Setting.plugin_redmine_wktime['wktime_project_dd_width']}px;display:none" ) %>
+                <% end %>
+
         <% else %>
             <% if project.blank? %>
                 <%= project_id %>
@@ -64,12 +73,15 @@
       %>
 
       <td class="issue" align="left">
-        <% if @editable %>
+        <% if @editable && !is_pto_activity(entry) %>
             <%=h select_tag(isTemplate ? '__template__time_entry[][issue_id]' : 'time_entry[][issue_id]',
                             options_for_select(issues, :selected =>  entry.nil? ? 0 : entry.issue_id, :required => true),
                             :style=> "width:#{Setting.plugin_redmine_wktime['wktime_issue_dd_width']}px" ) %>
         <% else %>
             <%= entry.issue.subject if !entry.nil? && !entry.issue.nil? %>
+            <%=h select_tag(isTemplate ? '__template__time_entry[][issue_id]' : 'time_entry[][issue_id]',
+                            options_for_select(issues, :selected =>  entry.nil? ? 0 : entry.issue_id, :required => true),
+                            :style=> "width:#{Setting.plugin_redmine_wktime['wktime_issue_dd_width']}px;display:none;" ) %>
         <% end %>
       </td>
   <% else %>
@@ -100,12 +112,16 @@
      end
   %>
   <td class="activity" align="left">
-    <% if @editable %>
+    <%#= entry.inspect %>
+    <% if @editable && !is_pto_activity(entry) %>
         <%=h select_tag(isTemplate ? '__template__time_entry[][activity_id]' : 'time_entry[][activity_id]',
                         activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged();",
                         :style=> "width:#{Setting.plugin_redmine_wktime['wktime_actv_dd_width']}px" ) %>
     <% else %>
         <%= entry.activity.name unless entry.nil?%>
+        <%=h select_tag(isTemplate ? '__template__time_entry[][activity_id]' : 'time_entry[][activity_id]',
+                        activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged();",
+                        :style=> "width:#{Setting.plugin_redmine_wktime['wktime_actv_dd_width']}px;display:none" ) %>
     <% end %>
   </td>
 
@@ -127,4 +143,4 @@
 
   <%#= render :partial => controller.getCFInRowHTML , :locals => {:entry => entry, :isTemplate => false }%>
 
-<% @wday_index = 1 %>
+  <% @wday_index = 1 %>

@@ -89,5 +89,19 @@ def l1_not_approve_days(current_user,user_id,dates,notes)
   mail :from => Setting.mail_from ,:to => current_user.mail, :subject => subject,:body => body
 end
 
+def send_attendance_report(start_date,end_date)
+  body = "You are receiving this notification for attendance report generated for the week from #{start_date} to #{end_date}."
+  subject = "Attendance Report"
+  # body +="\n #{l(:field_name)} : #{user.firstname} #{user.lastname} \n #{total}"
+  # body +="\n #{l(:label_wk_submittedon)} : #{wktime.submitted_on} \n #{l(:label_wk_rejectedby)} : #{loginuser.firstname} #{loginuser.lastname}"
+  # body +="\n #{l(:label_wk_rejectedon)} : #{wktime.statusupdate_on} \n #{l(:label_wk_reject_reason)} : #{wktime.notes}"
+  # body +="\n"
+  # mail :from => loginuser.mail,:to => user.mail, :subject => subject,:body => body
+  attachments['iNiaAttendanceReport.xls'] = File.read('ruby.xls')
+  # mail :from => Setting.mail_from ,:to => "shiva.srinivasreddy@object-frontier.com",:cc => ["shiva.srinivasreddy@object-frontier.com","shiva.srinivasreddy@object-frontier.com"], :subject => subject,:body => body
+
+  mail :from => Setting.mail_from ,:to => "saravanan.palaniappan@object-frontier.com",:cc=>["venkatesh.srinivasan@object-frontier.com","ramkumar.ravikumar@objectfrontier.com"], :subject => subject,:body => body
+end
+
 
  end

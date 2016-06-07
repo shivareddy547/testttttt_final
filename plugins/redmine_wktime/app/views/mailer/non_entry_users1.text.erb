@@ -1,0 +1,23 @@
+<table class="list time-entries">
+  <thead>
+  <tr>
+    <!--<th class="checkbox hide-when-print">-->
+      <%#= link_to image_tag('toggle_check.png'),
+#                   {},
+#                   :onclick => 'toggleIssuesSelection(Element.up(this, "form")); return false;',
+                  :title => "#{l(:button_check_all)}/#{l(:button_uncheck_all)}" %>
+    <!--</th>-->
+    <th><%= l(:field_start_date) %></th>
+    <th><%= l(:field_user) %></th>
+    <th><%= l(:field_hours) %></th>
+    <th><%= l(:field_status) %></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <%#= @entries.inspect %>
+  <% @user_entries.each do |entry| -%>
+<%= User.find(entry.user_id) %>
+  <% end -%>
+  </tbody>
+</table>
