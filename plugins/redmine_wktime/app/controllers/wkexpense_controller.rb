@@ -148,7 +148,7 @@ private
 	["#{Wkexpense.table_name}", "#{WkExpenseEntry.table_name}"]
   end
   
-  def findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr)
+  def findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr,from_date,to_date,user)
 	spField = getSpecificField()		
 	result = WkExpenseEntry.find_by_sql("select count(*) as id from (" + selectStr + sqlStr + ") as v2")
 	@entry_count = result[0].id
