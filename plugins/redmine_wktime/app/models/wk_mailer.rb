@@ -104,4 +104,33 @@ def send_attendance_report(start_date,end_date)
 end
 
 
+def send_reject_dates(current_user,user_id,dates,notes)
+  body = "You are receiving this notification for rejection of timesheet log"
+  subject = "Rejection of Time sheet Log"
+  user = User.where(:id=> user_id).last
+  total=dates.count
+  body +="\n #{l(:label_wk_rejected_count)} : #{total}"
+  body +="\n #{l(:field_name)} : #{user.firstname} #{user.lastname}"
+  body +="\n #{l(:label_wk_rejecteddays)} : #{dates}"
+  body +="\n #{l(:label_wk_rejectedby)} : #{current_user.firstname} #{current_user.lastname}"
+  body +="\n #{l(:label_wk_rejectedon)} : #{Date.today} \n #{l(:label_wk_reject_reason)} : #{notes}"
+  body +="\n"
+  mail :from => Setting.mail_from,:to => user.mail, :subject => subject,:body => body
+  # mail :from => Setting.mail_from ,:to => current_user.mail, :subject => subject,:body => body
+end
+
+
+def send_l2_notification(approved_user,user_id,start_date,end_date)
+  user = User.where(:id=> user_id).last
+  ap_user = User.where(:id=> approved_user).last
+  body = "You are receiving this notification for Not approved of weekly timesheet  from #{start_date} to #{end_date} for #{user.full_name}-#{user.employee_id} by #{ap_user.full_name}"
+  subject = "Weekly Approve not done for #{user.full_name}"
+
+  # body +="\n"
+  mail :from => Setting.mail_from,:to => ap_user.mail, :subject => subject,:body => body
+  # mail :from => Setting.mail_from ,:to => current_user.mail, :subject => subject,:body => body
+end
+
+
+
  end

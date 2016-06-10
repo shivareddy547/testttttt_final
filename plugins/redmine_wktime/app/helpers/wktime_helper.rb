@@ -2011,5 +2011,118 @@ module WktimeHelper
   end
 
 
+  def get_perm_for_project(project,perm)
+   arry_per=[]
+    if project.members.present?
+      project.members.each do |each_mem|
+        if each_mem.roles.present?
+          each_mem.roles.each do |each_role|
+            if each_role.permissions.present?
+              if each_role.permissions.include?(perm.to_sym)
+                arry_per << each_mem.user_id
+
+              end
+            end
+          end
+        end
+
+      end
+
+    end
+
+    if arry_per.present?
+      p "+++++++++++arry_perarry_per+++++++++"
+      return arry_per.first
+
+    end
+
+  end
+
+  def create_nc_for_time_entry(date)
+
+    User.active.each do |each_user|
+
+        find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+        if !find_entry.present?
+          find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+          master_id = NcMaster.find_by_name('TimeEntry')
+          nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+          nc_history.employee_id = each_user.employee_id
+          nc_history.employee_name = each_user.full_name
+          nc_history.user_id = each_user.id
+          nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+          nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+          nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+          nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+          nc_history.date = date
+          nc_history.reason = "TimeEntry Not Done..!"
+          nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+          nc_history.save
+
+        end
+
+      # nc_history.
+
+    end
+
+  end
+
+
+
+
+  def weekly_approve_notifications(date)
+
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week
+
+    User.where(:id=>530).each do |each_user|
+
+
+      find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
+
+
+      if !find_l2_entries.present?
+        p 111111111111111
+       p find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+
+        if l2_user_id.present?
+          p "++++++++++l2 user ++++++"
+         p User.find(l2_user_id)
+          p "============="
+           WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        end
+        if l1_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l1_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        end
+
+
+
+      end
+
+
+    end
+
+  end
+
+
+  def monthly_approve_notifications(date)
+
+    User.active.each do |each_user|
+
+      find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+
+
+
+    end
+
+  end
+
+
+
 
 end

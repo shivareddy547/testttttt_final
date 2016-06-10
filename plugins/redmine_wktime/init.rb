@@ -169,6 +169,21 @@ Rails.configuration.to_prepare do
     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
   end
 
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  week_time = '39 18 * * *'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    p "==========Scheduler Started for attendance report week=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    day_for_nc = Date.today-1
+    wktime_helper.create_nc_for_time_entry(day_for_nc)
+    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
   # scheduler.every '1s' do
   #   puts "change the oil filter!"
   # end
