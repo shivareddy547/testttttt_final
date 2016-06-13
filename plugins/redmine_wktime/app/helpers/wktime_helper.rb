@@ -1753,7 +1753,7 @@ module WktimeHelper
       @all_roles =[]
     end
     if @all_roles.present?
-      if (l == "l1")
+      if (l == "l1") && check_expire
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
         if check_l1.present? && !check_l2.present?
@@ -1777,6 +1777,30 @@ module WktimeHelper
     end
   end
 
+
+  def check_expire_for_l1
+
+    if date.present?
+
+    end
+
+  end
+
+  def check_expire_for_l2
+
+    if date.present?
+
+    end
+
+  end
+
+  def check_expire_for_l3
+
+    if date.present?
+
+    end
+
+  end
 
   def found_issues(current_issues,entry)
 
@@ -2068,6 +2092,35 @@ module WktimeHelper
   end
 
 
+  # def create_nc_for_approve(date)
+  #
+  #   User.active.each do |each_user|
+  #
+  #     find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+  #     if !find_entry.present?
+  #       find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+  #       master_id = NcMaster.find_by_name('TimeEntry')
+  #       nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+  #       nc_history.employee_id = each_user.employee_id
+  #       nc_history.employee_name = each_user.full_name
+  #       nc_history.user_id = each_user.id
+  #       nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+  #       nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+  #       nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+  #       nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+  #       nc_history.date = date
+  #       nc_history.reason = "TimeEntry Not Done..!"
+  #       nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+  #       nc_history.save
+  #
+  #     end
+  #
+  #     # nc_history.
+  #
+  #   end
+  #
+  # end
+
 
 
   def weekly_approve_notifications(date)
@@ -2077,13 +2130,11 @@ module WktimeHelper
 
     User.where(:id=>530).each do |each_user|
 
-
       find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
-
-
       if !find_l2_entries.present?
         p 111111111111111
-       p find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+       p find_user_project = Member.where(:user_id=>each_user.id).order('m
+ax(capacity) DESC').limit(1)
         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
         l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
 
@@ -2100,14 +2151,286 @@ module WktimeHelper
           WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
         end
 
-
-
       end
-
 
     end
 
   end
+
+
+  def weekly_approve_l2_l3_notifications(start_date,end_date)
+
+    # start_date=(Date.today-3).at_beginning_of_week
+    # end_date=start_date.at_end_of_week
+
+    User.where(:id=>530).each do |each_user|
+
+      find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
+      if !find_l2_entries.present?
+        p 111111111111111
+        p find_user_project = Member.where(:user_id=>each_user.id).order('m
+ax(capacity) DESC').limit(1)
+        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+
+        if !find_l2_entries.count > 26
+        if l2_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l2_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        end
+        if l1_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l1_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        end
+
+        end
+
+      end
+
+    end
+
+  end
+
+
+
+
+  def weekly_approve_pending_notifications_on_23
+
+    start_date=(Date.today+2)
+    if start_date.wday == 6 || start_date.wday==0
+
+      start_date=(Date.today-30)
+      end_date=Date.today
+      weekly_approve_l2_l3_notifications(start_date,end_date)
+
+    else
+
+      # start_date=(Date.today-30)
+      # end_date=Date.today
+
+    end
+
+
+  end
+
+
+
+
+  def weekly_approve_l1_notifications(date)
+
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week
+
+    User.active.each do |each_user|
+
+      find_l1_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l1')
+      if !find_l1_entries.present?
+        p 111111111111111
+        p find_user_project = Member.where(:user_id=>each_user.id).order('m
+ax(capacity) DESC').limit(1)
+        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+
+        if l2_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l2_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        end
+        if l1_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l1_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        end
+
+      end
+
+    end
+
+  end
+
+
+  def weekly_approve_l2_notifications(date)
+
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week
+
+    User.active.each do |each_user|
+
+      find_l1_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
+      if !find_l1_entries.present?
+        p 111111111111111
+        p find_user_project = Member.where(:user_id=>each_user.id).order('m
+ax(capacity) DESC').limit(1)
+        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        l3_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+
+        if l2_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l2_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        end
+        if l3_user_id.present?
+          p "++++++++++l2 user ++++++"
+          p User.find(l1_user_id)
+          p "============="
+          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        end
+
+      end
+
+    end
+
+  end
+
+
+#   def weekly_approve_l2_l3_notifications(date)
+#
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week
+#
+#     User.active.each do |each_user|
+#
+#       find_l1_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
+#       if !find_l1_entries.present?
+#         p 111111111111111
+#         p find_user_project = Member.where(:user_id=>each_user.id).order('m
+# ax(capacity) DESC').limit(1)
+#         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+#         l3_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+#
+#         if l2_user_id.present?
+#           p "++++++++++l2 user ++++++"
+#           p User.find(l2_user_id)
+#           p "============="
+#           WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+#         end
+#         if l3_user_id.present?
+#           p "++++++++++l2 user ++++++"
+#           p User.find(l1_user_id)
+#           p "============="
+#           WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+#         end
+#
+#       end
+#
+#     end
+#
+#   end
+
+
+
+  def weekly_auto_approve(date)
+
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week
+
+    User.active.each do |each_user|
+
+      find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
+      if !find_l2_entries.present?
+#         p 111111111111111
+#         p find_user_project = Member.where(:user_id=>each_user.id).order('m
+# ax(capacity) DESC').limit(1)
+        (start_date..end_date).to_a.each do |each_day|
+
+          if each_day.present?
+
+            # find_entry_with_date = TimeEntry.where(:user_id=>each_user.id,:spent_on =>each_day )
+
+            find_time_entry_hours = TimeEntry.find_by_sql("select sum(hours) as hours from time_entries where spent_on in ('#{each_day}') and user_id in (#{each_user.id})")
+            if find_time_entry_hours.present?
+              if  find_time_entry_hours < 4
+                # lop_request = RestClient.post 'https://iservstaging.objectfrontier.com/services/employees/autoleaves?',:headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'}, :param1 => 'one', :content_type => 'application/json'
+                # lop_request
+                url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
+                # response = RestClient::Request.new(:method => :post,:url => url, :headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :content_type => 'application/json').execute
+
+                response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false,:payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
+                )
+              elsif find_time_entry_hours < 8
+
+                response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Half Day"}
+                )
+
+              end
+
+            else
+
+              response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload => {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
+              )
+
+
+            end
+
+          end
+
+        end
+
+        # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        # l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+
+        # if l2_user_id.present?
+        #   p "++++++++++l2 user ++++++"
+        #   p User.find(l2_user_id)
+        #   p "============="
+        #   WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        # end
+        # if l1_user_id.present?
+        #   p "++++++++++l2 user ++++++"
+        #   p User.find(l1_user_id)
+        #   p "============="
+        #   WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        # end
+
+      end
+
+    end
+
+  end
+
+
+
+
+
+  def lms_request
+    url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
+
+    # RestClient.post(url, { 'x' => 1 }.to_json, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},:verify_ssl => false)
+
+    # RestClient.post(url, { 'x' => 1 }.to_json,:verify_ssl=>false ,:content_type => :json, :accept => :json)
+
+    response = RestClient::Request.execute(:method => :post,:url => url,  :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false,:payload => {:employeeId => '1144', :fromDate => '2016-05-30',:toDate => "2016-05-30", :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}.to_json
+        )
+    # response = RestClient::Request.new(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false,:employee_id=>"564646").execute
+    p "++++++++++response+++++++++++++++"
+    p response.inspect
+    # p response.errors
+    p response.code
+    p "+++++++++=end ++++++++++"
+
+    # url = 'https://iservstaging.objectfrontier.com/services/employees/autoleaves?'
+    # header = {'Accept' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB',:verify_ssl => false}
+    # response = RestClient.post url, {:verify_ssl => false}, header
+
+
+
+
+  end
+
+
+
+
+
+
+
+
 
 
   def monthly_approve_notifications(date)
