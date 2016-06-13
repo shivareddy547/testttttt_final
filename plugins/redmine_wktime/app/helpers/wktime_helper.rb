@@ -1778,7 +1778,7 @@ module WktimeHelper
   end
 
 
-  def check_expire_for_l11(user_id,date)
+  def check_expire_for_l1(user_id,date)
 p "+++++++++++++++++++++++++=datedate+_++++"
 p date
 
