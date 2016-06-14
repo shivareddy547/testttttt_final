@@ -264,13 +264,31 @@ function getCustFldToolTip()
     return cusfield;
 }
 
-function activityChanged()
+function activityChanged(obj)
 {
     var save_button = $("#wktime_save");
     if(save_button.size() > 0)
     {
         $("#wktime_save").prop('disabled', false);
     }
+    $('.flexi_reason select').each(function() {
+        if ($(this).attr('style') == ""){
+            $('.flexi_reason').show();
+        }else{$('.flexi_reason').hide();};
+    });
+
+    if ($("option:selected", obj).text()=='Flexi OFF' ){
+        $('.flexi_reason').show();
+        obj.closest('tr').find('.flexi_reason').find('select').show();
+    }else{
+        obj.closest('tr').find('.flexi_reason').find('select').hide();
+    }
+
+
+
+    
+
+
 }
 function comment()
 {

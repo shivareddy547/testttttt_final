@@ -19,6 +19,10 @@
   <p><%= f.text_field :hours, :size => 6, :required => true %></p>
   <p><%= f.text_field :comments, :size => 100, :maxlength => 255 %></p>
   <p><%= f.select :activity_id, activity_collection_for_select_options(@time_entry), :required => true %></p>
+  <% wktime_helper = Object.new.extend(WktimeHelper) %>
+  <p><%= f.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason), :required => true %>
+    <span id="flexi_others"></span>
+  </p>
   <% @time_entry.custom_field_values.each do |value| %>
     <p><%= custom_field_tag_with_label :time_entry, value %></p>
   <% end %>
@@ -31,4 +35,50 @@
       $('#time_entry_issue').text(ui.item.label);
     }
   });
+  $(document).ready(function(){
+    if ($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF'){
+      $('#time_entry_flexioff_reason').closest('p').show();
+    }else{
+      $('#time_entry_flexioff_reason').closest('p').hide();
+    };
+
+    if ($('#time_entry_flexioff_reason').find(":selected").text()=='Others'){
+      $('#time_entry_flexioff_reason').closest('p').find('#flexi_others').html("<input name='time_entry[flexioff_reason]' size='40' type='text' style='border:1px solid red' id='flexi_other'>")
+    }else{
+      $('#flexi_other').hide();
+    }
+
+    $('#time_entry_activity_id').change(function(){
+      if ($(this).find(":selected").text()=='Flexi OFF' ){
+        $('#time_entry_flexioff_reason').closest('p').show();
+      }
+      else{
+        $('#time_entry_flexioff_reason').closest('p').hide();
+        $('#time_entry_flexioff_reason').val('')
+      }
+    });
+
+    $('#time_entry_flexioff_reason').change(function(){
+      if ($('#time_entry_flexioff_reason').find(":selected").text()=='Others'){
+        $('#time_entry_flexioff_reason').closest('p').find('#flexi_others').html("<input name='time_entry[flexioff_reason]' size='40' type='text' style='border:1px solid red' id='flexi_other' placeholder='Others Reasons'>")
+      }else{
+        $('#flexi_other').hide();
+      }
+    });
+
+    $('#time_entry_activity_id').closest('form').submit(function(){
+      var x = ($('#time_entry_flexioff_reason').find(":selected").text()=='Others')
+      var y = $.trim($('#flexi_other').val())
+
+      if (($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF' && $('#time_entry_flexioff_reason').val()==null) || x && y==''){
+        $('.flexi_reason').show();
+        $('#errorExplanation').show();
+        $('#errorExplanation').append("<ul><li>Flexi Off Reason  can't be blank</li></ul>")
+        return false;
+      } else{
+        this.submit();
+      }
+    })
+
+  })
 <% end %>

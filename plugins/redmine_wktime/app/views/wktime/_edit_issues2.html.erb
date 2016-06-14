@@ -111,19 +111,26 @@
        activities.unshift( [ entry.activity_id, entry.activity_id ] )if !entry.nil? && activity.blank?
      end
   %>
-  <td class="activity" align="left">
+    <td class="activity" align="left">
     <%#= entry.inspect %>
     <% if @editable && !is_pto_activity_edit_issues2(entry) %>
         <%=h select_tag(isTemplate ? '__template__time_entry[][activity_id]' : 'time_entry[][activity_id]',
-                        activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged();",
+                        activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged($(this));",
                         :style=> "width:#{Setting.plugin_redmine_wktime['wktime_actv_dd_width']}px" ) %>
     <% else %>
         <%= entry.activity.name unless entry.nil?%>
         <%=h select_tag(isTemplate ? '__template__time_entry[][activity_id]' : 'time_entry[][activity_id]',
-                        activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged();",
+                        activities.blank? ? nil : options_for_select(activities, :selected => entry.nil? ? 0 : entry.activity_id),:onchange => "activityChanged($(this));",
                         :style=> "width:#{Setting.plugin_redmine_wktime['wktime_actv_dd_width']}px;display:none" ) %>
     <% end %>
   </td>
+  <td class="Location">
+    <%= select_tag isTemplate ? '__template__time_entry[][work_location]' : 'time_entry[][work_location]', options_for_select(timeEntry_location, :selected => entry.nil? ? '' : entry.work_location)%>
+  </td>
+  <td class='flexi_reason' >
+    <%= select_tag isTemplate ? '__template__time_entry[][flexioff_reason]' : 'time_entry[][flexioff_reason]' , options_for_select(flexioff_reasons,:selected => entry.nil? ? '' : entry.flexioff_reason) %>
+  </td>
+  
 
   <%if !Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? &&
           Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1 %>

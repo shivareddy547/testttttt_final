@@ -156,7 +156,8 @@ Rails.configuration.to_prepare do
 
   require 'rufus/scheduler'
   scheduler = Rufus::Scheduler.new
-  week_time = '0 22 * * 2'
+  week_time = '0 22
+ * * 2'
   # week_time = '13 18 6 * *'
   scheduler.cron  week_time do
     # do something every day, five minutes after midnight

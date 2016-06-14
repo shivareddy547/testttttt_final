@@ -15,7 +15,40 @@ $(document).ready(function(){
         showEntryWarning(txtEntryDate.value);
         txtEntryDate.onchange=function(){showEntryWarning(this.value)};
     }
+
+     $('.unlock_comments, .unlock_update').css({'display':'none','padding':'5px', 'float':'left'})
+    $('.flexi_reason').hide();
+
+    doChangeFlexi();
 });
+
+
+function doChangeFlexi() {
+        $('.activity select').each(function(i, obj) {
+            if ($(this).find(":selected").text()=='Flexi OFF' ){
+                $('.flexi_reason').show();
+                $(this).closest('tr').find('.flexi_reason').find('select').show();
+            }else {
+                $(this).closest('tr').find('.flexi_reason').find('select').hide();
+            }
+        });
+    }
+function myChangeFunction(member){
+    var type = '#unlock_type'+member
+    var unlock_comments = "#unlock_comments_"+member
+    var unlock_update = "#unlock_update_"+member
+    $(unlock_comments, unlock_update).css({'display':'none','padding':'5px', 'float':'left'})
+    if ($(type).val() != ''){
+        $('#unlock_update_'+member).show();
+    }else{
+        $('#unlock_update_'+member).hide();
+    }
+    if ($(type).val() != '' && $(type).val() == 0){
+        $('#unlock_comments_'+member).show();
+    }else{
+        $('#unlock_comments_'+member).hide();
+    }
+}
 
 function showEntryWarning(entrydate){
     var $this = $(this);
@@ -43,20 +76,22 @@ function showMessage(data,divID){
 
 
 
+
 function validate_unlock_comment(member)
 {
     var comment_id = "#member-"+member+"-unlock-form"+" "+"#comment"
     var form_id = "#member-"+member+"-unlock-form"
     var error = "#member-"+member+"-unlock-form"+" "+"#unlock_error_"+member
     var role = "#member-"+member+"-unlock"
-    if ($.trim($(comment_id).val()).length > 0)
+    if ( ($('#unlock_type'+member).val() != '' && $('#unlock_type'+member).val() > 0)){
+        $(form_id).submit();
+    }
+    if ($.trim($(comment_id).val()).length > 0 && ($('#unlock_type'+member).val() != '' && $('#unlock_type'+member).val() ==0) )
     {
         $(error).hide();
         $(form_id).submit();
         $(role).show();
-    }
-    else
-    {
+    }else{
         $(error).show();
     }
 

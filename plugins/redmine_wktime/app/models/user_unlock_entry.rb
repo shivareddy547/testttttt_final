@@ -1,7 +1,30 @@
 class UserUnlockEntry < ActiveRecord::Base
   unloadable
   belongs_to :user
-  validates_presence_of :user_id, :comment
+  validates_presence_of :user_id, :unlock_type
+
+  validates_presence_of :comment, :unless => lambda { self.unlock_type != 0 }
+  before_save :update_unlock_type
+
+
+  def update_unlock_type
+    case self.unlock_type
+      when '0'
+        self.unlock_type = 'Others'
+      when '1'
+        self.unlock_type = 'Failed to enter time within SLA'
+      when '2'
+        self.unlock_type = 'Unplanned Leave'
+      when '3'
+        self.unlock_type = 'Task not created/assigned'
+      when '4'
+        self.unlock_type = 'Access not provided'
+      when '5'
+        self.unlock_type = 'Recorded in wrong task'
+      when '6'
+        self.unlock_type = 'System/Application  down'
+    end
+  end
 
   def self.user_lock_status(user_id)
     days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i

@@ -31,18 +31,23 @@
                               :method => :put,
                               :html => { :id => "member-#{member.id}-unlock-form", :class => 'hol' }}
                     ) do |f| %>
-                    <p>
-                      <span id="unlock_error_<%= member.id %>" style="color:red;display:block;">Please enter comment.</span>
-                      <%= text_area_tag 'comment' %>
-                      <%= hidden_field_tag 'user_id', member.user_id %>
-                      <%= hidden_field_tag 'manager_id', @manager_id %>
-                      <%= hidden_field_tag 'permission', 'true' %>
-                    </p>
-                    <p>
+                    <div>
+
+                      <% wktime_helper = Object.new.extend(WktimeHelper) %>
+                      <%= select_tag 'unlock_type', options_for_select(wktime_helper.unlock_types),{:onchange => "myChangeFunction(#{member.id})", :prompt=>'Select Unlock type', :id =>'unlock_type'+member.id.to_s} %>
+                      <div id="unlock_comments_<%= member.id %>" class="unlock_comments">
+                        <span id="unlock_error_<%= member.id %>" style="color:red;display:block;">Please enter comment.</span>
+                        <%= text_area_tag 'comment' %>
+                        <%= hidden_field_tag 'user_id', member.user_id %>
+                        <%= hidden_field_tag 'manager_id', @manager_id %>
+                        <%= hidden_field_tag 'permission', 'true' %>
+                      </div>
+                    </div>
+                    <span id="unlock_update_<%= member.id %>" class='unlock_update'>
                       <%= link_to_function(l(:button_save),"validate_unlock_comment(#{member.id})") %>
                       <%= link_to_function(l(:button_cancel),
-                                           "$('#member-#{member.id}-unlock-form').hide();$('#unlock_error_#{member.id}').hide();$('#member-#{member.id}-unlock').show();$('#member-#{member.id}-unlock-form #comment').attr('value', ''); return false;") %>
-                    </p>
+                                           "$('#member-#{member.id}-unlock-form, #unlock_update_#{member.id}').hide();$('#unlock_error_#{member.id}').hide();$('#member-#{member.id}-unlock').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');$('#unlock_type#{member.id}').val(''); return false;") %>
+                    </span>
                 <% end %>
                 <td class="roles">
                   <%= form_for(member,

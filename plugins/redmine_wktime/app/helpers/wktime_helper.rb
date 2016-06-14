@@ -1780,8 +1780,7 @@ module WktimeHelper
 
 
   def check_expire_for_l1(user_id,date)
-p "+++++++++++++++++++++++++=datedate+_++++"
-p date
+
 
    days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
    setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
@@ -2309,15 +2308,15 @@ ax(capacity) DESC').limit(1)
 
     User.where(:id=>530).each do |each_user|
 
-      find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
+      find_l2_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
       if !find_l2_entries.present?
         p 111111111111111
-        p find_user_project = Member.where(:user_id=>each_user.id).order('m
-ax(capacity) DESC').limit(1)
+        p find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+
         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
         l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
-        if !find_l2_entries.count > 26
+        if !find_l2_entries.present?
         if l2_user_id.present?
           p "++++++++++l2 user ++++++"
           p User.find(l2_user_id)
@@ -2592,6 +2591,24 @@ ax(capacity) DESC').limit(1)
     end
 
   end
+
+  def unlock_types
+      [ ['Failed to enter time within SLA','1'], ['Unplanned Leave','2'],
+        ['Task not created/assigned','3'], ['Access not provided',4],
+        ['Recorded in wrong task','5'],['System/Application  down','6'], ['Others','0']
+      ]
+
+  end
+
+  def flexioff_reasons
+    [ [ 'Birthday(Self)','Birthday(Self)'],['Birthday (Spouse or Kids)','Birthday (Spouse or Kids)'],['Anniversary (Self)','Anniversary (Self)'],
+      ['No Work','No Work'],['Employee welfare activity','Employee welfare activity'],['Others','Others']
+    ]
+  end
+  def timeEntry_location
+    [[ 'Work From Office','Work From Office'], [ 'Work From Home','Work From Home']]
+  end
+
 
 
 

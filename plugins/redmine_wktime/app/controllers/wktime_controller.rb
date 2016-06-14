@@ -1068,10 +1068,9 @@ class WktimeController < ApplicationController
     else
       expire_unlock_time =(expire_time)
     end
-    user = UserUnlockEntry.new(:user_id=> params[:user_id],:manager_id=>User.current.id,:updated_by=>User.current.id,:comment=>params[:comment],:expire_time=>expire_unlock_time)
-
+    user = UserUnlockEntry.new(:user_id=> params[:user_id],:manager_id=>User.current.id,:updated_by=>User.current.id,:comment=>params[:comment],:expire_time=>expire_unlock_time,:unlock_type=>params[:unlock_type])
     if user.save
-      UserUnlockHistory.create(:user_id=> params[:user_id],:manager_id=>User.current.id,:updated_by=>User.current.id,:comment=>params[:comment],:expire_time=>expire_unlock_time,:date=>Date.today,:created_at=>Date.today)
+      UserUnlockHistory.create(:user_id=> params[:user_id],:manager_id=>User.current.id,:updated_by=>User.current.id,:comment=>params[:comment],:expire_time=>expire_unlock_time,:date=>Date.today,:created_at=>Date.today,:unlock_type=>params[:unlock_type])
       return true
     else
       return user
@@ -1226,6 +1225,8 @@ class WktimeController < ApplicationController
                 teEntry.attributes = entry
                 # since project_id and user_id is protected
                 teEntry.project_id = entry['project_id']
+                teEntry.work_location = entry['work_location']
+                teEntry.flexioff_reason, = entry['flexioff_reason']
                 teEntry.user_id = @user.id
                 teEntry.spent_on = @startday + k
                 #for one comment, it will be automatically loaded into the object
