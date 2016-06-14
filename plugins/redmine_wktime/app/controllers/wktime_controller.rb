@@ -415,9 +415,9 @@ class WktimeController < ApplicationController
             end
           end
         end
-      elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l3',User.current.id,[params[:project_id].to_i])
+      elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l3',User.current.id,[params[:project_id].to_i],@startday)
         approve_l3
-      elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l2',User.current.id,[params[:project_id].to_i])
+      elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l2',User.current.id,[params[:project_id].to_i],@startday)
         approve_home_l2
       end
     end

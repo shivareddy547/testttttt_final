@@ -10,7 +10,9 @@ class IniaServiceController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   # skip_before_filter :verify_authenticity_token
-  before_filter :verify_message_api_key,:find_project_user,:only=>[:create_ptos]
+  before_filter :verify_message_api_key,:only=>[:create_ptos,:update_auto_unapproved_entries]
+  before_filter :find_project_user,:only=>[:create_ptos]
+  before_filter :find_employee_ids_from_date_to_date,:only=>[:update_auto_unapproved_entries]
 
 
   def create_ptos
@@ -118,6 +120,61 @@ class IniaServiceController < ApplicationController
 
 
 
+def update_auto_unapproved_entries
+
+  start_date = params[:fromDate]
+  end_date = params[:toDate]
+
+if params[:employeeId].present?
+errors=[]
+  users = User.where("select * from users u join user_official_infos uo uo.employee_id in (#{params[:employeeId]}.join(',')")
+  users.each do |each_user|
+
+    find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
+    if !find_l2_entries.present?
+      p 111111111111111
+      p find_user_project = Member.where(:user_id=>each_user.id).order('m
+ax(capacity) DESC').limit(1)
+      # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+      # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+      (start_date..end_date).to_a.each do |each_date|
+        wktime = Wktime.find_or_intialize_by_user_id_and_begin_date(each_user.id,each_date)
+        wktime.project_id = find_user_project.first.project_id
+        wktime.status="l2"
+        if wktime.save
+          @wktime = wktime
+        else
+          errors << wktime.errors
+        end
+        end
+
+      end
+
+
+  end
+  # params[:employeeId].each do |each_emp|
+  #
+  #
+  # end
+end
+
+
+  if errors.present?
+    render_json_errors(errors.join(','))
+  else
+    render_json_ok(@wktime)
+  end
+
+end
+  # def auto_l2_approve
+  #
+  #
+  #
+  #
+  # end
+
+
+
   private
 
   def verify_message_api_key
@@ -126,6 +183,23 @@ class IniaServiceController < ApplicationController
       (find_valid_key == request.headers["key"].to_s) ? true : render_json_errors("Key Invalid.")
     else
       render_json_errors("Key not found in Url.")
+    end
+  end
+
+
+  def find_employee_ids_from_date_to_date
+    errors =[]
+    if !params[:employeeIds].present?
+      errors << "Employee Ids required..!d"
+    end
+    if !params[:fromDate].present?
+      errors << "fromDate requeired..!"
+    end
+    if !params[:todate].present?
+      errors << "toDate requeired..!"
+    end
+    if errors.present?
+      render_json_errors(errors.join(','))
     end
   end
 
