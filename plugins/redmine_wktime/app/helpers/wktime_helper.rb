@@ -1759,7 +1759,8 @@ module WktimeHelper
         if check_l1.present? && !check_l2.present?
           return true
         end
-      elsif(l == "l2") && check_expire_for_l2(start_date)
+        #&& check_expire_for_l2(start_date)
+      elsif(l == "l2")
         if @all_roles.include? l.to_sym
           return true
         end
