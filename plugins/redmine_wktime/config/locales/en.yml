@@ -143,6 +143,10 @@ en:
   field_reason_type: Reason Type
   field_flexioff_reason: Flexi Off Reason
   field_work_location: Work Location
+
+  label_wk_l1_approve_deadline: L1 Approve Deadline
+  label_wk_l2_approve_deadline: L2 Approve Deadline
+  label_wk_l3_approve_deadline: L3 Approve Deadline
   
   
 

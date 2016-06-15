@@ -2265,6 +2265,157 @@ p "+++++++++++++++end ++++++++"
 
 
 
+
+
+  def create_nc_for_employee_within_sla(date,id)
+
+    User.active.each do |each_user|
+
+      find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+      if !find_entry.present?
+        find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        master_id = NcMaster.find_by_id("#{id}")
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+        nc_history.employee_id = each_user.employee_id
+        nc_history.employee_name = each_user.full_name
+        nc_history.user_id = each_user.id
+        nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+        nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+        nc_history.date = date
+        nc_history.reason = "Employee fails to record time entry within the SLA"
+        nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+        nc_history.save
+
+      end
+
+      # nc_history.
+
+    end
+
+  end
+
+  def create_nc_for_employee_within_unlock_sla(date,id)
+
+    User.active.each do |each_user|
+
+      find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+      if !find_entry.present?
+        find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        master_id = NcMaster.find_by_id("#{id}")
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+        nc_history.employee_id = each_user.employee_id
+        nc_history.employee_name = each_user.full_name
+        nc_history.user_id = each_user.id
+        nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+        nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+        nc_history.date = date
+        nc_history.reason = "Employee fails to correct and updatethe time entry within the defined timeline"
+        nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+        nc_history.save
+
+      end
+
+      # nc_history.
+
+    end
+
+  end
+
+
+  def create_nc_for_l1_within_sla(date,id)
+
+    User.active.each do |each_user|
+      find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
+      # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+      if !find_wktime.present?
+        find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        master_id = NcMaster.find_by_id("#{id}")
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+        nc_history.employee_id = each_user.employee_id
+        nc_history.employee_name = each_user.full_name
+        nc_history.user_id = each_user.id
+        nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+        nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+        nc_history.date = date
+        nc_history.reason = "L1 fails to validate and approve the time entry within the defined timeline"
+        nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+        nc_history.save
+      end
+      # nc_history.
+
+    end
+
+  end
+
+
+
+  def create_nc_for_l1_within_unlock_sla(date,id)
+
+    User.active.each do |each_user|
+
+
+      find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
+
+      # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+      if !find_wktime.present?
+        find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        master_id = NcMaster.find_by_id("#{id}")
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+        nc_history.employee_id = each_user.employee_id
+        nc_history.employee_name = each_user.full_name
+        nc_history.user_id = each_user.id
+        nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+        nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+        nc_history.date = date
+        nc_history.reason = "L1 fails to ensure that the respective employee fails to correct the time entry within the defined timeline."
+        nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+        nc_history.save
+
+      end
+
+      # nc_history.
+
+    end
+
+  end
+
+
+  def create_nc_for_l2_within_sla(date,id)
+
+    User.active.each do |each_user|
+      find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l2")
+      # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
+      if !find_wktime.present?
+        find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        master_id = NcMaster.find_by_id("#{id}")
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
+        nc_history.employee_id = each_user.employee_id
+        nc_history.employee_name = each_user.full_name
+        nc_history.user_id = each_user.id
+        nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
+        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
+        nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
+        nc_history.date = date
+        nc_history.reason = "L2 fails to validate and approve  the time entry within the defined timeline."
+        nc_history.nc_master_id = master_id.present? ? master_id.id : ""
+        nc_history.save
+
+      end
+      # nc_history.
+    end
+  end
+
+
+
   def weekly_approve_notifications(date)
 
     start_date=(Date.today-3).at_beginning_of_week

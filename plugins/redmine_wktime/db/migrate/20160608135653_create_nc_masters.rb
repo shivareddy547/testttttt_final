@@ -1,10 +1,22 @@
 class CreateNcMasters < ActiveRecord::Migration
   def change
     create_table :nc_masters do |t|
-      t.string :name
-      t.string :nc_type
-      t.integer :value_of_day
-      t.float :time_in_a_day
+      t.string :id
+      t.string :process_id
+      t.string :type
+      t.string :title
+      t.text :description
+      t.string :severity
+      t.string :responsibility
+      t.string :accountability
+      t.string :ofs_qms
+      t.string :qms_version
+      t.string :isms_version
+      t.string :document_version
+      t.string :version
+      t.integer :wktime_nonapprove_day
+      t.integer :wktime_nonapprove_hr
+      t.integer :wktime_nonapprove_min
 
       t.timestamps
     end

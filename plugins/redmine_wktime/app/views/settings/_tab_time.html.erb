@@ -74,6 +74,69 @@
                                                                                                            [45, 45]], :selected => @settings['wktime_nonlog_min'].blank? ? 0 : @settings['wktime_nonlog_min']))%>
   </p>
 
+  <p>
+    <label><%= l(:label_wk_l1_approve_deadline) %></label>
+    <%
+       hr = []
+       for i in 0..23
+         if i < 10
+           hr << ['0' + i.to_s,i]
+         else
+           hr << [i,i]
+         end
+       end
+    %>
+
+    <%= l(:field_day) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_day_l1]', options_for_select((0..30).map {|i| [i,i] }, :selected => @settings['wktime_nonapprove_day_l1'].blank? ? 2 : @settings['wktime_nonapprove_day_l1']))%>
+    <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_hr_l1]', options_for_select(hr, :selected => @settings['wktime_nonapprove_hr_l1'].blank? ? 23 : @settings['wktime_nonapprove_hr_l1']))%>
+    <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_min_l1]', options_for_select([['00',0],
+                                                                                                       [15, 15],
+                                                                                                       [30, 30],
+                                                                                                       [45, 45]], :selected => @settings['wktime_nonapprove_min_l1'].blank? ? 0 : @settings['wktime_nonapprove_min_l1']))%>
+  </p>
+  <p>
+  <label><%= l(:label_wk_l2_approve_deadline) %></label>
+  <%
+     hr = []
+     for i in 0..23
+       if i < 10
+         hr << ['0' + i.to_s,i]
+       else
+         hr << [i,i]
+       end
+     end
+  %>
+
+  <%= l(:field_day) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_day_l2]', options_for_select(["MON", "TUE", "WED", "THU","FRI","SAT","SUN"], :selected => @settings['wktime_nonapprove_day_l2'].blank? ? 2 : @settings['wktime_nonapprove_day_l2']))%>
+  <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_hr_l2]', options_for_select(hr, :selected => @settings['wktime_nonapprove_hr_l2'].blank? ? 23 : @settings['wktime_nonapprove_hr_l2']))%>
+  <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_min_l2]', options_for_select([['00',0],
+                                                                                                            [15, 15],
+                                                                                                            [30, 30],
+                                                                                                            [45, 45]], :selected => @settings['wktime_nonapprove_min_l2'].blank? ? 0 : @settings['wktime_nonapprove_min_l2']))%>
+  </p>
+<p>
+  <label><%= l(:label_wk_l3_approve_deadline) %></label>
+  <%
+     hr = []
+     for i in 0..23
+       if i < 10
+         hr << ['0' + i.to_s,i]
+       else
+         hr << [i,i]
+       end
+     end
+  %>
+
+  <%= l(:field_day) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_day_l3]', options_for_select(["MON", "TUE", "WED", "THU","FRI","SAT","SUN"], :selected => @settings['wktime_nonapprove_day_l3'].blank? ? 2 : @settings['wktime_nonapprove_day_l3']))%>
+  <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_hr_l3]', options_for_select(hr, :selected => @settings['wktime_nonapprove_hr_l3'].blank? ? 23 : @settings['wktime_nonapprove_hr_l3']))%>
+  <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_min_l3]', options_for_select([['00',0],
+                                                                                                            [15, 15],
+                                                                                                            [30, 30],
+                                                                                                            [45, 45]], :selected => @settings['wktime_nonapprove_min_l3'].blank? ? 0 : @settings['wktime_nonapprove_min_l3']))%>
+  </p>
+
+
+
 </fieldset>
 
 <%custom_fields = TimeEntryCustomField.find(:all, :order => 'name')%>
