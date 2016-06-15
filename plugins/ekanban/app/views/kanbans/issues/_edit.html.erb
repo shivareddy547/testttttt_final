@@ -35,9 +35,20 @@
                   <p><%= time_entry.text_field :spent_on, :size => 10 %><%= calendar_for('time_entry_spent_on') %></p>
                 </div>
                 <p><%= time_entry.text_field :comments, :size => 60 %></p>
-                <% @time_entry.custom_field_values.each do |value| %>
-                    <p><%= custom_field_tag_with_label :time_entry, value %></p>
-                <% end %>
+              <div class="splitcontentleft">
+                <% wktime_helper = Object.new.extend(WktimeHelper) %>
+                <p><%= time_entry.select :work_location, options_for_select(wktime_helper.timeEntry_location, :selected => @time_entry.work_location), :required => true %></p>
+
+              </div>
+              <% reason = wktime_helper.flexioff_reasons.collect{|x|x[0]}.include?(@time_entry.flexioff_reason) ? @time_entry.flexioff_reason : 'Others'  %>
+              <div class="splitcontentright">
+                <p><%= time_entry.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,:selected => @time_entry.flexioff_reason.present? ? reason : ''), :required => true  %>
+                  <span id="flexi_others" name="<%=@time_entry.flexioff_reason %>"></span>
+                </p>
+              </div>
+              <% @time_entry.custom_field_values.each do |value| %>
+                <p><%= custom_field_tag_with_label :time_entry, value %></p>
+              <% end %>
             <% end %>
           </fieldset>
       <% end %>
@@ -106,10 +117,62 @@
 
 
     });
+    if ($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF'){
+      $('#time_entry_flexioff_reason').closest('p').show();
+    }else{
+      $('#time_entry_flexioff_reason').closest('p').hide();
+    };
+
+    if ($('#time_entry_flexioff_reason').find(":selected").text()=='Others'){
+      var flx = $('#flexi_others').attr('name')
+      $('#time_entry_flexioff_reason').closest('p').find('#flexi_others').html("<input name='time_entry[flexioff_reason]' size='40' type='text' style='border:1px solid red' id='flexi_other'>")
+      $('#flexi_other').val(flx)
+    }else{
+      $('#flexi_other').remove();
+    }
+
+    $('#time_entry_activity_id').change(function(){
+      if ($(this).find(":selected").text()=='Flexi OFF' ){
+        $('#time_entry_flexioff_reason').closest('p').show();
+      }
+      else{
+        $('#time_entry_flexioff_reason').closest('p').hide();
+        $('#time_entry_flexioff_reason').val('')
+      }
+    });
+
+    $('#time_entry_flexioff_reason').change(function(){
+      if ($('#time_entry_flexioff_reason').find(":selected").text()=='Others'){
+        var flx = $('#flexi_others').attr('name')
+        $('#time_entry_flexioff_reason').closest('p').find('#flexi_others').html("<input name='time_entry[flexioff_reason]' size='40' type='text' style='border:1px solid red' id='flexi_other' placeholder='Others Reasons'>")
+        $('#flexi_other').val('')
+      }else{
+        $('#flexi_other').remove();
+      }
+    });
+
+    $('#time_entry_activity_id').closest('form').submit(function(){
+      var x = ($('#time_entry_flexioff_reason').find(":selected").text()=='Others')
+      var y = $.trim($('#flexi_other').val())
+
+      if (($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF' && $('#time_entry_flexioff_reason').val()==null) || x && y==''){
+
+        if (!$('#errorExplanation').is(':visible') ){
+          $('.flexi_reason').show();
+        }
+        if ($('#flexi_error').not(':visible') ){
+          $('#errorExplanation').append("<ul><li id='flexi_error'>Flexi Off Reason  can't be blank</li></ul>")
+        }
+        return false;
+      } else{
+        this.submit();
+      }
+    })
 
 
 
-//
+
+    //
 //    function update_form()
 //
 //    {

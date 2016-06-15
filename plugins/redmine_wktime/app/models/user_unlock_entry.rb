@@ -2,7 +2,6 @@ class UserUnlockEntry < ActiveRecord::Base
   unloadable
   belongs_to :user
   validates_presence_of :user_id, :unlock_type
-
   validates_presence_of :comment, :unless => lambda { self.unlock_type != 0 }
   before_save :update_unlock_type
 

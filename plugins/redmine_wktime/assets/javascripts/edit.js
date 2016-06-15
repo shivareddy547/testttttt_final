@@ -109,11 +109,30 @@ $(document).ready(function() {
             }
         }
     });
+    $('.flexi_other_reason ').click(function(){
+        getOtherFlexiReason($(this))
+    });
+    $('.flexi_reason').each(function(){
+        if ($(this).find('#other_reason_flexi').attr('name') != '') {
+            name = $(this).find('#other_reason_flexi').attr('name')
+            $(this).find('#time_entry__flexioff_reason').find(":selected").val(name);
+        }
+    });
 
+$('.flexi_reason a').hide();
+    $('.flexi_reason select').each(function(){
+       if ($(this).find(":selected").text()=='Others' ) {
+           $(this).closest('tr').find('.flexi_reason').find('a').show();
+       }else{
+           $(this).closest('tr').find('.flexi_reason').find('a').hide();
+       }
+    });
 
 });
 
 function showComment(row, col) {
+    console.log('====================')
+    console.log([row, col])
     var images = $( 'img[name="custfield_img'+row+'[]"]' );
     var width = 300;
     var height = 350;
@@ -142,8 +161,8 @@ function showComment(row, col) {
         $( "#_edit_comm_iss_" ).html(issDropdowns[i].selectedIndex >= 0 ?
             issDropdowns[i].options[issDropdowns[i].selectedIndex].text : '');
     }
-    $( "#_edit_comm_act_" ).html(actDropdowns[i].selectedIndex >= 0 ?
-        actDropdowns[i].options[actDropdowns[i].selectedIndex].text : '');
+    // $( "#_edit_comm_act_" ).html(actDropdowns[i].selectedIndex >= 0 ?
+    //     actDropdowns[i].options[actDropdowns[i].selectedIndex].text : '');
 
     showCustomField();
 
@@ -263,6 +282,40 @@ function getCustFldToolTip()
     }
     return cusfield;
 }
+function flexiChanged(obj){
+
+    if ($("option:selected", obj).text()=='Others' ){
+        getOtherFlexiReason(obj);
+        obj.closest('tr').find('.flexi_reason').find('a').show();
+    }else {
+        obj.closest('tr').find('.flexi_reason').find('a').hide();
+    }
+}
+
+function getOtherFlexiReason(cur){
+    var reason1 = cur.closest('tr').find('.flexi_reason').find('#other_reason_flexi')
+    var reason =     reason1.attr('name')
+    showModal('ajax-modal', '250px');
+    $('#ajax-modal').html(" <div><div id='interruption_content'> </div>" +
+        "<div>" +
+        "<br>" +
+        "<div style='margin-left: 10px'><span id='tkt_cmt_error'>Others.</span><textarea cols='25' id='flxi_comment' maxlength='300' name='comment' rows='3' ></textarea>" +
+        "<span class='due_validity '> <button type='button'  value='Submit' id='save_flexi'  >Continue</button> <button type='reset' id='cancel_flexi' value='Reset'>Cancel</button></span>" +
+        "</div></div>");
+    $('.ui-dialog-title').html("<span style='float:left'>Flexi Off Reason.</span>")
+    $('#flxi_comment').val(reason);
+    $('#cancel_flexi').click(function(){
+        hideModal()
+    });
+    $('#save_flexi').click(function(){
+        var flexi_cmt =$('#flxi_comment').val();
+        reason1.attr('name', flexi_cmt)
+        cur.closest('tr').find('.flexi_reason').find('#time_entry__flexioff_reason').find(":selected").val(flexi_cmt);
+        hideModal()
+    });
+
+}
+
 
 function activityChanged(obj)
 {
@@ -271,11 +324,11 @@ function activityChanged(obj)
     {
         $("#wktime_save").prop('disabled', false);
     }
-    $('.flexi_reason select').each(function() {
-        if ($(this).attr('style') == ""){
-            $('.flexi_reason').show();
-        }else{$('.flexi_reason').hide();};
-    });
+//    $('.flexi_reason select').each(function() {
+//        if ($(this).attr('style') == ""){
+//            $('.flexi_reason').show();
+//        }else{$('.flexi_reason').hide();};
+//    });
 
     if ($("option:selected", obj).text()=='Flexi OFF' ){
         $('.flexi_reason').show();
@@ -284,12 +337,14 @@ function activityChanged(obj)
         obj.closest('tr').find('.flexi_reason').find('select').hide();
     }
 
-
-
-    
-
+        if ($('.flexi_reason select:visible').length > 0){
+            $('.flexi_reason').show();
+        }else{
+            $('.flexi_reason').hide();
+        }
 
 }
+
 function comment()
 {
     var save_button = $("#wktime_save");

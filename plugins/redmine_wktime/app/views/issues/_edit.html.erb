@@ -21,16 +21,19 @@
         </div>
         <p><%= time_entry.text_field :comments, :size => 60 %></p>
         <div class="splitcontentleft">
-        <% @time_entry.custom_field_values.each do |value| %>
-          <p><%= custom_field_tag_with_label :time_entry, value %></p>
-        <% end %>
+          <% wktime_helper = Object.new.extend(WktimeHelper) %>
+          <p><%= time_entry.select :work_location, options_for_select(wktime_helper.timeEntry_location, :selected => @time_entry.work_location), :required => true %></p>
         </div>
-            <% wktime_helper = Object.new.extend(WktimeHelper) %>
         <div class="splitcontentright">
-            <p><%= time_entry.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons), :required => true  %>
+          <% reason = wktime_helper.flexioff_reasons.collect{|x|x[0]}.include?(@time_entry.flexioff_reason) ? @time_entry.flexioff_reason : 'Others'  %>
+
+          <p><%= time_entry.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason.present? ? reason : ''), :required => true  %>
               <span id="flexi_others"></span>
             </p>
         </div>
+            <% @time_entry.custom_field_values.each do |value| %>
+              <p><%= custom_field_tag_with_label :time_entry, value %></p>
+            <% end %>
         <% end %>
     </fieldset>
     <% end %>
@@ -98,9 +101,15 @@
   var y = $.trim($('#flexi_other').val())
 
   if (($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF' && $('#time_entry_flexioff_reason').val()==null) || x && y==''){
+
+  if (!$('#errorExplanation').is(':visible') ){
   $('.flexi_reason').show();
-  $('#errorExplanation').show();
-  $('#errorExplanation').append("<ul><li>Flexi Off Reason  can't be blank</li></ul>")
+  }
+  if ($('#flexi_error').not(':visible') ){
+    $('#errorExplanation').append("<ul><li id='flexi_error'>Flexi Off Reason  can't be blank</li></ul>")
+  }
+
+
   return false;
   } else{
   this.submit();

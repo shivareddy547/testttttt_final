@@ -16,14 +16,34 @@ $(document).ready(function(){
         txtEntryDate.onchange=function(){showEntryWarning(this.value)};
     }
 
-     $('.unlock_comments, .unlock_update').css({'display':'none','padding':'5px', 'float':'left'})
+    $('.unlock_comments, .unlock_update').css({'display':'none','padding':'5px', 'float':'left'})
+
     $('.flexi_reason').hide();
 
+    $('.flexi_reason a').hide();
+
     doChangeFlexi();
+
+//    $('.flexi_other_reason ').click(function(){
+//        getOtherFlexiReason($(this))
+//    });
+
+//    $('.flexi_reason select').change(function(){
+//        console.log('============== oksy-----------')
+//        if ($(this).find(":selected").text()=='Others' ){
+//            getOtherFlexiReason($(this))
+//            $(this).closest('tr').find('.flexi_reason').find('a').show();
+//        }else {
+//            $(this).closest('tr').find('.flexi_reason').find('a').hide();
+//        }
+//    });
+
 });
 
 
-function doChangeFlexi() {
+
+
+    function doChangeFlexi() {
         $('.activity select').each(function(i, obj) {
             if ($(this).find(":selected").text()=='Flexi OFF' ){
                 $('.flexi_reason').show();
@@ -32,7 +52,19 @@ function doChangeFlexi() {
                 $(this).closest('tr').find('.flexi_reason').find('select').hide();
             }
         });
+
+        $('.flexi_reason select').each(function(){
+            console.log($(this).find(":selected").text())
+            if ($(this).find(":selected").text()=='Others' ){
+                $(this).closest('tr').find('.flexi_reason').find('a').show();
+            }else {
+                $(this).closest('tr').find('.flexi_reason').find('a').hide();
+            }
+        });
+
+
     }
+
 function myChangeFunction(member){
     var type = '#unlock_type'+member
     var unlock_comments = "#unlock_comments_"+member
@@ -49,7 +81,6 @@ function myChangeFunction(member){
         $('#unlock_comments_'+member).hide();
     }
 }
-
 function showEntryWarning(entrydate){
     var $this = $(this);
     var divID =document.getElementById('divError');
@@ -76,7 +107,6 @@ function showMessage(data,divID){
 
 
 
-
 function validate_unlock_comment(member)
 {
     var comment_id = "#member-"+member+"-unlock-form"+" "+"#comment"
@@ -96,6 +126,7 @@ function validate_unlock_comment(member)
     }
 
 }
+
 
 function lock_user(member)
 {

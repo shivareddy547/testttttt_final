@@ -1223,6 +1223,9 @@ class WktimeController < ApplicationController
                 teEntry = nil
                 teEntry = getTEEntry(id)
                 teEntry.attributes = entry
+                p '=================================================================== 4 ========================'
+                p entry
+                p '=--'
                 # since project_id and user_id is protected
                 teEntry.project_id = entry['project_id']
                 teEntry.work_location = entry['work_location']
@@ -1767,7 +1770,7 @@ end
 
   def findEntriesByCond(cond)
     TimeEntry.find(:all, :conditions => cond,
-                   :order => 'project_id, issue_id, activity_id, spent_on')
+                   :order => 'project_id, issue_id, activity_id, spent_on, work_location, flexioff_reason')
   end
 
   def setValueForSpField(teEntry,spValue,decimal_separator,entry)

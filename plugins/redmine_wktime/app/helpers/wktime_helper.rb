@@ -2177,7 +2177,6 @@ p "+++++++++++++++end ++++++++"
 
   end
 
-
   def get_perm_for_project(project,perm)
    arry_per=[]
     if project.members.present?

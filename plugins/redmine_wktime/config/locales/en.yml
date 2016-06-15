@@ -135,10 +135,14 @@ en:
   l2: L2
   label_time_zone_select: Time Zone
   label_wktime_home_l2: "Time(L2 Approval)"
+  field_time_entry_locaion: Location
+  field_reason_type: Reason Type
+  field_flexioff_reason: "Flexi Off Reason"
 
   field_time_entry_locaion: Location
   field_reason_type: Reason Type
   field_flexioff_reason: Flexi Off Reason
+  field_work_location: Work Location
   
   
 
