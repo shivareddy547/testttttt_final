@@ -278,8 +278,9 @@ class WktimeController < ApplicationController
         errorMsg
         if errorMsg.blank? && (!params[:wktime_save].blank? ||
             (!params[:wktime_submit].blank?))
-          if !@wktime.nil? && ( @wktime.status == 'n' || @wktime.status == 'r' || @wktime.status == 'l1' || @wktime.status == 'l2')
-            if (!@wktime.status == 'l1' || !@wktime.status == 'l2' || !@wktime.status == 'r' )
+          if !@wktime.nil? && ( @wktime.status == 'n' || @wktime.status == 'r' || @wktime.status == 'l1' || @wktime.status == 'l2' || @wktime.status == 'l3')
+           p 0000000000000000000000000000000000000000000000000000
+            if (!@wktime.status == 'l1' || !@wktime.status == 'l2' || !@wktime.status == 'r' || !@wktime.status == 'l3')
               @wktime.status = :n
             end
             # save each entry
@@ -362,6 +363,8 @@ class WktimeController < ApplicationController
         if params[:wktime_reject].present?
           sendRejectionEmail()
         end
+        p "=================helo-0000000000000000000000000000"
+        p @approve_days
         @approve_days.each do |approve_day|
           @find_time_entries = TimeEntry.where(:user_id=> params[:user_id], :spent_on => approve_day.to_date)
           if @find_time_entries.present?
@@ -385,8 +388,10 @@ class WktimeController < ApplicationController
                     approve_status = wktime_helper.check_time_log_entry_for_approve(approve_day,user)
                     if approve_status==false
                       if permissions.flatten.present? && permissions.flatten.include?(:l3)
+                        p 777777777777777777777777777777777777777777777777777777777777777777777777777777777
                         update_l1_or_l2_record(params, approve_day, project,'l3')
                       elsif  permissions.flatten.present? && permissions.flatten.include?(:l2)
+                        p 6666666666666666666666666666666666666666666
                         update_l1_or_l2_record(params, approve_day, project,'l2')
                       elsif permissions.flatten.include?(:l1)
                         update_l1_record(params, approve_day, project)
@@ -2026,18 +2031,18 @@ end
 
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
 
-    if params[:wktime_approve].present? && @wktime.status != "l3"
-      if role == "l2"
+    if params[:wktime_approve].present?
+
         @wktime.pre_status=@wktime.status
         @wktime.status = role
-      end
-    elsif params[:wktime_unapprove].present? && @wktime.status != "l3"
+
+    elsif params[:wktime_unapprove].present?
       if @wktime.pre_status.present? && @wktime.pre_status.to_s != role.to_s
         @wktime.status = @wktime.pre_status
       else
         @wktime.status = 'n'
       end
-    elsif  params[:wktime_reject].present? && @wktime.status !="l3"
+    elsif  params[:wktime_reject].present?
       @wktime.pre_status=@wktime.status
       @wktime.status = 'r'
       Rejection.create(:user_id => params[:user_id], :project_id => project.id, :rejected_by =>User.current.id, :rejected_role=> 'l2', :comment =>params[:wktime_notes], :date => @wktime.begin_date )

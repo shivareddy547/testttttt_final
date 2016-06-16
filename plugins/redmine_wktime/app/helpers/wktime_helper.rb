@@ -1725,6 +1725,7 @@ module WktimeHelper
 
 
   def check_bio_permission_list_user_id_project_id(l,user_id,project_ids,start_date)
+
     @all_roles=[]
 
     #user = User.find_by_id(user_id)
@@ -1754,7 +1755,14 @@ module WktimeHelper
     if (Setting.plugin_redmine_wktime[:wktime_own_approval].blank? && user_id.to_i == User.current.id)
       @all_roles =[]
     end
-    if @all_roles.present? && (user_id.to_i != User.current.id)
+
+    if @all_roles.present?
+p "++++++++++++is_l2?(user_id,project_ids)+++++++++++"
+p user_id.to_i
+p User.current.id
+p is_l2?(user_id,project_ids)
+p "++++++=end ++++++"
+
       if (l == "l1")
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
@@ -1766,11 +1774,13 @@ module WktimeHelper
         if @all_roles.include? l.to_sym
           return true
         end
-      elsif(l == "l3")
+      elsif(l == "l3") && is_l2?(user_id,project_ids)
+
         if @all_roles.include? l.to_sym
           return true
         end
       elsif(l == "bio_hours_display")
+
 
         if @all_roles.include? l.to_sym
           return true
@@ -1780,6 +1790,23 @@ module WktimeHelper
     end
   end
 
+
+  def is_l2?(user_id,project_ids)
+p 99999999999999999999999999999
+   p sql =  "select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permissions like '%l2%' and m.project_id in (#{project_ids.join(',')}) limit 1"
+   member =  Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permissions like '%l2%' and m.project_id in (#{project_ids.join(',')}) limit 1")
+
+    if member.present?
+
+      return true
+    end
+  end
 
   def check_expire_for_l1(user_id,date)
 
