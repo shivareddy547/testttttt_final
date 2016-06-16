@@ -127,14 +127,11 @@ def update_auto_unapproved_entries
 
 if params[:employeeIds].present?
 errors=[]
-p 11111111111111111
+
 # p sql = "select * from users u join user_official_infos uo uo.employee_id in (#{params[:employeeIds]})"
     users = User.find_by_sql("select u.id,u.login,u.firstname,u.lastname from users u
   join user_official_infos uo on u.id=uo.user_id where uo.employee_id in (#{params[:employeeIds]})")
 
-p "+++++++++++=usersusers+++++++++"
-  p users
-  p "++++++++++++end ++++++++"
 
   users.each do |each_user|
 
@@ -143,7 +140,41 @@ p "+++++++++++=usersusers+++++++++"
       find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
       # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
       # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+
+      find_activity = Enumeration.where(:name=>'PTO')
+      if find_activity.present?
+
+        @find_activity_id = find_activity.last.id
+      else
+        errors << "Unable apply for Leave, PTO Activity Not Found .!"
+      end
+      find_tracker = Tracker.where(:name=>'support')
+      if find_tracker.present?
+        @find_tracker_id = find_tracker.first.id
+      else
+        errors << "Unable apply for Leave, PTO Activity Not Found .!"
+      end
+      find_issue = Issue.where(:project_id=>find_user_project.first.project_id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
+      if find_issue.present?
+      @find_issue_id = find_issue.first.id
+    else
+     find_issue = Issue.new(:subject=>"PTO",:project_id=>find_user_project.first.project_id,:tracker_id=>@find_tracker_id,:author_id=>each_user.id,:assigned_to_id=>each_user.id)
+      if find_issue.save
+        @find_issue_id = find_issue.id
+      end
+      # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
+    end
       (start_date..end_date).to_a.each do |each_date|
+
+             @time_entry =  TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(find_user_project.first.project_id,each_user.id,@find_activity_id,each_date,@find_issue_id)
+             if @time_entry.present? && @time_entry.id.blank?
+               @time_entry.project_id = find_user_project.first.project_id
+               @time_entry.activity_id = @find_activity_id
+
+               @time_entry.issue_id = @find_issue_id
+               @time_entry.hours = 0.00
+               @time_entry.save
+             end
         @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
         @wktime.project_id = find_user_project.first.project_id
         @wktime.status="l2"
@@ -210,6 +241,8 @@ p "+++++++++++=usersusers+++++++++"
   #
   #
   # end
+
+
 end
 
 p "++++++++++++=@wktime@wktime@wktime+++++++++"
@@ -246,7 +279,10 @@ end
   def find_employee_ids_from_date_to_date
     errors =[]
     if !params[:employeeIds].present?
-      errors << "Employee Ids required..!d"
+      errors << "Employee Ids required..!"
+    end
+    if params[:employeeIds].present? && params[:employeeIds].split(',').count > 1
+      errors << "Multiple Employee Ids not allowed..!"
     end
     if !params[:fromDate].present?
       errors << "fromDate requeired..!"
