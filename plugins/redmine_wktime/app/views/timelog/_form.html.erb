@@ -20,9 +20,10 @@
   <p><%= f.text_field :comments, :size => 100, :maxlength => 255 %></p>
   <p><%= f.select :activity_id, activity_collection_for_select_options(@time_entry), :required => true %></p>
   <% wktime_helper = Object.new.extend(WktimeHelper) %>
+
   <p><%= f.select :work_location, options_for_select(wktime_helper.timeEntry_location, :selected => @time_entry.work_location), :required => true %></p>
   <% reason = wktime_helper.flexioff_reasons.collect{|x|x[0]}.include?(@time_entry.flexioff_reason) ? @time_entry.flexioff_reason : 'Others'  %>
-  <p><%= f.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason.present? ? reason : ''), {:required => true} %>
+  <p><%= f.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason.nil? ? '' : reason), {:prompt => '--- Select ---',:required => true} %>
     <span id="flexi_others" name="<%=@time_entry.flexioff_reason %>"></span>
   </p>
   <% @time_entry.custom_field_values.each do |value| %>
@@ -42,6 +43,7 @@
       $('#time_entry_flexioff_reason').closest('p').show();
     }else{
       $('#time_entry_flexioff_reason').closest('p').hide();
+
     };
 
     if ($('#time_entry_flexioff_reason').find(":selected").text()=='Others'){
@@ -59,6 +61,7 @@
       else{
         $('#time_entry_flexioff_reason').closest('p').hide();
         $('#time_entry_flexioff_reason').val('')
+        $('#flexi_other').remove();
       }
     });
 
@@ -72,23 +75,6 @@
       }
     });
 
-    $('#time_entry_activity_id').closest('form').submit(function(){
-      var x = ($('#time_entry_flexioff_reason').find(":selected").text()=='Others')
-      var y = $.trim($('#flexi_other').val())
-
-  if (($('#time_entry_activity_id').find(":selected").text()=='Flexi OFF' && $('#time_entry_flexioff_reason').val()==null) || x && y==''){
-
-    if (!$('#errorExplanation').is(':visible') ){
-      $('.flexi_reason').show();
-    }
-  if ($('#flexi_error').not(':visible') ){
-  $('#errorExplanation').append("<ul><li id='flexi_error'>Flexi Off Reason  can't be blank</li></ul>")
-  }
-        return false;
-      } else{
-        this.submit();
-      }
-    })
 
   })
 <% end %>

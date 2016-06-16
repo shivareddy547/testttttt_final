@@ -49,6 +49,7 @@ $(document).ready(function(){
                 $('.flexi_reason').show();
                 $(this).closest('tr').find('.flexi_reason').find('select').show();
             }else {
+                $(this).closest('tr').find('#flexi_other').remove();
                 $(this).closest('tr').find('.flexi_reason').find('select').hide();
             }
         });

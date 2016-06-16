@@ -130,11 +130,11 @@
   <td class='flexi_reason' >
     <% flexi_con = flexioff_reasons.collect{|x|x[0]}.include?((entry.flexioff_reason rescue '')) %>
     <% reason = flexi_con ? entry.flexioff_reason : 'Others'  %>
-    <%= select_tag isTemplate ? '__template__time_entry[][flexioff_reason]' : 'time_entry[][flexioff_reason]' , options_for_select(flexioff_reasons,:selected => entry.nil? ? '' : reason),:onchange => "flexiChanged($(this));" %>
+    <%= select_tag isTemplate ? '__template__time_entry[][flexioff_reason]' : 'time_entry[][flexioff_reason]' , options_for_select(flexioff_reasons,:selected => entry.nil? ? '' : reason),{:prompt => "--select --", :onchange => "flexiChanged($(this));"} %>
     <span id="other_reason_flexi" name="<%= (flexi_con ? '' : (entry.flexioff_reason rescue '')) %>"></span>
     <span id="flexi_hidden"></span>
     <% image_tg = image_tag('text_list_bullets.png', :class => 'flexi_other_reason', :name => '__template__time_entry[][flexioff_reason]',
-                            :title => "#{entry.nil? || @prev_template ? l(:label_custom_field_plural) : []}") %>
+                            :title => "#{entry.nil? || entry.flexioff_reason.nil? ? l(:label_custom_field_plural) : entry.flexioff_reason}") %>
 
     <%= link_to image_tg, "#"	%>
   </td>

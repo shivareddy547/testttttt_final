@@ -121,7 +121,7 @@ $(document).ready(function() {
 
 $('.flexi_reason a').hide();
     $('.flexi_reason select').each(function(){
-       if ($(this).find(":selected").text()=='Others' ) {
+       if ($(this).is(':visible') && $(this).find(":selected").text()=='Others' ) {
            $(this).closest('tr').find('.flexi_reason').find('a').show();
        }else{
            $(this).closest('tr').find('.flexi_reason').find('a').hide();
@@ -334,6 +334,7 @@ function activityChanged(obj)
         $('.flexi_reason').show();
         obj.closest('tr').find('.flexi_reason').find('select').show();
     }else{
+        obj.closest('tr').find('#flexi_other').remove();
         obj.closest('tr').find('.flexi_reason').find('select').hide();
     }
 

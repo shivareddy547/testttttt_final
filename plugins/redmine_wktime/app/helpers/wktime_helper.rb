@@ -900,7 +900,9 @@ module WktimeHelper
     status_l2 =Wktime.where(:user_id=>user_id,:begin_date=>date,:status=>'l2')
     l2_entry = TimeEntry.where(:spent_on=> date,:user_id=>user_id)
     if  status_l2.present?
-      true
+      return true
+    else
+      return false
     end
   end
 
@@ -1441,7 +1443,7 @@ module WktimeHelper
     #     end
     #   end
      end
-    
+
     user_emp_code.delete('')
     user_emp_code.delete(0)
     user_emp_code = user_emp_code.uniq.join(",")
@@ -1458,8 +1460,8 @@ module WktimeHelper
       url = Redmine::Configuration['iserv_base_url']
       # key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
       url1 = "#{url}/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
-      response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute 
-     
+      response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute
+
       # raise
       user_array = user_emp_code.split(',')
       my_arrays = {}
@@ -1752,7 +1754,7 @@ module WktimeHelper
     if (Setting.plugin_redmine_wktime[:wktime_own_approval].blank? && user_id.to_i == User.current.id)
       @all_roles =[]
     end
-    if @all_roles.present?
+    if @all_roles.present? && (user_id.to_i != User.current.id)
       if (l == "l1")
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
@@ -1801,7 +1803,7 @@ p "+++++++++++++++end ++++++++"
      return true
 
    else
-     return false
+     return true
    end
 
 
@@ -2204,6 +2206,34 @@ p "+++++++++++++++end ++++++++"
 
   end
 
+
+  def get_perm_for_project_multiple(project,perm)
+    arry_per=[]
+    if project.members.present?
+      project.members.each do |each_mem|
+        if each_mem.roles.present?
+          each_mem.roles.each do |each_role|
+            if each_role.permissions.present?
+              if each_role.permissions.include?(perm.to_sym)
+                arry_per << each_mem.user_id
+
+              end
+            end
+          end
+        end
+
+      end
+
+    end
+
+    if arry_per.present?
+      p "+++++++++++arry_perarry_per+++++++++"
+      return arry_per
+
+    end
+
+  end
+
   def create_nc_for_time_entry(date)
 
     User.active.each do |each_user|
@@ -2274,6 +2304,16 @@ p "+++++++++++++++end ++++++++"
       find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
       if !find_entry.present?
         find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
+
         master_id = NcMaster.find_by_id("#{id}")
         nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
         nc_history.employee_id = each_user.employee_id
@@ -2303,6 +2343,15 @@ p "+++++++++++++++end ++++++++"
       find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
       if !find_entry.present?
         find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
         master_id = NcMaster.find_by_id("#{id}")
         nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
         nc_history.employee_id = each_user.employee_id
@@ -2333,6 +2382,15 @@ p "+++++++++++++++end ++++++++"
       # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
       if !find_wktime.present?
         find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
         master_id = NcMaster.find_by_id("#{id}")
         nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
         nc_history.employee_id = each_user.employee_id
@@ -2343,7 +2401,7 @@ p "+++++++++++++++end ++++++++"
         nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
         nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
         nc_history.date = date
-        nc_history.reason = "L1 fails to validate and approve the time entry within the defined timeline"
+        nc_history.reason = master_id.
         nc_history.nc_master_id = master_id.present? ? master_id.id : ""
         nc_history.save
       end
@@ -2359,25 +2417,37 @@ p "+++++++++++++++end ++++++++"
 
     User.active.each do |each_user|
 
-
       find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
-
+      lock_status = UserUnlockEntry.where(:user_id=>each_user.id)
       # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
-      if !find_wktime.present?
+      if !find_wktime.present? && lock_status.present?
         find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
+        nc_history_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+        if nc_history_l1.present?
+        l1_user = User.find(nc_history_l1)
         master_id = NcMaster.find_by_id("#{id}")
-        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
-        nc_history.employee_id = each_user.employee_id
-        nc_history.employee_name = each_user.full_name
+        nc_history = NcHistory.find_or_initialize_by_employee_id_and_date_user_id(l1_user.id,date,each_user.employee_id)
+        nc_history.employee_id = l1_user.employee_id
+        nc_history.employee_name = l1_user.full_name
         nc_history.user_id = each_user.id
         nc_history.project_id= find_user_project.present? ? find_user_project.first.project_id : ""
-        nc_history.project_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
+
         nc_history.project_l2= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l2') : ""
         nc_history.project_l3= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l3') : ""
         nc_history.date = date
         nc_history.reason = "L1 fails to ensure that the respective employee fails to correct the time entry within the defined timeline."
         nc_history.nc_master_id = master_id.present? ? master_id.id : ""
         nc_history.save
+        end
 
       end
 
@@ -2394,7 +2464,17 @@ p "+++++++++++++++end ++++++++"
       find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l2")
       # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
       if !find_wktime.present?
+
         find_user_project= Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
         master_id = NcMaster.find_by_id("#{id}")
         nc_history = NcHistory.find_or_initialize_by_employee_id_and_date(each_user.employee_id,date)
         nc_history.employee_id = each_user.employee_id
@@ -2428,8 +2508,17 @@ p "+++++++++++++++end ++++++++"
         p 111111111111111
        p find_user_project = Member.where(:user_id=>each_user.id).order('m
 ax(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-        l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+        l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
         if l2_user_id.present?
           p "++++++++++l2 user ++++++"
@@ -2460,24 +2549,33 @@ ax(capacity) DESC').limit(1)
 
       find_l2_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
       if !find_l2_entries.present?
-        p 111111111111111
-        p find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
 
-        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-        l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+         find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+        if !find_user_project.present?
+
+          find_user_project= Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join projects p on p.id=m.project_id
+join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+
+        end
+        l2_user_id = get_perm_for_project_multiple(find_user_project.first.project,'l2')
+        l3_user_id = get_perm_for_project_multiple(find_user_project.first.project,'l3')
 
         if !find_l2_entries.present?
         if l2_user_id.present?
-          p "++++++++++l2 user ++++++"
-          p User.find(l2_user_id)
-          p "============="
-          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+
+          l2_user_id.each do |each_l2|
+          WkMailer.send_l2_l3_notification(each_l2,each_user.id,start_date,end_date).deliver
+            end
         end
-        if l1_user_id.present?
-          p "++++++++++l2 user ++++++"
-          p User.find(l1_user_id)
-          p "============="
-          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        if l3_user_id.present?
+
+          l3_user_id.each do |each_l3|
+            WkMailer.send_l2_l3_notification(each_l3,each_user.id,start_date,end_date).deliver
+          end
+        end
+
         end
 
         end
@@ -2486,7 +2584,7 @@ ax(capacity) DESC').limit(1)
 
     end
 
-  end
+
 
 
 
@@ -2524,20 +2622,27 @@ ax(capacity) DESC').limit(1)
       if !find_l1_entries.present?
         p 111111111111111
         p find_user_project = Member.where(:user_id=>each_user.id).order('m
-ax(capacity) DESC').limit(1)
+ax(capacity) DESC').limit(1);
+
+#         if !find_user_project.present?
+#
+#           find_user_project= Member.find_by_sql("select * from members m
+# join member_roles mr on mr.member_id=m.id
+# join projects p on p.id=m.project_id
+# join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
+#
+#         end
+
+
         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-        l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+        l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
         if l2_user_id.present?
-          p "++++++++++l2 user ++++++"
-          p User.find(l2_user_id)
-          p "============="
+
           WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
         end
         if l1_user_id.present?
-          p "++++++++++l2 user ++++++"
-          p User.find(l1_user_id)
-          p "============="
+
           WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
         end
 
