@@ -19,11 +19,41 @@ class Sync < ActiveRecord::Base
       @sync_time = (rec.last_sync-1.minute)
     end
     rec.save
+
+ hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
+# @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+#   @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
+    @inactive_user_info = hrms.execute("SELECT * FROM vw_employee where employee_no !=0 and employee_no != '' and login_id != '' and work_email !='' and login_id !='' and is_active=0 and modified_date >= '#{@sync_time}';")
+    inia =  ActiveRecord::Base.establish_connection(:production).connection
+ @inactive_user_info.each(:as => :hash) do |user|
+find_user_with_employee_id = "select * from 
+       where user_official_infos.employee_id='#{user['employee_no']}'"
+      find_user_with_employee = inia.execute(find_user_with_employee_id)
+
+      if find_user_with_employee.count == 0
+
+  find_user_with_employee.each(:as => :hash) do |row|
+
+ user_update_query = "UPDATE users SET login='#{user['login_id']}',firstname='#{user['first_name']}',lastname='#{user['last_name']}'
+          ,mail='#{user['work_email']}',auth_source_id=1,status='3',updated_on=NOW() where id='#{row["user_id"]}'"
+              update_employee = inia.execute(user_update_query)
+
+  end
+
+
+         
+
+      end
+
+ end
+
+
+
 # hrms_connection =  ActiveRecord::Base.establish_connection(:hrms_sync_details)
     hrms =  ActiveRecord::Base.establish_connection(hrms_sync_details).connection
 # @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,c.work_email, c.employee_no FROM hrms.employee a, hrms.user b, hrms.official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
 #   @user_info = hrms.execute("SELECT a.first_name, a.last_name, b.login_id,b.is_active,c.work_email, c.employee_no FROM employee a, user b, official_info c where b.id=a.user_id and a.id=c.employee_id and a.modified_date >= '#{@sync_time}'")
-    @user_info = hrms.execute("SELECT * FROM vw_employee where employee_no !=0 and employee_no != '' and login_id != '' and work_email !='' and login_id !='' and modified_date >= '#{@sync_time}';")
+    @user_info = hrms.execute("SELECT * FROM vw_employee where employee_no !=0 and employee_no != '' and login_id != '' and work_email !='' and login_id !='' and is_active=1 and modified_date >= '#{@sync_time}';")
     inia =  ActiveRecord::Base.establish_connection(:production).connection
 
 
@@ -34,13 +64,15 @@ class Sync < ActiveRecord::Base
 
       # find_user_with_employee = inia.execute(find_user_with_login_id)
 
-      find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['employee_no']}'"
+      find_user_with_employee_id = "select * from 
+       where user_official_infos.employee_id='#{user['employee_no']}'"
       find_user_with_employee = inia.execute(find_user_with_employee_id)
 
 
       if find_user_with_employee.count == 0
 
         if user['prev_emp_no'].present?
+      
           find_previous_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{user['prev_emp_no']}'"
           find_user_with_employee = inia.execute(find_previous_employee_id)
 
@@ -54,6 +86,7 @@ class Sync < ActiveRecord::Base
               find_user_with_employee_id = "select * from user_official_infos where user_official_infos.employee_id='#{row['user_id']}'"
               find_user_with_employee_id = inia.execute(find_user_with_employee_id)
               if find_user_with_employee_id.count ==0
+                p 33333333333333333333333333333333333
                 user_info_query = "INSERT into user_official_infos (user_id, employee_id, department,location_name,region_name,location_type) values ('#{row["user_id"].to_i}',#{user['employee_no']},'#{user['dep_name']}','#{user['loc_name']}','#{user['region_name']}','#{user['location_type']}')"
                 save_employee = inia.insert_sql(user_info_query)
               else
