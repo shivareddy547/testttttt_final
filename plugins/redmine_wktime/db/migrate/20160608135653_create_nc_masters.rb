@@ -1,9 +1,9 @@
 class CreateNcMasters < ActiveRecord::Migration
   def change
     create_table :nc_masters do |t|
-      t.string :id
+      t.string :nc_id
       t.string :process_id
-      t.string :type
+      t.string :nc_type
       t.string :title
       t.text :description
       t.string :severity

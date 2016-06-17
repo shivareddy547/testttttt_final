@@ -1,4 +1,4 @@
-id,process_id,type,title,description,severity,responsibility,accountability,ofs_qms,qms_version,isms_version,document_version,version
+nc_id,process_id,nc_type,title,description,severity,responsibility,accountability,ofs_qms,qms_version,isms_version,document_version,version
 TEP_NC_001,PMO_TEP_0010,NC,Access right not provided,Role based access not provided to employees (Team members),Major,DO,DO,,,,,
 TEP_NC_002,PMO_TEP_0010,NC,Access right not validated,DO/manager fails to validate the access with in the defined timeline,Major,DO,DO,,,,,
 TEP_NC_003,PMO_TEP_0010,Security incident,Access right not validated,Unauthorized persons are having access to project or function,Critical,DO,DO,,,,,

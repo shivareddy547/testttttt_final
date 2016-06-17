@@ -2,7 +2,7 @@ require 'csv'
 # require 'iconv'
 class NcMaster < ActiveRecord::Base
   # attr_accessible :name, :time_in_a_day, :type, :value_of_day
-  attr_accessible :id, :process_id, :title, :description, :severity, :responsibility, :accountability, :ofs_qms, :qms_version, :isms_version, :document_version, :version
+  attr_accessible :nc_id, :nc_type,:process_id, :title, :description, :severity, :responsibility, :accountability, :ofs_qms, :qms_version, :isms_version, :document_version, :version
 
 
   def self.import_csv

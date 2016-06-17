@@ -179,7 +179,7 @@ class IniaServiceController < ApplicationController
             @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
             @wktime.project_id = find_user_project.first.project_id
             @wktime.status="l2"
-            @wktime.pre_status=@wktime.status
+            @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
             @wktime.hours = @wktime.hours.to_f
             @wktime.statusupdate_on = Date.today
 

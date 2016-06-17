@@ -99,7 +99,7 @@
                  <% date1_entry = Wktime.where(:begin_date=> day,:status=> "l1",:user_id=>params[:user_id], :project_id =>  accessable_projects(project_ids, 'l1').uniq)  %>
                 <% status = date1_entry.present? %>
                 <% date1_entry1 = Wktime.where(:begin_date=> (@startday..@startday+6),:status=> "l3",:user_id=>params[:user_id]).count  %>
-
+<%= @startday+i %>
                 <% l2_status = check_l2_status(params[:user_id],@startday+i) %>
                 <% expire_time = check_expire_for_l1(params[:user_id],@startday+i) %>
                 <% current_user = User.where(:id=> params[:user_id]).last %>
@@ -124,7 +124,7 @@
 
                     <% status = "l2" %>
                     <%= hidden_field_tag 'approved_days[]', @startday+i,{ :class=>"approval-checkbox approval-checkbox_#{status}",:style=>"display:none",:rowvalue => "#{i+1 }",:onclick=>"check('#{status}')"}-%>
-                <%elsif (check_bio_permission_list_user_id_project_id('l1',params[:user_id],project_ids,@startday)) && !l2_status.present? && expire_time %>
+                <%elsif (check_bio_permission_list_user_id_project_id('l1',params[:user_id],project_ids,@startday)) && !l2_status.present? && (expire_time != true) %>
 
                     <%= check_box_tag 'approved_days[]', @startday+i, false , :class=>"approval-checkbox approval-checkbox_#{status}",:rowvalue => "#{i+1}",:onclick=>"check('#{status}');"-%>
 
@@ -190,7 +190,7 @@
                 <%end %>
 
 
-                <% elsif (check_bio_permission_list_user_id_project_id('l2',params[:user_id],project_ids,@startday)) %>
+                <% elsif (check_bio_permission_list_user_id_project_id('l2',params[:user_id],project_ids,@startday)  && !check_l3_status_for_week == true) %>
 
                     <% if ((params[:user_id].to_i==User.current.id.to_i) && check_work_days_for_week.present? && !check_l2_status_for_week == true )   %>
                         <%= link_to 'l2_present', "",:style=>"display:none;",:id=>"l2_present" %>
@@ -214,7 +214,13 @@
         <% if !Setting.plugin_redmine_wktime[:wktime_use_approval_system].blank? &&
                 Setting.plugin_redmine_wktime[:wktime_use_approval_system].to_i == 1 %>
             <% @l1 = Wktime.where(:begin_date=>@startday,:user_id=>params[:id],:status=>"l1") %>
-            <% if  check_bio_permission_list_user_id_project_id('l2',params[:user_id],project_ids,@startday) %>
+
+        <% if  check_bio_permission_list_user_id_project_id('l3',params[:user_id],project_ids,@startday) %>
+            <% if controller.check_approvable_status_l3_week(@startday)  %>
+                <%= submit_tag l(:button_wk_disapprove),:name => 'wktime_unapprove',:id=>"wktime_unapprove"  %>
+            <% end %>
+
+        <% elsif  check_bio_permission_list_user_id_project_id('l2',params[:user_id],project_ids,@startday) %>
                 <% if controller.check_approvable_status_l2(@startday)  %>
                     <%= submit_tag l(:button_wk_disapprove),:name => 'wktime_unapprove',:id=>"wktime_unapprove"  %>
                 <% end %>

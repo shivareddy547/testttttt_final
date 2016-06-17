@@ -11,7 +11,8 @@ class CreateNcHistories < ActiveRecord::Migration
       t.integer :project_l2
       t.integer :project_l3
       t.date :date
-      t.integer :nc_master_id
+      t.string :nc_master_id
+      t.string :nc_create_for
 
       t.timestamps
     end

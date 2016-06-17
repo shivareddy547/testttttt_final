@@ -985,6 +985,15 @@ class WktimeController < ApplicationController
       return true
     end
   end
+  def check_approvable_status_l3_week(startday)
+    # startday = startday.beginning_of_month
+    # end_day = startday.end_of_month
+    end_day = (startday + 6)
+    @status = Wktime.where(begin_date: startday..end_day,status: "l3")
+    if @status.present?
+      return true
+    end
+  end
   def check_approvable_status_home_l2(startday,end_day)
     @status = Wktime.where(begin_date: startday..end_day,status: "l2")
     if @status.present?
