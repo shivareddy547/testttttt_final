@@ -137,7 +137,8 @@ class IniaServiceController < ApplicationController
 
         find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
         if !find_l2_entries.present? || (find_l2_entries.count <= (start_date..end_date).to_a.count)
-          find_user_project = Member.where(:user_id=>each_user.id).order('max(capacity) DESC').limit(1)
+          find_user_project = Member.find_by_sql("select * from members where user_id=530 order by capacity DESC limit 1")
+
           # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
           # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
