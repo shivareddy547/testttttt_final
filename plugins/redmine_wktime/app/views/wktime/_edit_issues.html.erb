@@ -99,7 +99,7 @@
                  <% date1_entry = Wktime.where(:begin_date=> day,:status=> "l1",:user_id=>params[:user_id], :project_id =>  accessable_projects(project_ids, 'l1').uniq)  %>
                 <% status = date1_entry.present? %>
                 <% date1_entry1 = Wktime.where(:begin_date=> (@startday..@startday+6),:status=> "l3",:user_id=>params[:user_id]).count  %>
-<%= @startday+i %>
+<%#= @startday+i %>
                 <% l2_status = check_l2_status(params[:user_id],@startday+i) %>
                 <% expire_time = check_expire_for_l1(params[:user_id],@startday+i) %>
                 <% current_user = User.where(:id=> params[:user_id]).last %>
