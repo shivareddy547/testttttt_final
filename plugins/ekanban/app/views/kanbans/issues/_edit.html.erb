@@ -42,7 +42,7 @@
               </div>
               <% reason = wktime_helper.flexioff_reasons.collect{|x|x[0]}.include?(@time_entry.flexioff_reason) ? @time_entry.flexioff_reason : 'Others'  %>
               <div class="splitcontentright">
-                <p><%= time_entry.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,:selected => @time_entry.flexioff_reason.present? ? reason : ''), :required => true  %>
+                <p><%= time_entry.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,:selected => @time_entry.flexioff_reason.present? ? reason : ''), {:prompt => '--- Select ---',:required => true}  %>
                   <span id="flexi_others" name="<%=@time_entry.flexioff_reason %>"></span>
                 </p>
               </div>

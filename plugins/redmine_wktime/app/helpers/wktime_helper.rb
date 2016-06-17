@@ -340,7 +340,7 @@ module WktimeHelper
   def getKey(entry,unitLabel)
     cf_in_row1_value = nil
     cf_in_row2_value = nil
-    key = entry.project.id.to_s + (entry.issue.blank? ? '' : entry.issue.id.to_s) + entry.activity.id.to_s + (unitLabel.blank? ? '' : entry.currency)
+    key = entry.project.id.to_s + (entry.issue.blank? ? '' : entry.issue.id.to_s) +(entry.work_location.nil? ? '' : entry.work_location)+(entry.flexioff_reason.nil? ? '' : entry.flexioff_reason) + entry.activity.id.to_s + (unitLabel.blank? ? '' : entry.currency)
     entry.custom_field_values.each do |custom_value|
       custom_field = custom_value.custom_field
       if (!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].blank? &&	Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].to_i == custom_field.id)

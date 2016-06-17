@@ -23,7 +23,7 @@
   <% wktime_helper = Object.new.extend(WktimeHelper) %>
   <p><%= f.select :work_location, options_for_select(wktime_helper.timeEntry_location, :selected => @time_entry.work_location), :required => true %></p>
   <% reason = wktime_helper.flexioff_reasons.collect{|x|x[0]}.include?(@time_entry.flexioff_reason) ? @time_entry.flexioff_reason : 'Others'  %>
-  <p><%= f.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason.present? ? reason : ''), {:required => true} %>
+  <p><%= f.select :flexioff_reason, options_for_select(wktime_helper.flexioff_reasons,  :selected => @time_entry.flexioff_reason.present? ? reason : ''), {:prompt => '--- Select ---', :required => true} %>
     <span id="flexi_others" name="<%=@time_entry.flexioff_reason %>"></span>
   </p>
   <% @time_entry.custom_field_values.each do |value| %>
