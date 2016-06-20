@@ -1238,7 +1238,8 @@ p 1111111111111111111111111111111111111111111111111111111111111
           end
           j = 0
           ids.each_with_index do |id, k|
-            if disabled[k] == "false"
+            # if disabled[k] == "false"
+            if check_time_log_entry(@startday + k, User.find(params[:user_id]))
               if(!id.blank? || !hours[j].blank?)
                 teEntry = nil
                 teEntry = getTEEntry(id)

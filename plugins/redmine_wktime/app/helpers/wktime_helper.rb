@@ -1762,13 +1762,16 @@ p user_id.to_i
 p User.current.id
 p is_l2?(user_id,project_ids)
 p "++++++=end ++++++"
-
+p "+++++++++==start_datestart_datestart_date+++++++++"
+p start_date
+p "++++++++++++++++"
       if (l == "l1")
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
         if check_l1.present? && !check_l2.present?
           return true
         end
+
         #&& check_expire_for_l2(start_date)
       elsif(l == "l2") && check_expire_for_l2(start_date)
         if @all_roles.include? l.to_sym
@@ -1817,15 +1820,15 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
    wktime_helper = Object.new.extend(WktimeHelper)
    current_time = wktime_helper.set_time_zone(Time.now)
    expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
-   deadline_date = UserUnlockEntry.dead_line_final_method
+   deadline_date = UserUnlockEntry.dead_line_final_method_l1
    if deadline_date.present?
       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
    end
-   expire_time = expire_time+7*60*60
+   # expire_time = expire_time+7*60*60
 
 p expire_time
 p "+++++++++++++++end ++++++++"
-   if date > deadline_date
+   if date < deadline_date
 
      return true
 
@@ -1948,7 +1951,7 @@ p "+++++++++++++++end ++++++++"
   # end
 
   def check_expire_for_l2(date)
-    date=(Date.today-4).at_beginning_of_week
+    # date=(Date.today-4).at_beginning_of_week
     # end_date=start_date.at_end_of_week
 
     days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2'].to_i
@@ -1964,6 +1967,7 @@ p "+++++++++++++++end ++++++++"
 p "+++++++++++++++++++l2 222222222222222222"
     p date
     p deadline_date
+
     if (date+5)  > deadline_date
 
       return true
@@ -2465,6 +2469,10 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
   def create_nc_for_l1_within_unlock_sla(date,user_id)
     a = []
     nc_id = "TEP_NC_014"
+    p "++++user ++++++++++++"
+    p user_id
+    p date
+    p "+++++++++end ++++++++++"
     User.where(:id=>user_id).each do |each_user|
 
       # find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
@@ -2503,12 +2511,12 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
             nc_history.date = date
             nc_history.reason = "L1 fails to ensure that the respective employee fails to correct the time entry within the defined timeline."
             nc_history.nc_master_id = master_id.present? ? master_id.nc_id : ""
-            nc_history.nc_created_for = each_user.id
+            nc_history.nc_create_for = each_user.id
             nc_history.save
           end
 
         end
-        raise
+
       end
 
 

@@ -119,8 +119,10 @@ $(document).ready(function() {
         }
     });
 
-$('.flexi_reason a').hide();
-    $('.flexi_reason select').each(function(){
+
+
+    $('.flexi_reason a').hide();
+        $('.flexi_reason select').each(function(){
        if ($(this).is(':visible') && $(this).find(":selected").text()=='Others' ) {
            $(this).closest('tr').find('.flexi_reason').find('a').show();
        }else{
@@ -340,8 +342,10 @@ function activityChanged(obj)
 
         if ($('.flexi_reason select:visible').length > 0){
             $('.flexi_reason').show();
+//            $('#check_flexi_visible').show()
         }else{
             $('.flexi_reason').hide();
+            $('#check_flexi_visible').hide()
         }
 
 }
@@ -651,10 +655,18 @@ function addRow(){
     var cellCount = issueTemplate.rows[0].cells.length;
     var i, cell;
     for(i=0; i < cellCount; i++){
+        col_name = issueTemplate.rows[0].cells[i].className;
+        var me = false
+        if (col_name=='flexi_reason' && !$('.flexi_reason').is(':visible')){
+            var me = true
+        }
         cell = row.insertCell(i);
         cell.innerHTML = issueTemplate.rows[0].cells[i].innerHTML.replace(/__template__/g, '');
         cell.className = issueTemplate.rows[0].cells[i].className;
         cell.align = issueTemplate.rows[0].cells[i].align;
+        if (me){
+            $('.flexi_reason').hide();
+        }
     }
     renameElemProperties(row, 0, rowCount- (headerRows + footerRows - 1));
     //saveButton.disabled = false;

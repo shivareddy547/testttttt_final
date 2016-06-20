@@ -81,6 +81,7 @@
     <td class="issue"></td>
     <td class="activity"></td>
    <td></td>
+    <td id="check_flexi_visible"></td>
     <% if !Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].blank? &&
             Setting.plugin_redmine_wktime['wktime_enter_comment_in_row'].to_i == 1 %>
     <td class="comments"></td>
@@ -251,5 +252,14 @@
 //            $( this ).find("input").prop('disabled', true);
           $( this ).find("input").css('display', "none");$( this ).find("a").attr("href", "javascript:void(0)");
         });});
+
+        $(document).ready(function(){
+            $('#check_flexi_visible').css('display', 'none')
+            if ($('.flexi_reason').is(':visible')){
+                $('#check_flexi_visible').show()
+            }else{
+                $('#check_flexi_visible').hide()
+            }
+        })
 
 </script>
