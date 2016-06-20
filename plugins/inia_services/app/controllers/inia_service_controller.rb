@@ -53,6 +53,12 @@ class IniaServiceController < ApplicationController
           end
 
         end
+
+        if @time_entry.hours.to_i <= 0
+          @time_entry.delete
+
+        end
+
       end
     else
       errors << " Leave can not create for the category..!"
@@ -62,7 +68,7 @@ class IniaServiceController < ApplicationController
     if errors.present?
       render_json_errors(errors.join(','))
     else
-      render_json_ok(@time_entry)
+      render_json_ok(TimeEntry.last)
     end
 
   end

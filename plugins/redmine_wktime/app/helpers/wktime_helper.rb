@@ -1773,7 +1773,7 @@ p "++++++++++++++++"
         end
 
         #&& check_expire_for_l2(start_date)
-      elsif(l == "l2") && check_expire_for_l2(start_date)
+      elsif(l == "l2")
         if @all_roles.include? l.to_sym
           return true
         end
