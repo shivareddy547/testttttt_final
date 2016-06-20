@@ -971,9 +971,26 @@ class WktimeController < ApplicationController
     end
   end
   def check_approvable_status_l2(startday)
+    p "++++++++++++start +++++++++++++++++date +++++++++++++++++"
+    p startday
+    p "++++++++++++++++++++end +++++++++"
     end_day = (startday + 6)
     @status = Wktime.where(begin_date: startday..end_day,status: "l2")
-    if @status.present?
+    # if @status.present?
+    #   @status.each do |delete_rec|
+    #     delete_rec.hours <=0
+    #     delete_rec.delete
+    #
+    #   end
+    # end
+    @status1 = Wktime.where(begin_date: startday..end_day,status: "l1")
+    p "++++++++++++@status +++++++++++++++++date +++++++++++++++++"
+    p @status
+    p "+++++++++statius l1++++++++"
+    p @status1
+  
+    p "++++++++++++++++++++end +++++++++"
+    if @status.present? && @status.count > 5
       return true
     end
   end
@@ -2017,9 +2034,13 @@ end
   end
 
   def update_l1_record(params, approve_day, project)
+
     # @wktime = Wktime.where(:user_id=>params[:user_id],:begin_date=>approve_day.to_date,:hours=>@sum,  :statusupdater_id => User.current.id, :project_id => project.id).first_or_initialize
     # @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_status_and_begin_date(user_id:params[:user_id],project_id:project.id,status: 'l1',begin_date: approve_day)
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
+    p "+++++++++++++++before entry +++++++++++++++++++++++++++++++++"
+    p @wktime
+    p "+++++++++++====end +++++++++"
     @wktime.submitted_on = Date.today
     @wktime.submitter_id = User.current.id
     @wktime.hours = @sum
@@ -2038,6 +2059,10 @@ end
       @wktime.status = 'r'
       @wktime.project_id = project.id
     end
+    p "+++++++++++++++after  entry +++++++++++++++++++++++++++++++++"
+    p @wktime
+    p "+++++++++++====end +++++++++"
+
   end
 
 
@@ -2046,6 +2071,28 @@ end
     #    Wktime.where(:user_id=>params[:user_id],:begin_date=>approve_day.to_date,:hours=>@sum, :project_id => project.id).first_or_initialize
 
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
+
+    # if params[:wktime_approve].present? && @wktime.status !="l2" && @wktime.status !="l3"
+    #   @wktime.pre_status=@wktime.status
+    #   @wktime.status = 'l1'
+    #   @wktime.project_id = project.id
+    # elsif params[:wktime_unapprove].present? && @wktime.status !="l2" && @wktime.status !="l3"
+    #   @wktime.pre_status=@wktime.status
+    #   @wktime.status = 'n'
+    #   @wktime.project_id = project.id
+    # elsif  params[:wktime_reject].present? && @wktime.status != "l2" && @wktime.status !="l3"
+    #   Rejection.create(:user_id => params[:user_id], :project_id => project.id, :rejected_by =>User.current.id, :rejected_role=> 'l1', :comment =>params[:wktime_notes], :date => @wktime.begin_date )
+    #   @wktime.pre_status=@wktime.status
+    #   @wktime.status = 'r'
+    #   @wktime.project_id = project.id
+    # end
+    #
+
+    p "+++++++++++++++before entry +++++++++++++++++++++++++++++++++"
+    p @wktime
+    p "+++++++++++====end +++++++++"
+
+
 
     if params[:wktime_approve].present?
 
@@ -2063,9 +2110,20 @@ end
       @wktime.status = 'r'
       Rejection.create(:user_id => params[:user_id], :project_id => project.id, :rejected_by =>User.current.id, :rejected_role=> 'l2', :comment =>params[:wktime_notes], :date => @wktime.begin_date )
     end
+
+
+
+
+
+
     @wktime.project_id = project.id
     @sum = @sum.present? ? @sum : 0
     @wktime.hours = @sum
+
+
+    p "+++++++++++++++afer entry +++++++++++++++++++++++++++++++++"
+    p @wktime
+    p "+++++++++++====end +++++++++"
   end
 
   # L3 approval
