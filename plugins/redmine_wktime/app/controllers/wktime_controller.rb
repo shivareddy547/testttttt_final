@@ -1014,14 +1014,20 @@ class WktimeController < ApplicationController
 # to change the status to locked user to unlock
   def unlock_users
     #@@unlock_status = find_lock_users(params[:user_id])
-
+p 1111111111111111111111111111111111111111111111111111111111111
     @update_unlock_status = update_unlock_details(params)
     @lock_status = UserUnlockEntry.where(:user_id=>params[:user_id])
+    if @update_unlock_status
+     wktime_helper = Object.new.extend(WktimeHelper)
+     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today,params[:user_id])
+    end
+
     respond_to do |format|
       format.html { redirect_to_settings_in_projects }
       format.js
       format.api {
         if @update_unlock_status == true
+
           render_api_ok
         else
           render_validation_errors(@update_unlock_status)

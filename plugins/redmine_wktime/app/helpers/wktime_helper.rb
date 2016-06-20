@@ -2462,9 +2462,10 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
 
 
 
-  def create_nc_for_l1_within_unlock_sla(date,id)
+  def create_nc_for_l1_within_unlock_sla(date,user_id)
     a = []
-    User.active.each do |each_user|
+    nc_id = "TEP_NC_014"
+    User.where(:id=>user_id).each do |each_user|
 
       # find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
       # TimeEntry.where(:user_id=>each_user.id,:spent_on=>date).sum(:hours)
@@ -2490,7 +2491,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
           nc_history_l1= find_user_project.present? ? get_perm_for_project(find_user_project.first.project,'l1') : ""
           if nc_history_l1.present?
             find_user = User.find(get_perm_for_project(find_user_project.first.project,'l1'))
-            master_id = NcMaster.find_by_nc_id("#{id}")
+            master_id = NcMaster.find_by_nc_id("#{nc_id}")
             nc_history = NcHistory.find_or_initialize_by_employee_id_and_project_id_and_date_and_nc_master_id(each_user.employee_id,find_user_project.first.project_id,date,master_id.nc_id)
             nc_history.employee_id = find_user.employee_id
             nc_history.employee_name = find_user.full_name
