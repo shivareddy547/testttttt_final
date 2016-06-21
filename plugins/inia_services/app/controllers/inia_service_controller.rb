@@ -25,6 +25,8 @@ class IniaServiceController < ApplicationController
         # if !check_lock_status_for_week(each_day,@author.id).present?
         #   errors << " Leave can not apply for the #{each_day} , it's locked.!"
         # end
+
+
         @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(@project.first.id,@author.id,@find_activity_id,each_day,@find_issue_id )
         @time_entry.issue_id=@find_issue_id
         @time_entry.comments=  params[:leaveStatus].present?  && params[:leaveStatus]=="Approved" ? params[:leaveDescription] : ""
