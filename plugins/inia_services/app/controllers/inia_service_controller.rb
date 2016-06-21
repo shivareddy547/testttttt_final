@@ -56,13 +56,10 @@ class IniaServiceController < ApplicationController
 
         if @time_entry.hours.to_i <= 0
           @time_entry.delete
-
         end
-
       end
     else
       errors << " Leave can not create for the category..!"
-
     end
 
     if errors.present?
