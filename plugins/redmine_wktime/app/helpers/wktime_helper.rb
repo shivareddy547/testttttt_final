@@ -2466,14 +2466,11 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
 
 
 
-  def create_nc_for_l1_within_unlock_sla(date,user_id)
+  def create_nc_for_l1_within_unlock_sla(date)
     a = []
     nc_id = "TEP_NC_014"
-    p "++++user ++++++++++++"
-    p user_id
-    p date
-    p "+++++++++end ++++++++++"
-    User.where(:id=>user_id).each do |each_user|
+
+    User.active.each do |each_user|
 
       # find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
       # TimeEntry.where(:user_id=>each_user.id,:spent_on=>date).sum(:hours)
@@ -2585,7 +2582,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
     start_date=(Date.today-3).at_beginning_of_week
     end_date=start_date.at_end_of_week
 
-    User.where(:id=>530).each do |each_user|
+    User.active.each do |each_user|
 
       find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
       if !find_l2_entries.present?
@@ -2629,7 +2626,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
     # start_date=(Date.today-3).at_beginning_of_week
     # end_date=start_date.at_end_of_week
 
-    User.where(:id=>530).each do |each_user|
+    User.active.each do |each_user|
 
       find_l2_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
       if !find_l2_entries.present?
@@ -2667,7 +2664,6 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
       end
 
     end
-
 
 
 

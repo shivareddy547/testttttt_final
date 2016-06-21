@@ -279,7 +279,7 @@ class WktimeController < ApplicationController
         if errorMsg.blank? && (!params[:wktime_save].blank? ||
             (!params[:wktime_submit].blank?))
           if !@wktime.nil? && ( @wktime.status == 'n' || @wktime.status == 'r' || @wktime.status == 'l1' || @wktime.status == 'l2' || @wktime.status == 'l3')
-           p 0000000000000000000000000000000000000000000000000000
+
             if (!@wktime.status == 'l1' || !@wktime.status == 'l2' || !@wktime.status == 'r' || !@wktime.status == 'l3')
               @wktime.status = :n
             end
@@ -484,9 +484,7 @@ class WktimeController < ApplicationController
         params[:enddate] = deadline_date
       end
       @approved_dates << (params[:startdate].to_date..params[:enddate].to_date).to_a
-      p "++++++++++==@approved_dates++++++++++++="
-      p @approved_dates
-      p "+++++++++++++end +++++++++++++"
+
       approved_dates = @approved_dates.flatten
       @user_ids.each do |each_user|
         approved_dates.each do |each_date|
@@ -971,9 +969,7 @@ class WktimeController < ApplicationController
     end
   end
   def check_approvable_status_l2(startday)
-    p "++++++++++++start +++++++++++++++++date +++++++++++++++++"
-    p startday
-    p "++++++++++++++++++++end +++++++++"
+
     end_day = (startday + 6)
     @status = Wktime.where(begin_date: startday..end_day,status: "l2")
     # if @status.present?
@@ -984,12 +980,9 @@ class WktimeController < ApplicationController
     #   end
     # end
     @status1 = Wktime.where(begin_date: startday..end_day,status: "l1")
-    p "++++++++++++@status +++++++++++++++++date +++++++++++++++++"
-    p @status
-    p "+++++++++statius l1++++++++"
-    p @status1
+
   
-    p "++++++++++++++++++++end +++++++++"
+
     if @status.present? && @status.count > 5
       return true
     end
@@ -1036,7 +1029,7 @@ p 1111111111111111111111111111111111111111111111111111111111111
     @lock_status = UserUnlockEntry.where(:user_id=>params[:user_id])
     if @update_unlock_status
      wktime_helper = Object.new.extend(WktimeHelper)
-     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today,params[:user_id])
+     wktime_helper.create_nc_for_employee_within_unlock_sla(Date.today,"TEP_NC_014",params[:user_id])
     end
 
     respond_to do |format|

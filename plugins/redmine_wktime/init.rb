@@ -153,136 +153,136 @@ Rails.configuration.to_prepare do
     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
   end
 
-#
-#   require 'rufus/scheduler'
-#   scheduler = Rufus::Scheduler.new
-#   week_time = '0 22
-#  * * 2'
-#   # week_time = '13 18 6 * *'
-#   scheduler.cron  week_time do
-#     # do something every day, five minutes after midnight
-#     # (see "man 5 crontab" in your terminal)
-#     p "==========Scheduler Started for attendance report week=========="
-#     wktime_helper = Object.new.extend(WktimeHelper)
-#     start_date=(Date.today-3).at_beginning_of_week
-#     end_date=start_date.at_end_of_week-2
-#     wktime_helper.get_new_attendance(start_date,end_date)
-#     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-#   end
-#
-#
-# # Employee timeentry nc creation.
-#
-#   require 'rufus/scheduler'
-#
-#   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-#   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day']
-#   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr']
-#   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min']
-#   scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-#   if hr == '0' && min == '0'
-#     cronSt = "0 * * * *"
-#   else
-#     cronSt = "#{min} #{hr} * * *"
-#   end
-#   # cronSt= "45 23 * * *"
-#   scheduler.cron cronSt do
-#
-#     wktime_helper = Object.new.extend(WktimeHelper)
-#     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_004")
-#
-#   end
-#
-# # L1 approval nc creation
-#
-#   require 'rufus/scheduler'
-#
-#   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-#   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
-#   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
-#   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-#   scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-#   if hr == '0' && min == '0'
-#     cronSt = "0 * * * *"
-#   else
-#     cronSt = "#{min} #{hr} * * *"
-#   end
-#   # cronSt= "45 23 * * *"
-#   scheduler.cron cronSt do
-#
-#     wktime_helper = Object.new.extend(WktimeHelper)
-#     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_007")
-#     wktime_helper = Object.new.extend(WktimeHelper)
-#     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_007")
-#
-#   end
-#
-#
-#   #L2 approval nc creation
-#
-#   require 'rufus/scheduler'
-#
-#   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-#   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
-#   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
-#   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-#   scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-#   if hr == '0' && min == '0'
-#     cronSt = "0 * * * *"
-#   else
-#     cronSt = "#{min} #{hr} * * *"
-#   end
-#   # cronSt= "45 23 * * *"
-#   scheduler.cron cronSt do
-#
-#     wktime_helper = Object.new.extend(WktimeHelper)
-#     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_004")
-#
-#   end
-#
+
+  require 'rufus/scheduler'
+  scheduler = Rufus::Scheduler.new
+  week_time = '0 22 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    p "==========Scheduler Started for attendance report week=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    wktime_helper.get_new_attendance(start_date,end_date)
+    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
 
 
+# Employee timeentry nc creation.
 
-  Rails.configuration.to_prepare do
-    if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
-        require 'rufus/scheduler'
+  require 'rufus/scheduler'
 
-          # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-          day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
-          hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
-          min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-          scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-          if hr == '0' && min == '0' && day== '0'
-            cronSt = "0 * * * *"
-          else
-            cronSt = "#{min} #{hr} #{day} * *"
-          end
-          cronSt= "43 23 * * *"
-          scheduler.cron cronSt do
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_nonlog_day']
+  hr = Setting.plugin_redmine_wktime['wktime_nonlog_hr']
+  min = Setting.plugin_redmine_wktime['wktime_nonlog_min']
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  if hr == '0' && min == '0'
+    cronSt = "0 * * * *"
+  else
+    cronSt = "#{min} #{hr} * * *"
+  end
+  # cronSt= "45 23 * * *"
+  scheduler.cron cronSt do
 
-p 55555555555555555555555555555555555555555555555555555555
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_004")
 
-          end
+  end
+
+# L1 approval nc creation
+
+  require 'rufus/scheduler'
+
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
+  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
+  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  if hr == '0' && min == '0'
+    cronSt = "0 * * * *"
+  else
+    cronSt = "#{min} #{hr} * * *"
+  end
+  # cronSt= "45 23 * * *"
+  scheduler.cron cronSt do
+
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.create_nc_for_l1_within_sla(Date.today-day,"TEP_NC_007")
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_023")
+
+  end
 
 
-    end
+  #L2 approval nc creation
+
+  require 'rufus/scheduler'
+
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
+  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
+  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
+  date = Date.parse(day)
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  if hr == '0' && min == '0'
+    cronSt = "0 * * * *"
+  else
+    cronSt = "#{min} #{hr} * * #{date.wday}"
+  end
+  # cronSt= "45 23 * * *"
+  scheduler.cron cronSt do
+
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.create_nc_for_l2_within_sla(Date.today-day,"TEP_NC_022")
+
   end
 
 
 
-
-  Rails.configuration.to_prepare do
-    if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
-      require 'rufus/scheduler'
-
-      if (!Setting.plugin_redmine_wktime['wktime_use_approval_system'].blank? && Setting.plugin_redmine_wktime['wktime_use_approval_system'].to_i == 1)
-        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-
-      end
-
-
-    end
-  end
+#
+#   Rails.configuration.to_prepare do
+#     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
+#         require 'rufus/scheduler'
+#
+#           # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+#           day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
+#           hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
+#           min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
+#           scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+#           if hr == '0' && min == '0' && day== '0'
+#             cronSt = "0 * * * *"
+#           else
+#             cronSt = "#{min} #{hr} #{day} * *"
+#           end
+#           cronSt= "43 23 * * *"
+#           scheduler.cron cronSt do
+#
+# p 55555555555555555555555555555555555555555555555555555555
+#
+#           end
+#
+#
+#     end
+#   end
+#
+#
+#
+#
+#   Rails.configuration.to_prepare do
+#     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
+#       require 'rufus/scheduler'
+#
+#       if (!Setting.plugin_redmine_wktime['wktime_use_approval_system'].blank? && Setting.plugin_redmine_wktime['wktime_use_approval_system'].to_i == 1)
+#         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+#
+#       end
+#
+#
+#     end
+#   end
 
 
 
