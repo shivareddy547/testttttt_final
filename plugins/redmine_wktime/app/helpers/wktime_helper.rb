@@ -2575,8 +2575,6 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
     end
   end
 
-
-
   def weekly_approve_notifications(date)
 
     start_date=(Date.today-3).at_beginning_of_week
