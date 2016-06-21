@@ -22,9 +22,9 @@ class IniaServiceController < ApplicationController
     if params[:fromDate].present? && params[:toDate].present? && @find_activity_id.present? && @find_issue_id.present? && (params[:leaveCategory]=="Leave" || params[:leaveCategory]=="OnDuty" )
 
       (params[:fromDate].to_date..params[:toDate].to_date).each do |each_day|
-        if !check_lock_status_for_week(each_day,@author.id).present?
-          errors << " Leave can not apply for the #{each_day} , it's locked.!"
-        end
+        # if !check_lock_status_for_week(each_day,@author.id).present?
+        #   errors << " Leave can not apply for the #{each_day} , it's locked.!"
+        # end
         @time_entry = TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(@project.first.id,@author.id,@find_activity_id,each_day,@find_issue_id )
         @time_entry.issue_id=@find_issue_id
         @time_entry.comments=  params[:leaveStatus].present?  && params[:leaveStatus]=="Approved" ? params[:leaveDescription] : ""
@@ -54,7 +54,7 @@ class IniaServiceController < ApplicationController
 
         end
 
-        if @time_entry.hours.to_i <= 0
+        if @time_entry.present? && @time_entry.hours.to_i <= 0
           @time_entry.delete
         end
       end
@@ -393,8 +393,12 @@ class IniaServiceController < ApplicationController
               @find_issue_id = find_issue.first.id
             else
 
+             l2_mems = Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join roles r on r.id=mr.role_id
+where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
 
-              find_issue = Issue.new(:subject=>"PTO",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>@author.id,:assigned_to_id=>@author.id)
+              find_issue = Issue.new(:subject=>"PTO",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
 
                 @find_issue_id = find_issue.id
@@ -409,9 +413,12 @@ class IniaServiceController < ApplicationController
               @find_issue_id = find_issue.first.id
             else
 
-              find_issue = Issue.new(:subject=>"OnDuty",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>@author.id,:assigned_to_id=>@author.id)
+              l2_mems = Member.find_by_sql("select * from members m
+join member_roles mr on mr.member_id=m.id
+join roles r on r.id=mr.role_id
+where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
+              find_issue = Issue.new(:subject=>"OnDuty",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
-
                 @find_issue_id = find_issue.id
               end
               # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"

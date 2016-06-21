@@ -184,7 +184,7 @@ class UserUnlockEntry < ActiveRecord::Base
     return dead_line_date
   end
 
-  def self.dead_line_final_method_l2
+  def self.dead_line_final_method_l2_ex
     array_days = []
     days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2'].to_i
     collect_dates=[]
@@ -209,7 +209,7 @@ class UserUnlockEntry < ActiveRecord::Base
         array_days << dead_line
         dead_line = (dead_line-1)
       end
-      break if array_days.size > Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2'].to_i
+      break if array_days.size > Setting.plugin_redmine_wktime['wktime_nonapprove_day_l'].to_i
       i += 1
     end
     if array_days.present?

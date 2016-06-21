@@ -1959,16 +1959,21 @@ p "+++++++++++++++end ++++++++"
     setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2'].to_i
     wktime_helper = Object.new.extend(WktimeHelper)
     current_time = wktime_helper.set_time_zone(Time.now)
-    expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
-    deadline_date = UserUnlockEntry.dead_line_final_method_l2
-    if deadline_date.present?
-      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
-    end
-p "+++++++++++++++++++l2 222222222222222222"
-    p date
-    p deadline_date
+    expire_time = wktime_helper.return_time_zone.parse("#{Date.parse(days).year}-#{Date.parse(days).month}-#{Date.parse(days).day} #{setting_hr}:#{setting_min}")
 
-    if (date+5)  > deadline_date
+    # current_time = wktime_helper.set_time_zone(Time.now)
+    expire_time_current = wktime_helper.return_time_zone.parse("#{date.to_date.year}-#{date.to_date.month}-#{date.to_date.day} #{current_time.hour}:#{current_time.min}")
+
+
+#     deadline_date = UserUnlockEntry.get_final_dead_line_l2(Day.parse(days))
+#     if deadline_date.present?
+#       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+#     end
+# p "+++++++++++++++++++l2 222222222222222222"
+#     p date
+#     p deadline_date
+
+    if expire_time_current  > expire_time
 
       return true
 
