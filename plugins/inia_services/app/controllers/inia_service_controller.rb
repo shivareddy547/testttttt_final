@@ -37,8 +37,16 @@ p 5555555555555555555555555555555555
           elsif params[:leaveDuration] == "Half day"
             @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? 4 : 0
           elsif params[:leaveDuration] == "Hours"
-            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? params[:leaveHours].to_f : 0
-
+            p "++++++++++++++leave hours =-++++++++++++++++++++++++++++++++++"
+            p params[:leaveHours].to_f
+          if params[:leaveHours].present?
+            hours = params[:leaveHours].to_s
+             f = hours.to_s.split(':').first
+             s = hours.to_s.split(':').last
+             @total_hrs=(f.to_i*60+s.to_i).to_f/60.to_f
+          end
+            p ":+++++++=end ++++++++++++"
+            @time_entry.hours = params[:leaveStatus].present?  && params[:leaveStatus]=="Approved"  ? "%.2f" % @total_hrs : 0
           end
 
         end
@@ -402,7 +410,10 @@ p 444444444444
 join member_roles mr on mr.member_id=m.id
 join roles r on r.id=mr.role_id
 where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
-
+             p "+++++++++l2_mems++++++++"
+             p l2_mems
+             p @project
+             p "++++++++++++end +++++++++++"
               find_issue = Issue.new(:subject=>"PTO",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
 
@@ -422,6 +433,10 @@ where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
 join member_roles mr on mr.member_id=m.id
 join roles r on r.id=mr.role_id
 where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
+              p "+++++++++l2_mems++++++++"
+              p l2_mems
+              p @project
+              p "++++++++++++end +++++++++++"
               find_issue = Issue.new(:subject=>"OnDuty",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
                 @find_issue_id = find_issue.id
