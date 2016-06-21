@@ -189,6 +189,7 @@ Rails.configuration.to_prepare do
 
     wktime_helper = Object.new.extend(WktimeHelper)
     wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
+    wktime_helper.expire_unlock_history
 
   end
 
@@ -215,6 +216,7 @@ Rails.configuration.to_prepare do
     wktime_helper = Object.new.extend(WktimeHelper)
     wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
     wktime_helper.expire_unlock_history
+    wktime_helper.weekly_approve_l1_notifications(Date.today)
 
   end
 
@@ -239,6 +241,8 @@ Rails.configuration.to_prepare do
     wktime_helper = Object.new.extend(WktimeHelper)
     wktime_helper.create_nc_for_l2_within_sla(Date.today)
     wktime_helper.expire_unlock_history
+    # wktime_helper.weekly_approve_l1_notifications(Date.today)
+
 
   end
 
@@ -260,6 +264,8 @@ Rails.configuration.to_prepare do
   scheduler.cron cronSt do
     wktime_helper = Object.new.extend(WktimeHelper)
     wktime_helper.weekly_auto_approve(Date.today)
+    wktime_helper.expire_unlock_history
+    wktime_helper.weekly_approve_l2_notifications(Date.today)
     # wktime_helper.expire_unlock_history
 
   end

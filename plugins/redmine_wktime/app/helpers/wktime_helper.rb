@@ -2696,38 +2696,28 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
 
   def weekly_approve_l1_notifications(date)
 
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week
+    # start_date=(Date.today-3).at_beginning_of_week
+    # end_date=start_date.at_end_of_week
 
     User.active.each do |each_user|
 
-      find_l1_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l1')
+      find_l1_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l1')
       if !find_l1_entries.present?
         p 111111111111111
         p find_user_project = Member.where(:user_id=>each_user.id).order('m
 ax(capacity) DESC').limit(1);
 
-#         if !find_user_project.present?
-#
-#           find_user_project= Member.find_by_sql("select * from members m
-# join member_roles mr on mr.member_id=m.id
-# join projects p on p.id=m.project_id
-# join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permissions like ''%l2%'' limit 1")
-#
-#         end
-
-
         l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-        l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+        # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
         if l2_user_id.present?
 
-          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+          WkMailer.send_l2_notification(l2_user_id,each_user.id,date,date).deliver
         end
-        if l1_user_id.present?
-
-          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
-        end
+        # if l1_user_id.present?
+        #
+        #   WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+        # end
 
       end
 
@@ -2748,20 +2738,20 @@ ax(capacity) DESC').limit(1);
         p 111111111111111
         p find_user_project = Member.where(:user_id=>each_user.id).order('m
 ax(capacity) DESC').limit(1)
-        l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+        # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
         l3_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
-        if l2_user_id.present?
-          p "++++++++++l2 user ++++++"
-          p User.find(l2_user_id)
-          p "============="
-          WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
-        end
+        # if l2_user_id.present?
+        #   p "++++++++++l2 user ++++++"
+        #   p User.find(l2_user_id)
+        #   p "============="
+        #   WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+        # end
         if l3_user_id.present?
           p "++++++++++l2 user ++++++"
           p User.find(l1_user_id)
           p "============="
-          WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+          WkMailer.send_l2_notification(l3_user_id,each_user.id,start_date,end_date).deliver
         end
 
       end
@@ -2816,7 +2806,7 @@ ax(capacity) DESC').limit(1)
      start_date=(date.to_date-4).at_beginning_of_week
      end_date=start_date.at_end_of_week
 
-    User.where(:id=>530).each do |each_user|
+    User.active.each do |each_user|
 
       find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
 
@@ -2842,7 +2832,6 @@ ax(capacity) DESC').limit(1)
           end
 
         end
-
 
 
 
