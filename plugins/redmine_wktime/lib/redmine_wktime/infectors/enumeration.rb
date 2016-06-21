@@ -10,7 +10,7 @@ module RedmineWktime
         receiver.send(:include, InstanceMethods)
         receiver.class_eval do
           unloadable
-          scope :active, lambda { where(:active => true).where("name NOT IN (?)",'PTO') }
+          # scope :active, lambda { where(:active => true).where("name NOT IN (?)",'PTO') }
           # has_many :rejections, :class_name => 'Rejection', :foreign_key => 'project_id'
         end
       end
