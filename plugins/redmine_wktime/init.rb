@@ -210,9 +210,9 @@ Rails.configuration.to_prepare do
   scheduler.cron cronSt do
 
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_sla(Date.today-day,"TEP_NC_007")
+    wktime_helper.create_nc_for_l1_within_sla(Date.today-day)
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_023")
+    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day)
 
   end
 
@@ -235,7 +235,7 @@ Rails.configuration.to_prepare do
   # cronSt= "45 23 * * *"
   scheduler.cron cronSt do
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l2_within_sla(Date.today-day,"TEP_NC_022")
+    wktime_helper.create_nc_for_l2_within_sla(Date.today-day)
 
   end
 

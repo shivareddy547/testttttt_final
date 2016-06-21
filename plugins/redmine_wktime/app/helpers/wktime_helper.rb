@@ -2337,8 +2337,8 @@ p "+++++++++++++++end ++++++++"
 
 
 
-  def create_nc_for_employee_within_sla(date,id)
-
+  def create_nc_for_employee_within_sla(date)
+id="TEP_NC_004"
     User.active.each do |each_user|
 
       find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
@@ -2419,8 +2419,8 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
   end
 
 
-  def create_nc_for_l1_within_sla(date,id)
-
+  def create_nc_for_l1_within_sla(date)
+id="TEP_NC_007"
     User.active.each do |each_user|
       find_wktime = Wktime.where(:user_id=>each_user.id,:begin_date=>date,:status=>"l1")
       # find_entry = TimeEntry.where(:user_id=>each_user.id,:spent_on=>date)
@@ -2457,7 +2457,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
             nc_history.date = date
             nc_history.reason = master_id.description
             nc_history.nc_master_id = master_id.present? ? master_id.nc_id : ""
-            nc_history.nc_created_for = each_user.id
+            nc_history.nc_create_for = each_user.id
             nc_history.save
           end
         end
@@ -2529,7 +2529,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.name like 
 
 
   def create_nc_for_l2_within_sla(date,id)
-
+    nc_id = "TEP_NC_016"
     start_date=(date.to_date-3).at_beginning_of_week
     end_date=start_date.at_end_of_week
 
@@ -2571,7 +2571,7 @@ join roles r on r.id=mr.role_id where m.user_id=#{each_user.id} and r.permission
           nc_history.date = date
           nc_history.reason = "L2 fails to validate and approve  the time entry within the defined timeline."
           nc_history.nc_master_id = master_id.present? ? master_id.nc_id : ""
-          nc_history.nc_created_for = each_user.id
+          nc_history.nc_create_for = each_user.id
           nc_history.save
 
         end
