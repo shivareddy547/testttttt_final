@@ -1028,9 +1028,10 @@ p 1111111111111111111111111111111111111111111111111111111111111
     @update_unlock_status = update_unlock_details(params)
     @lock_status = UserUnlockEntry.where(:user_id=>params[:user_id])
     if @update_unlock_status
-     wktime_helper = Object.new.extend(WktimeHelper)
-     wktime_helper.create_nc_for_employee_within_unlock_sla(Date.today,"TEP_NC_014",params[:user_id])
+
     end
+  wktime_helper = Object.new.extend(WktimeHelper)
+  wktime_helper.create_nc_for_employee_within_unlock_sla(Date.today,"TEP_NC_014",params[:user_id])
 
     respond_to do |format|
       format.html { redirect_to_settings_in_projects }

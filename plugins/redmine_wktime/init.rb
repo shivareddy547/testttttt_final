@@ -234,12 +234,10 @@ Rails.configuration.to_prepare do
   end
   # cronSt= "45 23 * * *"
   scheduler.cron cronSt do
-
     wktime_helper = Object.new.extend(WktimeHelper)
     wktime_helper.create_nc_for_l2_within_sla(Date.today-day,"TEP_NC_022")
 
   end
-
 
 
 #
