@@ -188,7 +188,7 @@ Rails.configuration.to_prepare do
   scheduler.cron cronSt do
 
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day,"TEP_NC_004")
+    wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
 
   end
 
@@ -206,13 +206,15 @@ Rails.configuration.to_prepare do
   else
     cronSt = "#{min} #{hr} * * *"
   end
-  # cronSt= "45 23 * * *"
+   # cronSt= "12 19 * * *"
   scheduler.cron cronSt do
 
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_sla(Date.today-day)
+    wktime_helper.expire_unlock_history
+    wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day)
+    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+    wktime_helper.expire_unlock_history
 
   end
 
@@ -235,7 +237,30 @@ Rails.configuration.to_prepare do
   # cronSt= "45 23 * * *"
   scheduler.cron cronSt do
     wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l2_within_sla(Date.today-day)
+    wktime_helper.create_nc_for_l2_within_sla(Date.today)
+    wktime_helper.expire_unlock_history
+
+  end
+
+
+  require 'rufus/scheduler'
+
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
+  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
+  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
+  date = Date.parse(day)
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  if hr == '0' && min == '0'
+    cronSt = "0 * * * *"
+  else
+    cronSt = "#{min} #{hr} * * #{date.wday}"
+  end
+  # cronSt= "45 23 * * *"
+  scheduler.cron cronSt do
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.weekly_auto_approve(Date.today)
+    # wktime_helper.expire_unlock_history
 
   end
 
