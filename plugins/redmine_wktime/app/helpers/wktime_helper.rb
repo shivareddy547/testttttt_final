@@ -39,6 +39,9 @@ module WktimeHelper
   end
 
   def statusEntry(entry,user_id)
+
+
+   @admin_user = User.find_by_login("admin")
     startday = entry.spent_on.to_date
     end_day = (startday + 6)
     work_days = []
@@ -68,7 +71,14 @@ module WktimeHelper
     if final_status_l3.present? && final_status_l3.length==1
       status = "l3"
     elsif final_status_l2.present? && final_status_l2.length==1
-      status = "l2"
+      status_admin_l2 = Wktime.where(begin_date: startday.to_date..end_day.to_date,status: "l2",user_id: entry.user_id,:statusupdater_id=>@admin_user.id)
+      if status_admin_l2.present?
+      status = "sl2"
+      else
+        status = "l2"
+      end
+
+      # status = "l2"
     elsif final_status_l1.present? && final_status_l1.length==1
       status = "l1"
     elsif status_r.present? && status_r.length > 4
@@ -82,6 +92,8 @@ module WktimeHelper
         statusStr = l(:wk_status_l1_approved)
       when 'l2'
         statusStr = l(:wk_status_l2_approved)
+      when 'sl2'
+        statusStr = l(:wk_status_syl2_approved)
       when 'l3'
         statusStr = l(:wk_status_l3_approved)
       when 'r'
@@ -2914,6 +2926,8 @@ ax(capacity) DESC').limit(1)
 
       User.active.each do |each_user|
 
+
+        @admin_user = User.find_by_login("Admin")
         find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
         if !find_l2_entries.present? || (find_l2_entries.count <= (start_date..end_date).to_a.count)
           find_user_project = Member.find_by_sql("select * from members where user_id=#{each_user.id} order by capacity DESC limit 1")
@@ -2961,6 +2975,8 @@ ax(capacity) DESC').limit(1)
             @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
             @wktime.hours = @wktime.hours.to_f
             @wktime.statusupdate_on = Date.today
+            @wktime.statusupdater_id =@admin_user.id rescue ""
+            @wktime.notes="System Approved"
 
             if @wktime.save
 
@@ -3094,7 +3110,7 @@ ax(capacity) DESC').limit(1)
   end
 
   def unlock_types
-      [ ['Failed to enter time within SLA','1'], ['Unplanned Leave','2'],
+      [ ['Failed to enter time within SLA','1'], ['Informed/Uninformed Leave','2'],
         ['Task not created/assigned','3'], ['Access not provided',4],
         ['Recorded in wrong task','5'],['System/Application  down','6'], ['Others','0']
       ]
@@ -3107,7 +3123,7 @@ ax(capacity) DESC').limit(1)
     ]
   end
   def timeEntry_location
-    [[ 'Work From Office','Work From Office'], [ 'Work From Home','Work From Home']]
+    [[ 'In Office','In Office'], [ 'Out Of Office','Out Of Office']]
   end
 
 
