@@ -109,7 +109,9 @@
                 <% if !Setting.plugin_redmine_wktime[:wktime_use_approval_system].blank? &&
                         Setting.plugin_redmine_wktime[:wktime_use_approval_system].to_i == 1  %>
                 <% if entries.present? %>
-                 <%#= check_bio_permission_list_project_ids('bio_hours_display',entries.map(&:project_id).uniq).inspect %>
+                 <%#= check_bio_permission_list_proje
+
+                 ct_ids('bio_hours_display',entries.map(&:project_id).uniq).inspect %>
                         <% if (check_bio_permission_list_user_id_project_id('bio_hours_display',params[:user_id],project_ids,@startday) ) %>
                 <span style="color:red">
 

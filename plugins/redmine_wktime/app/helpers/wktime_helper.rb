@@ -3018,13 +3018,13 @@ ax(capacity) DESC').limit(1)
 #       users = User.find_by_sql("select u.id,u.login,u.firstname,u.lastname from users u
 #   join user_official_infos uo on u.id=uo.user_id where uo.employee_id in (#{params[:employeeIds]})")
 
-
+    @admin_user = User.find_by_login("Admin")
       User.active.each do |each_user|
 
 
-        @admin_user = User.find_by_login("Admin")
+
         find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
-        if !find_l2_entries.present? || (find_l2_entries.count <= (start_date..end_date).to_a.count)
+        if !find_l2_entries.present? || (find_l2_entries.count < (start_date..end_date).to_a.count)
           find_user_project = Member.find_by_sql("select * from members where user_id=#{each_user.id} order by capacity DESC limit 1")
 
           # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
