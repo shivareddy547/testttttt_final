@@ -1637,6 +1637,7 @@ module WktimeHelper
         get_result["bio_hours"]= each_rec["worktime_hhmm"]
         result2 << get_result
       else
+
         s={}
         s["employee_id"]=each_rec["userid"].to_i
         s["day"]=each_rec["processdate"].to_date
@@ -1644,6 +1645,7 @@ module WktimeHelper
         s["approval_status"]="n"
         s["spent_hours"]=0
         s["bio_hours"]=each_rec["worktime_hhmm"]
+        s["department"]= get_department(each_rec["userid"].to_i)
 
         result3 << s
 
@@ -1651,10 +1653,18 @@ module WktimeHelper
 
     end
 
+
+    p "+++++++++++result3++++++++++++++++++++++++"
+    p result3
+    p "++++++++++"
+    p "++++++++++++++++result 2++++++++++"
+    p result2
+    p "++++++++++++++++++=end +++++++++++++++++"
+
     result = result3 + result2
     result= result.sort_by { |hsh| hsh["employee_id"].to_i }
-    start_date = Date.today-3
-    end_date = Date.today
+    # start_date = Date.today-3
+    # end_date = Date.today
 
     workbook = WriteExcel.new('ruby.xls')
     worksheet  = workbook.add_worksheet
@@ -1820,11 +1830,19 @@ module WktimeHelper
       j=each_rec["employee_id"]
     end
     if workbook.close
-    WkMailer.send_attendance_report(start_date,end_date).deliver
+    # WkMailer.send_attendance_report(start_date,end_date).deliver
     end
 
   end
 
+  def get_department(emp_id)
+    user_info = UserOfficialInfo.where(:employee_id=>emp_id)
+    if user_info.present?
+     return user_info.first.department
+    else
+     return ""
+    end
+  end
 
 
   def check_bio_permission_list_user_id_project_id(l,user_id,project_ids,start_date)
@@ -2310,7 +2328,7 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
 
     if entry.present?
       find_entry = TimeEntry.find(entry.id)
-      if find_entry.activity.name=="PTO" && find_entry.hours > 0
+      if (find_entry.activity.name=="PTO" || find_entry.activity.name=="OnDuty") && find_entry.hours > 0
         return true
       else
         return false

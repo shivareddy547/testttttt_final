@@ -60,7 +60,7 @@
         %>
         <%#if this is from a previous template, don't print the hours%>
         <td class="hours" style="<%= color %>">
-        <% if  !is_pto_activity(entry) %>
+        <% if  is_pto_activity(entry) %>
                   <%= entry.hours unless entry.nil?%>
                       <%=h text_field_tag('hours' + @row.to_s() +'[]', entry.nil? || @prev_template ? '' : ("%.2f" % entry.hours) ,:size => 7,
                                           :disabled => status,:class=>"row_#{@wday_index}",
