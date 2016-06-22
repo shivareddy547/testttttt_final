@@ -1059,6 +1059,38 @@ module WktimeHelper
 
   end
 
+
+  def check_time_log_entry_l3(select_time)
+    days = 0
+    setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l3'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l3'].to_i
+    wktime_helper = Object.new.extend(WktimeHelper)
+    current_time = wktime_helper.set_time_zone(Time.now)
+    # week_current_time = wktime_helper.set_time_zone(Time.now)
+    week_day = DateTime.parse(Setting.plugin_redmine_wktime['wktime_nonapprove_day_l3'])
+    p "++++++++=week_day+++++++++"
+    p week_day
+    p "++++++++++++"
+    # week_expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+
+    expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+    deadline_date = UserUnlockEntry.dead_line_final_method
+    if deadline_date.present?
+      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+    end
+
+
+
+    if  expire_time > current_time
+
+      return true
+    else
+
+      return false
+    end
+
+  end
+
   def check_time_log_entry_for_approve(select_time,current_user)
     days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
     setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
@@ -1848,7 +1880,7 @@ p "++++++++++++++++"
         if @all_roles.include? l.to_sym
           return true
         end
-      elsif(l == "l3") && is_l2?(user_id,project_ids)
+      elsif(l == "l3") && is_l2?(user_id,project_ids) && check_expire_for_l3(start_date)
 
         if @all_roles.include? l.to_sym
           return true
@@ -2041,6 +2073,23 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
     end
   end
 
+
+  def check_expire_for_l3(date)
+    #
+    current_start_date=Date.today.at_beginning_of_week
+    current_end_date=Date.today.at_end_of_week
+    if check_time_log_entry_l3(Date.today) == true || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
+      pre_start_date=(Date.today-4).at_beginning_of_week
+      pre_end_date=Date.today
+      current_start_date=Date.today.at_beginning_of_week
+      current_end_date=Date.today.at_end_of_week
+
+      if (pre_start_date..pre_end_date).to_a.include?(date.to_date+1) || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
+        return true
+
+      end
+    end
+  end
 
 
   def found_issues(current_issues,entry)
