@@ -1002,10 +1002,10 @@ module WktimeHelper
 
 
 
-  def check_time_log_entry_l2(select_time,current_user)
-    days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
-    setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
-    setting_min = Setting.plugin_redmine_wktime['wktime_nonlog_min'].to_i
+  def check_time_log_entry_l1(select_time)
+    days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
+    setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1'].to_i
     wktime_helper = Object.new.extend(WktimeHelper)
     current_time = wktime_helper.set_time_zone(Time.now)
     expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
@@ -1013,24 +1013,43 @@ module WktimeHelper
     if deadline_date.present?
       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
     end
-    # lock_status = UserUnlockEntry.where(:user_id=>current_user.id)
-    # if lock_status.present?
-    #   lock_status_expire_time = lock_status.last.expire_time
-    #   if lock_status_expire_time.to_date <= expire_time.to_date
-    #     lock_status.delete_all
-    #   end
-
-    # entry_status =  TimeEntry.where(:user_id=>current_user.id,:spent_on=>select_time.to_date.strftime('%Y-%m-%d').to_date)
-    # wiki_status_l1=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l1")
-    # wiki_status_l2=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l2")
-    # wiki_status_l3=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l3")
-    # permanent_unlock = PermanentUnlock.where(:user_id=>current_user.id)
 
     if ((select_time.to_date > deadline_date.to_date ) )
 
       return true
 
     elsif (select_time.to_date == deadline_date.to_date && expire_time > current_time)
+
+      return true
+    else
+
+      return false
+    end
+
+  end
+
+  def check_time_log_entry_l2(select_time)
+    days = 0
+    setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2'].to_i
+    wktime_helper = Object.new.extend(WktimeHelper)
+    current_time = wktime_helper.set_time_zone(Time.now)
+    # week_current_time = wktime_helper.set_time_zone(Time.now)
+    week_day = DateTime.parse(Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2'])
+    p "++++++++=week_day+++++++++"
+    p week_day
+    p "++++++++++++"
+    # week_expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+
+    expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+    deadline_date = UserUnlockEntry.dead_line_final_method
+    if deadline_date.present?
+      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+    end
+
+
+
+    if  expire_time > current_time
 
       return true
     else
@@ -1824,8 +1843,8 @@ p "++++++++++++++++"
           return true
         end
 
-        #&& check_expire_for_l2(start_date)
-      elsif(l == "l2")
+
+      elsif(l == "l2") && check_expire_for_l2(start_date)
         if @all_roles.include? l.to_sym
           return true
         end
@@ -1864,38 +1883,43 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
   end
 
   def check_expire_for_l1(user_id,date)
+#
+#     days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
+#     setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1'].to_i
+#     setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1'].to_i
+#    wktime_helper = Object.new.extend(WktimeHelper)
+#    current_time = wktime_helper.set_time_zone(Time.now)
+#    expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+#    deadline_date = UserUnlockEntry.dead_line_final_method_l1
+#    if deadline_date.present?
+#       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+#    end
+#    # expire_time = expire_time+7*60*60
+#
+# p expire_time
+# p "+++++++++++++++end ++++++++"
+#    if date < deadline_date
+#
+#      return true
+#
+#    else
+#      return false
+#    end
 
-
-    days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
-    setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1'].to_i
-    setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1'].to_i
-   wktime_helper = Object.new.extend(WktimeHelper)
-   current_time = wktime_helper.set_time_zone(Time.now)
-   expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
-   deadline_date = UserUnlockEntry.dead_line_final_method_l1
-   if deadline_date.present?
-      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
-   end
-   # expire_time = expire_time+7*60*60
-
-p expire_time
-p "+++++++++++++++end ++++++++"
-   if date < deadline_date
-
-     return true
-
-   else
-     return false
-   end
-
-
+    if check_time_log_entry_l1(date) == false
+      # start_date=(Date.today-4).at_beginning_of_week
+      # end_date=start_date.at_end_of_week
+      # if (start_date..end_date).to_a.include?(date)
+      #   return true
+      #
+      # end
+      return true
+    end
 
   end
 
 
-
   def check_expire_for_l12(user_id,date)
-
 
     days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
     setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
@@ -1917,8 +1941,6 @@ p "+++++++++++++++end ++++++++"
     else
       return false
     end
-
-
 
   end
 
@@ -2003,36 +2025,20 @@ p "+++++++++++++++end ++++++++"
   # end
 
   def check_expire_for_l2(date)
-    # date=(Date.today-4).at_beginning_of_week
-    # end_date=start_date.at_end_of_week
+    #
+    current_start_date=Date.today.at_beginning_of_week
+    current_end_date=Date.today.at_end_of_week
+    if check_time_log_entry_l2(Date.today) == true || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
+      pre_start_date=(Date.today-4).at_beginning_of_week
+      pre_end_date=Date.today
+      current_start_date=Date.today.at_beginning_of_week
+      current_end_date=Date.today.at_end_of_week
 
-    days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2'].to_i
-    setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2'].to_i
-    setting_min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2'].to_i
-    wktime_helper = Object.new.extend(WktimeHelper)
-    current_time = wktime_helper.set_time_zone(Time.now)
-    expire_time = wktime_helper.return_time_zone.parse("#{Date.parse(days).year}-#{Date.parse(days).month}-#{Date.parse(days).day} #{setting_hr}:#{setting_min}")
+      if (pre_start_date..pre_end_date).to_a.include?(date.to_date+1) || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
+            return true
 
-    # current_time = wktime_helper.set_time_zone(Time.now)
-    expire_time_current = wktime_helper.return_time_zone.parse("#{date.to_date.year}-#{date.to_date.month}-#{date.to_date.day} #{current_time.hour}:#{current_time.min}")
-
-
-#     deadline_date = UserUnlockEntry.get_final_dead_line_l2(Day.parse(days))
-#     if deadline_date.present?
-#       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
-#     end
-# p "+++++++++++++++++++l2 222222222222222222"
-#     p date
-#     p deadline_date
-
-    if expire_time_current  > expire_time
-
-      return true
-
-    else
-      return false
+      end
     end
-
   end
 
 
