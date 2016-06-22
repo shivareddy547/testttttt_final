@@ -1009,10 +1009,14 @@ module WktimeHelper
     wktime_helper = Object.new.extend(WktimeHelper)
     current_time = wktime_helper.set_time_zone(Time.now)
     expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
-    deadline_date = UserUnlockEntry.dead_line_final_method
+    deadline_date = UserUnlockEntry.dead_line_final_method_l1
     if deadline_date.present?
       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
     end
+
+    p "++++++++++++select_time++++++++"
+    p deadline_date
+    p "+++++++++++end +++++++="
 
     if ((select_time.to_date > deadline_date.to_date ) )
 
@@ -1840,7 +1844,7 @@ module WktimeHelper
     if user_info.present?
      return user_info.first.department
     else
-     return ""
+     return "Shiva"
     end
   end
 

@@ -348,6 +348,12 @@ function activityChanged(obj)
             $('#check_flexi_visible').hide()
         }
 
+
+    if ($('.flexi_reason').is(':visible')){
+        $('#check_flexi_visible').show()
+    }else{
+        $('#check_flexi_visible').hide()
+    } 
 }
 
 function comment()

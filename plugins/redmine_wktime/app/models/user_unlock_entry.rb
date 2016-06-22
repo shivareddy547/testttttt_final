@@ -251,6 +251,39 @@ class UserUnlockEntry < ActiveRecord::Base
     end
   end
 
+  def self.dead_line_final_method_l1
+    array_days = []
+    days = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
+    collect_dates=[]
+    if Setting.plugin_redmine_wktime['wktime_public_holiday'].present?
+      cureent_user_timezone = (User.current.time_zone.present? && User.current.time_zone.name.present?) ? User.current.time_zone.name.to_s.delete(' ') : "Chennai"
+      Setting.plugin_redmine_wktime['wktime_public_holiday'].each do |public_holiday|
+        if public_holiday.delete(' ').include?(cureent_user_timezone)
+          collect_dates << public_holiday.split('|')[0].strip
+        end
+      end
+    end
+    wktime_helper = Object.new.extend(WktimeHelper)
+    current_time = wktime_helper.set_time_zone(Time.now)
+    dead_line = (current_time.to_date)
+    array_size = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
+    i = 0
+    while i <= array_size.to_i do
+      if check_public(dead_line)
+        array_size +=1
+        dead_line = (dead_line-1)
+      else
+        array_days << dead_line
+        dead_line = (dead_line-1)
+      end
+      break if array_days.size > Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1'].to_i
+      i += 1
+    end
+    if array_days.present?
+      return array_days.last
+    end
+  end
+
 
   def self.dead_line_final_method
     array_days = []
