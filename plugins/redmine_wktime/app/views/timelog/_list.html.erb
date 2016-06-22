@@ -23,6 +23,8 @@
     <%= raw @query.inline_columns.map {|column| "<td class=\"#{column.css_classes}\">#{column_content(column, entry)}</td>"}.join %>
     <td class="buttons">
    <% if entry.user_id.to_i == User.current.id.to_i %>
+
+          <% if !['PTO','OnDuty'].include?(entry.activity.name) %>
     <% if UserUnlockEntry.edit_user(User.current,entry) == false -%>
     <%= link_to image_tag('edit.png'), edit_time_entry_path(entry),
                                            :title => l(:button_edit) %>
@@ -31,6 +33,7 @@
                                              :method => :delete,
                                              :title => l(:button_delete) %>
     <% end -%>
+              <% end %>
       <% end -%>
     </td>
   </tr>

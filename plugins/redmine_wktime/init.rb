@@ -2,6 +2,8 @@ require 'redmine'
 require_dependency 'custom_fields_helper'
 require_dependency 'timelog_controller_patch'
 require_dependency 'settings_controller_patch'
+require_dependency 'context_menus_controller_patch'
+
 
 module WktimeHelperPatch
   def self.included(base)
@@ -17,7 +19,7 @@ end
 CustomFieldsHelper.send(:include, WktimeHelperPatch)
 TimelogController.send(:include, TimelogControllerPatch)
 SettingsController.send(:include, SettingsControllerPatch)
-
+ContextMenusController.send(:include, ContextMenusControllerPatch)
 
 Redmine::Plugin.register :redmine_wktime do
   name 'Time & Expense'

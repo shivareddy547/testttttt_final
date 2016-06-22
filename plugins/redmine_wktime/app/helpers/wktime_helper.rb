@@ -2801,103 +2801,249 @@ ax(capacity) DESC').limit(1)
 
 
 
-  def weekly_auto_approve(date)
-
-     start_date=(date.to_date-4).at_beginning_of_week
-     end_date=start_date.at_end_of_week
-
-    User.active.each do |each_user|
-
-      find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
-
-        find_user_project = Member.find_by_sql("select * from members m where m.user_id=#{each_user.id} order by m.capacity DESC limit 1")
-
-        # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-        # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
-
-
-        (start_date..end_date).to_a.each do |each_date|
-
-          @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
-          @wktime.project_id = find_user_project.first.project_id
-          @wktime.status="l2"
-          @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
-          @wktime.hours = @wktime.hours.to_f
-          @wktime.statusupdate_on = Date.today
-          @wktime.statusupdater_id=User.find(1).id
-
-          if @wktime.save
-
-
-          end
-
-        end
-
-
-
-
-#       if !find_l2_entries.present?
-# #         p 111111111111111
-# #         p find_user_project = Member.where(:user_id=>each_user.id).order('m
-# # ax(capacity) DESC').limit(1)
-#         (start_date..end_date).to_a.each do |each_day|
+#   def weekly_auto_approve(date)
 #
-#           if each_day.present?
+#      start_date=(date.to_date-4).at_beginning_of_week
+#      end_date=start_date.at_end_of_week
 #
-#             # find_entry_with_date = TimeEntry.where(:user_id=>each_user.id,:spent_on =>each_day )
+#     User.active.each do |each_user|
 #
-#             find_time_entry_hours = TimeEntry.find_by_sql("select sum(hours) as hours from time_entries where spent_on in ('#{each_day}') and user_id in (#{each_user.id})")
-#             if find_time_entry_hours.present?
-#               if  find_time_entry_hours < 4
-#                 # lop_request = RestClient.post 'https://iservstaging.objectfrontier.com/services/employees/autoleaves?',:headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'}, :param1 => 'one', :content_type => 'application/json'
-#                 # lop_request
-#                 url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
-#                 # response = RestClient::Request.new(:method => :post,:url => url, :headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :content_type => 'application/json').execute
+#       find_l2_entries = Wktime.where(:user_id=>530,:begin_date=>start_date..end_date,:status=>'l2')
 #
-#                 response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false,:payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
-#                 )
-#               elsif find_time_entry_hours < 8
+#         find_user_project = Member.find_by_sql("select * from members m where m.user_id=#{each_user.id} order by m.capacity DESC limit 1")
 #
-#                 response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Half Day"}
-#                 )
-#
-#               end
-#
-#             else
-#
-#               response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload => {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
-#               )
+#         # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+#         # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 #
 #
-#             end
+#         (start_date..end_date).to_a.each do |each_date|
+#
+#           @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
+#           @wktime.project_id = find_user_project.first.project_id
+#           @wktime.status="l2"
+#           @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
+#           @wktime.hours = @wktime.hours.to_f
+#           @wktime.statusupdate_on = Date.today
+#           @wktime.statusupdater_id=User.find(1).id
+#
+#           if @wktime.save
+#
 #
 #           end
 #
 #         end
 #
-#         # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
-#         # l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
 #
-#         # if l2_user_id.present?
-#         #   p "++++++++++l2 user ++++++"
-#         #   p User.find(l2_user_id)
-#         #   p "============="
-#         #   WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
-#         # end
-#         # if l1_user_id.present?
-#         #   p "++++++++++l2 user ++++++"
-#         #   p User.find(l1_user_id)
-#         #   p "============="
-#         #   WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
-#         # end
 #
-#       end
+#
+# #       if !find_l2_entries.present?
+# # #         p 111111111111111
+# # #         p find_user_project = Member.where(:user_id=>each_user.id).order('m
+# # # ax(capacity) DESC').limit(1)
+# #         (start_date..end_date).to_a.each do |each_day|
+# #
+# #           if each_day.present?
+# #
+# #             # find_entry_with_date = TimeEntry.where(:user_id=>each_user.id,:spent_on =>each_day )
+# #
+# #             find_time_entry_hours = TimeEntry.find_by_sql("select sum(hours) as hours from time_entries where spent_on in ('#{each_day}') and user_id in (#{each_user.id})")
+# #             if find_time_entry_hours.present?
+# #               if  find_time_entry_hours < 4
+# #                 # lop_request = RestClient.post 'https://iservstaging.objectfrontier.com/services/employees/autoleaves?',:headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'}, :param1 => 'one', :content_type => 'application/json'
+# #                 # lop_request
+# #                 url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
+# #                 # response = RestClient::Request.new(:method => :post,:url => url, :headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :content_type => 'application/json').execute
+# #
+# #                 response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false,:payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
+# #                 )
+# #               elsif find_time_entry_hours < 8
+# #
+# #                 response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload =>  {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Half Day"}
+# #                 )
+# #
+# #               end
+# #
+# #             else
+# #
+# #               response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload => {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
+# #               )
+# #
+# #
+# #             end
+# #
+# #           end
+# #
+# #         end
+# #
+# #         # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+# #         # l1_user_id = get_perm_for_project(find_user_project.first.project,'l1')
+# #
+# #         # if l2_user_id.present?
+# #         #   p "++++++++++l2 user ++++++"
+# #         #   p User.find(l2_user_id)
+# #         #   p "============="
+# #         #   WkMailer.send_l2_notification(l2_user_id,each_user.id,start_date,end_date).deliver
+# #         # end
+# #         # if l1_user_id.present?
+# #         #   p "++++++++++l2 user ++++++"
+# #         #   p User.find(l1_user_id)
+# #         #   p "============="
+# #         #   WkMailer.send_l2_notification(l1_user_id,each_user.id,start_date,end_date).deliver
+# #         # end
+# #
+# #       end
+#
+#     end
+#
+#   end
 
+
+
+  def weekly_auto_approve(date)
+
+    start_date = (date.to_date-4).at_beginning_of_week
+    end_date = start_date.at_end_of_week
+
+
+      errors=[]
+
+# p sql = "select * from users u join user_official_infos uo uo.employee_id in (#{params[:employeeIds]})"
+#       users = User.find_by_sql("select u.id,u.login,u.firstname,u.lastname from users u
+#   join user_official_infos uo on u.id=uo.user_id where uo.employee_id in (#{params[:employeeIds]})")
+
+
+      User.active.each do |each_user|
+
+        find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
+        if !find_l2_entries.present? || (find_l2_entries.count <= (start_date..end_date).to_a.count)
+          find_user_project = Member.find_by_sql("select * from members where user_id=#{each_user.id} order by capacity DESC limit 1")
+
+          # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
+          # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
+
+          find_activity = Enumeration.where(:name=>'PTO')
+          if find_activity.present?
+
+            @find_activity_id = find_activity.last.id
+          else
+            errors << "Unable apply for Leave, PTO Activity Not Found .!"
+          end
+          find_tracker = Tracker.where(:name=>'support')
+          if find_tracker.present?
+            @find_tracker_id = find_tracker.first.id
+          else
+            errors << "Unable apply for Leave, PTO Activity Not Found .!"
+          end
+          find_issue = Issue.where(:project_id=>find_user_project.first.project_id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
+          if find_issue.present?
+            @find_issue_id = find_issue.first.id
+          else
+            find_issue = Issue.new(:subject=>"PTO",:project_id=>find_user_project.first.project_id,:tracker_id=>@find_tracker_id,:author_id=>each_user.id,:assigned_to_id=>each_user.id)
+            if find_issue.save
+              @find_issue_id = find_issue.id
+            end
+            # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
+          end
+          (start_date..end_date).to_a.each do |each_date|
+
+            @time_entry =  TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(find_user_project.first.project_id,each_user.id,@find_activity_id,each_date,@find_issue_id)
+            if @time_entry.present? && @time_entry.id.blank?
+              @time_entry.project_id = find_user_project.first.project_id
+              @time_entry.activity_id = @find_activity_id
+
+              @time_entry.issue_id = @find_issue_id
+              @time_entry.hours = 0.00
+              @time_entry.save
+            end
+            @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
+            @wktime.project_id = find_user_project.first.project_id
+            @wktime.status="l2"
+            @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
+            @wktime.hours = @wktime.hours.to_f
+            @wktime.statusupdate_on = Date.today
+
+            if @wktime.save
+
+              # @wktime = wktime
+              find_time_entry_hours = TimeEntry.find_by_sql("select sum(hours) as hours from time_entries where spent_on in ('#{each_date}') and user_id in (#{each_user.id})")
+
+
+
+              # url = Redmine::Configuration['iserv_base_url']
+              # key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
+              # url1 = "#{url}/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
+              # response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute
+
+
+              # url = Redmine::Configuration['iserv_base_url']
+              url = "#{Redmine::Configuration['iserv_base_url']}/services/employees/autoleaves?"
+              key = Redmine::Configuration['iserv_api_key']
+              if find_time_entry_hours.present?
+                if  find_time_entry_hours.first.hours.to_f < 4
+                  # lop_request = RestClient.post 'https://iservstaging.objectfrontier.com/services/employees/autoleaves?',:headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'}, :param1 => 'one', :content_type => 'application/json'
+                  # lop_request
+                  # url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
+                  # response = RestClient::Request.new(:method => :post,:url => url, :headers => {'Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :content_type => 'application/json').execute
+
+                  # url = "https://iservstaging.objectfrontier.com/services/employees/autoleaves?"
+
+                  # RestClient.post(url, { 'x' => 1 }.to_json, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},:verify_ssl => false)
+
+                  # RestClient.post(url, { 'x' => 1 }.to_json,:verify_ssl=>false ,:content_type => :json, :accept => :json)
+
+                  response = RestClient::Request.execute(:method => :post,:url => url,  :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => key},  :verify_ssl => false,:payload => {:employeeId => each_user.employee_id, :fromDate => each_date.to_date,:toDate => each_date.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full day"}.to_json
+                  )
+
+
+                elsif find_time_entry_hours.first.hours.to_f < 8
+
+                  # response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload =>  {:employeeId => each_user.employee_id, :fromDate => each_date.to_date,:toDate =>each_date.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Half Day"}
+                  # )
+
+                  response = RestClient::Request.execute(:method => :post,:url => url,  :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => key},  :verify_ssl => false,:payload => {:employeeId => each_user.employee_id, :fromDate => each_date.to_date,:toDate => each_date.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Half day"}.to_json
+                  )
+
+                end
+
+              else
+
+                # response = RestClient::Request.execute(:method => :post,:url => url, :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB'},  :verify_ssl => false, :payload => {:employeeId => '1144', :fromDate => each_day.to_date,:toDate =>each_day.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full Day"}
+                # )
+                response = RestClient::Request.execute(:method => :post,:url => url,  :headers =>{'Accept' => 'application/json','Content-Type' => 'application/json','Auth-Key' => key},  :verify_ssl => false,:payload => {:employeeId => each_user.employee_id, :fromDate => each_date.to_date,:toDate => each_date.to_date, :leaveDays => "1",:leaveType=>"",:leaveCategory => "Leave",:leaveDescription=>"System leave",:leaveDuration=>"Full day"}.to_json
+                )
+
+
+
+              end
+
+
+            else
+              errors << @wktime.errors.messages
+            end
+          end
+
+        end
+
+
+      end
+      # params[:employeeId].each do |each_emp|
+      #
+      #
+      # end
+
+
+
+
+    p "++++++++++++=@wktime@wktime@wktime+++++++++"
+    p @wktime
+    p "++++end +_+++++++++++++="
+    if errors.present?
+      render_json_errors(errors.join(','))
+    else
+      render_json_ok(@wktime)
     end
 
   end
-
-
 
 
 

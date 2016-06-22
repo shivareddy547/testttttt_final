@@ -30,7 +30,6 @@ module RedmineWktime
           unloadable
           alias_method_chain :activity_collection_for_select_options, :redmine_wktime
 
-
         end
       end
     end
