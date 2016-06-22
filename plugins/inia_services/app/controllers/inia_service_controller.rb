@@ -381,13 +381,7 @@ p 444444444444
 
       if params[:fromDate].present? && params[:toDate].present?
 
-        find_activity = Enumeration.where(:name=>'PTO')
-        if find_activity.present?
 
-          @find_activity_id = find_activity.last.id
-        else
-          errors << "Unable apply for Leave, PTO Activity Not Found .!"
-        end
         find_tracker = Tracker.where(:name=>'support')
         if find_tracker.present?
           @find_tracker_id = find_tracker.first.id
@@ -398,6 +392,14 @@ p 444444444444
         if params[:leaveDuration].present?
 
           if params[:leaveCategory] != "OnDuty"
+
+            find_activity = Enumeration.where(:name=>'PTO')
+            if find_activity.present?
+
+              @find_activity_id = find_activity.last.id
+            else
+              errors << "Unable apply for Leave, PTO Activity Not Found .!"
+            end
 
             find_issue = Issue.where(:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
 
@@ -414,14 +416,26 @@ where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
              p l2_mems
              p @project
              p "++++++++++++end +++++++++++"
+             if l2_mems.present?
               find_issue = Issue.new(:subject=>"PTO",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
 
                 @find_issue_id = find_issue.id
               end
+             else
+               errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name},L2 not found for in #{@project.first.name}"
+               end
               # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
             end
           else
+
+            find_activity = Enumeration.where(:name=>'OnDuty')
+            if find_activity.present?
+
+              @find_activity_id = find_activity.last.id
+            else
+              errors << "Unable apply for Leave, PTO Activity Not Found .!"
+            end
 
             find_issue = Issue.where(:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:subject=>'OnDuty')
             if find_issue.present?
@@ -437,9 +451,13 @@ where m.project_id=#{@project.first.id}  and r.permissions like '%l2%'")
               p l2_mems
               p @project
               p "++++++++++++end +++++++++++"
+              if l2_mems.present?
               find_issue = Issue.new(:subject=>"OnDuty",:project_id=>@project.first.id,:tracker_id=>@find_tracker_id,:author_id=>l2_mems.first.user_id,:assigned_to_id=>@author.id)
               if find_issue.save
                 @find_issue_id = find_issue.id
+              end
+              else
+                errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name},L2 not found for in #{@project.first.name}"
               end
               # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
             end
