@@ -1032,6 +1032,8 @@ module WktimeHelper
 
   end
 
+
+
   def check_time_log_entry_l2(select_time)
     days = 0
     setting_hr= Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2'].to_i
@@ -1046,7 +1048,7 @@ module WktimeHelper
     # week_expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
 
     expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
-    deadline_date = UserUnlockEntry.dead_line_final_method
+    deadline_date = UserUnlockEntry.dead_line_final_method_l2
     if deadline_date.present?
       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
     end
