@@ -7,9 +7,9 @@ module RedmineWktime
         def activity_collection_for_select_options_with_redmine_wktime(time_entry=nil, project=nil)
           project ||= @project
           if project.nil?
-            activities = TimeEntryActivity.shared.active.where("active=true and name NOT IN (?)",'PTO')
+            activities = TimeEntryActivity.shared.active.where("active=true and name NOT IN (?)",['PTO','OnDuty'])
           else
-            activities = project.activities.where("active=true and name NOT IN (?)",'PTO')
+            activities = project.activities.where("active=true and name NOT IN (?)",['PTO','OnDuty'])
           end
 
           collection = []

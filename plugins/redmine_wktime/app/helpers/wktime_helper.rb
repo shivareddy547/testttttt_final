@@ -2185,7 +2185,7 @@ p "+++++++++++++++end ++++++++"
 
     if entry.present?
       find_entry = TimeEntry.find(entry.id)
-      if find_entry.activity.name=="PTO"
+      if find_entry.activity.name=="PTO" || find_entry.activity.name=="OnDuty"
         return true
       else
         return false

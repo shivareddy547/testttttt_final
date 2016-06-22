@@ -804,7 +804,7 @@ class WktimeController < ApplicationController
       error = "403"
     end
     actStr =""
-    project.activities.each do |a|
+    project.activities.where("active=true and name NOT IN (?)",['PTO','OnDuty']).each do |a|
       actStr << project_id.to_s() + '|' + a.id.to_s() + '|' + a.name + "\n"
     end
 
@@ -1737,7 +1737,7 @@ p 1111111111111111111111111111111111111111111111111111111111111
       @projectIssues[project_id] =   allIssues.select {|i| i.visible?(@user) }
     end
     if @projActivities[project_id].blank?
-      @projActivities[project_id] = project.activities.where("active=true and name NOT IN (?)",'PTO') unless project.nil?
+      @projActivities[project_id] = project.activities.where("active=true and name NOT IN (?)",['PTO','OnDuty']) unless project.nil?
     end
   end
 
