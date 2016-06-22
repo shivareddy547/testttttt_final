@@ -251,19 +251,19 @@
         $(".time-entry .activity:contains('PTO')").each(function() { $(this).parent().find('td.hours').each(function() {
 //            $( this ).find("input").prop('disabled', true);
           $( this ).find("input").css('display', "none");$( this ).find("a").attr("href", "javascript:void(0)");
+       });});
+        $(".time-entry .activity:contains('OnDuty')").each(function() { $(this).parent().find('td.hours').each(function() {
+            $( this ).find("input").prop('disabled', true);
+            $( this ).find("input").css('display', "none");$( this ).find("a").attr("href", "javascript:void(0)");
         });});
-//        $(".time-entry .activity:contains('OnDuty')").each(function() { $(this).parent().find('td.hours').each(function() {
-////            $( this ).find("input").prop('disabled', true);
-//            $( this ).find("input").css('display', "none");$( this ).find("a").attr("href", "javascript:void(0)");
-//        });});
 
-//        $(document).ready(function(){
-//            $('#check_flexi_visible').css('display', 'none')
-//            if ($('.flexi_reason').is(':visible')){
-//                $('#check_flexi_visible').show()
-//            }else{
-//                $('#check_flexi_visible').hide()
-//            }
-//        })
+        $(document).ready(function(){
+            $('#check_flexi_visible').css('display', 'none')
+            if ($('.flexi_reason').is(':visible')){
+                $('#check_flexi_visible').show()
+            }else{
+                $('#check_flexi_visible').hide()
+            }
+        })
 
 </script>

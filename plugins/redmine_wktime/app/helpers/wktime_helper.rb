@@ -1000,6 +1000,46 @@ module WktimeHelper
 
   end
 
+
+
+  def check_time_log_entry_l2(select_time,current_user)
+    days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
+    setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_nonlog_min'].to_i
+    wktime_helper = Object.new.extend(WktimeHelper)
+    current_time = wktime_helper.set_time_zone(Time.now)
+    expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+    deadline_date = UserUnlockEntry.dead_line_final_method
+    if deadline_date.present?
+      deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
+    end
+    # lock_status = UserUnlockEntry.where(:user_id=>current_user.id)
+    # if lock_status.present?
+    #   lock_status_expire_time = lock_status.last.expire_time
+    #   if lock_status_expire_time.to_date <= expire_time.to_date
+    #     lock_status.delete_all
+    #   end
+
+    # entry_status =  TimeEntry.where(:user_id=>current_user.id,:spent_on=>select_time.to_date.strftime('%Y-%m-%d').to_date)
+    # wiki_status_l1=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l1")
+    # wiki_status_l2=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l2")
+    # wiki_status_l3=Wktime.where(:user_id=>current_user.id,:begin_date=>select_time.to_date.strftime('%Y-%m-%d').to_date,:status=>"l3")
+    # permanent_unlock = PermanentUnlock.where(:user_id=>current_user.id)
+
+    if ((select_time.to_date > deadline_date.to_date ) )
+
+      return true
+
+    elsif (select_time.to_date == deadline_date.to_date && expire_time > current_time)
+
+      return true
+    else
+
+      return false
+    end
+
+  end
+
   def check_time_log_entry_for_approve(select_time,current_user)
     days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i
     setting_hr= Setting.plugin_redmine_wktime['wktime_nonlog_hr'].to_i
