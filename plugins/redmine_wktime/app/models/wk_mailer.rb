@@ -131,6 +131,18 @@ def send_l2_notification(approved_user,user_id,start_date,end_date)
   # mail :from => Setting.mail_from ,:to => current_user.mail, :subject => subject,:body => body
 end
 
+def send_l2_month_notification(approved_user,user_id,start_date,end_date)
+  user = User.where(:id=> user_id).last
+  ap_user = User.where(:id=> approved_user).last
+  body = "You are receiving this notification for Need to complete approval of timesheet  from #{start_date} to #{end_date} for #{user.full_name}-#{user.employee_id} before #{end_date} "
+  subject = "Monthly Approve not done for #{user.full_name}"
+
+  # body +="\n"
+  mail :from => Setting.mail_from,:to => ap_user.mail, :subject => subject,:body => body
+  # mail :from => Setting.mail_from ,:to => current_user.mail, :subject => subject,:body => body
+end
+
+
 
 
  end

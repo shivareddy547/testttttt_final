@@ -135,7 +135,26 @@
                                                                                                             [45, 45]], :selected => @settings['wktime_nonapprove_min_l3'].blank? ? 0 : @settings['wktime_nonapprove_min_l3']))%>
   </p>
 
+  <p>
+    <label><%= l(:label_wk_payroll_deadline) %></label>
+    <%
+       hr = []
+       for i in 1..30
+         if i < 10
+           hr << ['0' + i.to_s,i]
+         else
+           hr << [i,i]
+         end
+       end
+    %>
 
+    <%= l(:field_day) %>&nbsp;<%= select_tag('settings[wktime_payroll_day]', options_for_select((0..30).map {|i| [i,i] }, :selected => @settings['wktime_payroll_day'].blank? ? 2 : @settings['wktime_payroll_day']))%>
+    <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_payroll_hr]', options_for_select(hr, :selected => @settings['wktime_payroll_hr'].blank? ? 23 : @settings['wktime_payroll_hr']))%>
+    <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_payroll_min]', options_for_select([['00',0],
+                                                                                                       [15, 15],
+                                                                                                       [30, 30],
+                                                                                                       [45, 45]], :selected => @settings['wktime_payroll_min'].blank? ? 0 : @settings['wktime_payroll_min']))%>
+  </p>
 
 </fieldset>
 

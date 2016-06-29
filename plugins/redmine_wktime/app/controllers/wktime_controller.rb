@@ -2031,6 +2031,8 @@ end
 
     # @wktime = Wktime.where(:user_id=>params[:user_id],:begin_date=>approve_day.to_date,:hours=>@sum,  :statusupdater_id => User.current.id, :project_id => project.id).first_or_initialize
     # @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_status_and_begin_date(user_id:params[:user_id],project_id:project.id,status: 'l1',begin_date: approve_day)
+
+
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
     p "+++++++++++++++before entry +++++++++++++++++++++++++++++++++"
     p @wktime
@@ -2064,6 +2066,23 @@ end
     #@wktime = Wktime.find_or_initialize_by_begin_date_and_user_id(:user_id=>params[:user_id],:begin_date=>approve_day.to_date)
     #    Wktime.where(:user_id=>params[:user_id],:begin_date=>approve_day.to_date,:hours=>@sum, :project_id => project.id).first_or_initialize
 
+    find_entry = TimeEntry.where(:user_id=>params[:user_id],:spent_on=>approve_day)
+
+    if !find_entry.present?
+      find_activity = Enumeration.where(:name=>'PTO')
+      if find_activity.present?
+
+        @find_activity_id = find_activity.last.id
+
+      end
+      find_tracker = Tracker.where(:name=>'support')
+      if find_tracker.present?
+        @find_tracker_id = find_tracker.first.id
+
+      end
+      init_entry = TimeEntry.new(:user_id=>params[:user_id],:project_id=>project.id,:spent_on=>approve_day,:hours=>0.0,:activity_id=>@find_activity_id,:tracker_id=>@find_tracker_id)
+      init_entry.save
+    end
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
 
     # if params[:wktime_approve].present? && @wktime.status !="l2" && @wktime.status !="l3"
@@ -2087,7 +2106,6 @@ end
     p "+++++++++++====end +++++++++"
 
 
-
     if params[:wktime_approve].present?
 
         @wktime.pre_status=@wktime.status
@@ -2104,8 +2122,6 @@ end
       @wktime.status = 'r'
       Rejection.create(:user_id => params[:user_id], :project_id => project.id, :rejected_by =>User.current.id, :rejected_role=> 'l2', :comment =>params[:wktime_notes], :date => @wktime.begin_date )
     end
-
-
 
 
 

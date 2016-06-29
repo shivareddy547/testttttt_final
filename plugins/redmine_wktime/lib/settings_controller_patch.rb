@@ -10,7 +10,8 @@ module SettingsControllerPatch
         end
 
 
-
+p "+++++++++++++++=settings +++++++++++++"
+        p params[:settings]
         if request.post?
           Setting.send "plugin_#{@plugin.id}=", params[:settings]
  if Setting.send "plugin_#{@plugin.id}=", params[:settings]

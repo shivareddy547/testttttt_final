@@ -44,6 +44,20 @@ Redmine::Plugin.register :redmine_wktime do
                'wktime_nonlog_day' => '2',
                'wktime_nonlog_hr' => '11',
                'wktime_nonlog_min' => '15',
+
+               'wktime_nonapprove_day_l3' => '2',
+               'wktime_nonapprove_hr_l3' => '11',
+               'wktime_nonapprove_min_l3' => '15',
+               'wktime_nonapprove_day_l2' => '2',
+               'wktime_nonapprove_hr_l2' => '11',
+               'wktime_nonapprove_min_l2' => '15',
+               'wktime_nonapprove_day_l1' => '2',
+               'wktime_nonapprove_hr_l1' => '11',
+               'wktime_nonapprove_min_l1' => '15',
+               'wktime_payroll_day' => '2',
+               'wktime_payroll_hr' => '11',
+               'wktime_payroll_min' => '15',
+
                'wktime_nonlog_mail_message' => 'You are receiving this notification for missing timesheet log',
                'wktime_page_width' => '250',
                'wktime_page_height' => '297',
@@ -269,6 +283,68 @@ Rails.configuration.to_prepare do
     wktime_helper.expire_unlock_history
     wktime_helper.weekly_approve_l2_notifications(Date.today)
     # wktime_helper.expire_unlock_history
+
+  end
+
+
+
+
+  require 'rufus/scheduler'
+
+
+
+  # scheduler.at '2014/12/24 2000' do
+  #   puts "merry xmas!"
+  # end
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_payroll_day']
+  hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
+  min = Setting.plugin_redmine_wktime['wktime_payroll_min']
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  if hr == '0' && min == '0'
+    cronSt = "0 * * * *"
+  else
+    cronSt = "#{min} #{hr} * * *"
+  end
+  wktime_helper = Object.new.extend(WktimeHelper)
+  expire_time = wktime_helper.check_expire_date_payroll
+
+  # cronSt= "12 19 * * *"
+  scheduler.at expire_time do
+    wktime_helper.weekly_auto_approve(expire_time)
+    # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+    # wktime_helper = Object.new.extend(WktimeHelper)
+    # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+    # wktime_helper.expire_unlock_history
+    # wktime_helper.weekly_approve_l1_notifications(Date.today)
+
+  end
+
+
+  require 'rufus/scheduler'
+
+  # scheduler.at '2014/12/24 2000' do
+  #   puts "merry xmas!"
+  # end
+  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+  day = Setting.plugin_redmine_wktime['wktime_payroll_day']
+  hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
+  min = Setting.plugin_redmine_wktime['wktime_payroll_min']
+  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+  wktime_helper = Object.new.extend(WktimeHelper)
+
+  expire_time = wktime_helper.check_expire_date_payroll
+p "++++++++++=expire_time++++++++"
+  p expire_time
+  # cronSt= "12 19 * * *"
+  scheduler.at(expire_time-2.day)do
+    # wktime_helper.weekly_auto_approve(expire_time)
+    wktime_helper.monthly_approve_l2_notifications(expire_time)
+    # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+    # wktime_helper = Object.new.extend(WktimeHelper)
+    # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+    # wktime_helper.expire_unlock_history
+    # wktime_helper.weekly_approve_l1_notifications(Date.today)
 
   end
 
