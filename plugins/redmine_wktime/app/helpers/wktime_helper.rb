@@ -3145,7 +3145,7 @@ User.where(:id=>[528,530,646,15]).each do |each_user|
   (start_date..end_date).to_a.each do |each_date|
     wktimes = Wktime.where(:user_id=>each_user.id,:begin_date=>each_date)
     wktimes.each do |each_time|
-each_time
+each_time.delete
     end
 
 @wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
