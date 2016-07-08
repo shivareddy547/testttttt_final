@@ -2075,12 +2075,13 @@ end
         @find_activity_id = find_activity.last.id
 
       end
-      find_tracker = Tracker.where(:name=>'support')
+      find_tracker = Tracker.where(:name=>'Support')
       if find_tracker.present?
         @find_tracker_id = find_tracker.first.id
 
       end
-      init_entry = TimeEntry.new(:user_id=>params[:user_id],:project_id=>project.id,:spent_on=>approve_day,:hours=>0.0,:activity_id=>@find_activity_id,:tracker_id=>@find_tracker_id)
+      init_entry = TimeEntry.new(:user_id=>params[:user_id],:project_id=>project.id,:spent_on=>approve_day,:hours=>0.0,:activity_id=>@find_activity_id)
+      
       init_entry.save
     end
     @wktime = Wktime.find_or_create_by_user_id_and_project_id_and_begin_date(user_id:params[:user_id],project_id:project.id,begin_date: approve_day)
