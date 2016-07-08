@@ -2062,6 +2062,8 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
 
 
 
+
+
   def check_expire_for_l2(date)
     #
     current_start_date=Date.today.at_beginning_of_week
@@ -2073,6 +2075,8 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
       current_end_date=Date.today.at_end_of_week
 
       if (pre_start_date..pre_end_date).to_a.include?(date.to_date+1) || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
+            return false
+          else
             return true
 
       end
@@ -3130,6 +3134,40 @@ p "++++++++++++++++++++++++end ++++++++++++"
     end
 
   end
+
+def week_approve_update(date)
+  @admin_user = User.find_by_login("Admin")
+
+ start_date = (date.to_date).at_beginning_of_week
+    end_date = date.to_date
+
+User.where(:id=>[528,530,646,15]).each do |each_user|
+  (start_date..end_date).to_a.each do |each_date|
+    wktimes = Wktime.where(:user_id=>each_user.id,:begin_date=>each_date)
+    wktimes.each do |each_time|
+each_time
+    end
+
+@wktime = Wktime.find_or_initialize_by_user_id_and_begin_date(each_user.id,each_date)
+            
+            @wktime.status="n"
+            @wktime.pre_status=@wktime.status.present? ? 'n' : "n"
+            @wktime.hours = TimeEntry.where(:user_id=>each_user.id,:spent_on=>each_date).sum(&:hours)
+            @wktime.statusupdate_on = Date.today
+            @wktime.statusupdater_id =@admin_user.id rescue ""
+            @wktime.notes=""
+            if @wktime.save
+            end
+            p 11111111111111111111111111111111111
+            p @wktime
+            p TimeEntry.where(:user_id=>each_user.id,:spent_on=>each_date).sum(&:hours)
+            p 222222222222222222222222
+          end
+end
+
+end
+
+
 
 
 end

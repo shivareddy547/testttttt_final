@@ -308,9 +308,9 @@ Rails.configuration.to_prepare do
   end
   wktime_helper = Object.new.extend(WktimeHelper)
   expire_time = wktime_helper.check_expire_date_payroll
-
+  cronSt = "#{expire_time.min} #{expire_time.hour} * * #{expire_time.to_date.wday}"
   # cronSt= "12 19 * * *"
-  scheduler.at expire_time do
+ scheduler.cron cronSt do
     wktime_helper.weekly_auto_approve(expire_time)
     # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
     # wktime_helper = Object.new.extend(WktimeHelper)
@@ -333,11 +333,12 @@ Rails.configuration.to_prepare do
   scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   wktime_helper = Object.new.extend(WktimeHelper)
 
-  expire_time = wktime_helper.check_expire_date_payroll
+  expire_time = wktime_helper.check_expire_date_payroll 
 p "++++++++++=expire_time++++++++"
   p expire_time
   # cronSt= "12 19 * * *"
-  scheduler.at(expire_time-2.day)do
+  cronSt = "#{expire_time.min} #{expire_time.hour} * * #{(expire_time-2.day).to_date.wday}"
+   scheduler.cron cronSt do
     # wktime_helper.weekly_auto_approve(expire_time)
     wktime_helper.monthly_approve_l2_notifications(expire_time)
     # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
