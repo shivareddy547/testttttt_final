@@ -1964,14 +1964,6 @@ module WktimeHelper
     end
 
     if @all_roles.present?
-p "++++++++++++is_l2?(user_id,project_ids)+++++++++++"
-p user_id.to_i
-p User.current.id
-p is_l2?(user_id,project_ids)
-p "++++++=end ++++++"
-p "+++++++++==start_datestart_datestart_date+++++++++"
-p start_date
-p "++++++++++++++++"
       if (l == "l1") && check_expire_for_payroll(start_date)
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
@@ -1980,7 +1972,7 @@ p "++++++++++++++++"
         end
 
 
-      elsif(l == "l2") && check_expire_for_l2(start_date) && check_expire_for_payroll(start_date)
+      elsif(l == "l2")  && check_expire_for_payroll(start_date)==true && check_expire_for_l2(start_date)==true
         if @all_roles.include? l.to_sym
           return true
         end
@@ -2075,12 +2067,16 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
       current_end_date=Date.today.at_end_of_week
 
       if (pre_start_date..pre_end_date).to_a.include?(date.to_date+1) || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
-            return false
+               return true
           else
-            return true
+              return false
 
       end
+    else
+     
+      return false
     end
+    # return true
   end
 
 
