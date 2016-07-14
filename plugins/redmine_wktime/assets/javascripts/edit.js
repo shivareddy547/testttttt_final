@@ -133,6 +133,12 @@ $(document).ready(function() {
 });
 
 function showComment(row, col) {
+
+    var save_button = $("#wktime_save");
+    if(save_button.size() > 0)
+    {
+        $("#wktime_save").prop('disabled', false);
+    }
     console.log('====================')
     console.log([row, col])
     var images = $( 'img[name="custfield_img'+row+'[]"]' );
@@ -286,12 +292,22 @@ function getCustFldToolTip()
 }
 function flexiChanged(obj){
 
+
+    var save_button = $("#wktime_save");
+    if(save_button.size() > 0)
+    {
+        $("#wktime_save").prop('disabled', false);
+    }
+
     if ($("option:selected", obj).text()=='Others' ){
         getOtherFlexiReason(obj);
         obj.closest('tr').find('.flexi_reason').find('a').show();
     }else {
         obj.closest('tr').find('.flexi_reason').find('a').hide();
     }
+
+
+
 }
 
 function getOtherFlexiReason(cur){

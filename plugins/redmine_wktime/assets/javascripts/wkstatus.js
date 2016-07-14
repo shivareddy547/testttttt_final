@@ -77,7 +77,16 @@ function myChangeFunction(member){
         $('#unlock_update_'+member).hide();
     }
     if ($(type).val() != '' && $(type).val() == 0){
-        $('#unlock_comments_'+member).show();
+         $('#unlock_comments_'+member).show();
+    }else{
+        $('#unlock_comments_'+member).hide();
+    }
+}
+
+function displayComment(member){
+    var type = '#unlock_type'+member
+    if ($(type).val() != '' && $(type).val() == 0){
+       $('#unlock_comments_'+member).show();
     }else{
         $('#unlock_comments_'+member).hide();
     }

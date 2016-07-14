@@ -85,7 +85,7 @@
                   <% user_lock_status = UserUnlockEntry.lock_status(member.user_id)  %>
                   <% if user_unlock_status == true %>
                       <%= link_to_function l(:button_unlock),
-                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');$('#unlock_error_#{member.id}').hide(); return false;",
+                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');displayComment('#{member.id}');$('#unlock_error_#{member.id}').hide(); return false;",
                                            :class => "icon icon-unlock icon-unlock-#{member.user_id} btn" %>
                       <%= link_to_function l(:button_lock),
                                            "lock_user(#{member.user_id});return false;",
@@ -95,7 +95,7 @@
                                            "lock_user(#{member.user_id});return false;",
                                            :class => "icon icon-lock icon-lock-#{member.user_id} btn" %>
                       <%= link_to_function l(:button_unlock),
-                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');$('#unlock_error_#{member.id}').hide(); return false;",
+                                           "$('#member-#{member.id}-unlock').hide(); $('#member-#{member.id}-unlock-form').show();$('#member-#{member.id}-unlock-form #comment').attr('value', '');displayComment('#{member.id}');$('#unlock_error_#{member.id}').hide(); return false;",
                                            :class => "icon icon-unlock icon-unlock-#{member.user_id} btn",:style=>"display:none;" %>
 
                   <%end%>

@@ -127,7 +127,7 @@
   <td class="Location">
 
     <% if @editable && !is_pto_activity_edit_issues2(entry) %>
-        <%=h select_tag isTemplate ? '__template__time_entry[][work_location]' : 'time_entry[][work_location]', options_for_select(timeEntry_location, :selected => entry.nil? ? '' : entry.work_location)%>
+        <%=h select_tag isTemplate ? '__template__time_entry[][work_location]' : 'time_entry[][work_location]', options_for_select(timeEntry_location, :selected => entry.nil? ? '' : entry.work_location),:onchange => "activityChanged($(this));"%>
 
   <% else %>
         <%= entry.work_location unless entry.nil?%>
