@@ -170,8 +170,7 @@ Rails.configuration.to_prepare do
   end
 
 
-  require 'rufus/scheduler'
-  scheduler = Rufus::Scheduler.new
+  
   week_time = '0 22 * * 2'
   # week_time = '13 18 6 * *'
   scheduler.cron  week_time do
@@ -188,13 +187,13 @@ Rails.configuration.to_prepare do
 
 # Employee timeentry nc creation.
 
-  require 'rufus/scheduler'
+  
 
   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
   day = Setting.plugin_redmine_wktime['wktime_nonlog_day']
   hr = Setting.plugin_redmine_wktime['wktime_nonlog_hr']
   min = Setting.plugin_redmine_wktime['wktime_nonlog_min']
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   if hr == '0' && min == '0'
     cronSt = "0 * * * *"
   else
@@ -211,13 +210,13 @@ Rails.configuration.to_prepare do
 
 # L1 approval nc creation
 
-  require 'rufus/scheduler'
+ 
 
   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   if hr == '0' && min == '0'
     cronSt = "0 * * * *"
   else
@@ -239,14 +238,14 @@ Rails.configuration.to_prepare do
 
   #L2 approval nc creation
 
-  require 'rufus/scheduler'
+  
 
   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
   date = Date.parse(day)
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   if hr == '0' && min == '0'
     cronSt = "0 * * * *"
   else
@@ -263,19 +262,20 @@ Rails.configuration.to_prepare do
   end
 
 
-  require 'rufus/scheduler'
+
 
   # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
   day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
   hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
   min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
   date = Date.parse(day)
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   if hr == '0' && min == '0'
     cronSt = "0 * * * *"
   else
     cronSt = "#{min} #{hr} * * #{date.wday}"
   end
+
   # cronSt= "45 23 * * *"
   scheduler.cron cronSt do
     wktime_helper = Object.new.extend(WktimeHelper)
@@ -285,12 +285,6 @@ Rails.configuration.to_prepare do
     # wktime_helper.expire_unlock_history
 
   end
-
-
-
-
-  require 'rufus/scheduler'
-
 
 
   # scheduler.at '2014/12/24 2000' do
@@ -321,8 +315,6 @@ Rails.configuration.to_prepare do
   end
 
 
-  require 'rufus/scheduler'
-
   # scheduler.at '2014/12/24 2000' do
   #   puts "merry xmas!"
   # end
@@ -330,12 +322,10 @@ Rails.configuration.to_prepare do
   day = Setting.plugin_redmine_wktime['wktime_payroll_day']
   hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
   min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
   wktime_helper = Object.new.extend(WktimeHelper)
 
   expire_time = wktime_helper.check_expire_date_payroll 
-p "++++++++++=expire_time++++++++"
-  p expire_time
   # cronSt= "12 19 * * *"
   cronSt = "#{expire_time.min} #{expire_time.hour} * * #{(expire_time-2.day).to_date.wday}"
    scheduler.cron cronSt do
