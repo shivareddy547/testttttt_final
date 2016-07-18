@@ -1461,6 +1461,16 @@ module WktimeHelper
     end
   end
 
+  def check_box_status_with_group(user,project_id,startday,end_day)
+    approve_l2_dates = Wktime.where(begin_date: (startday..end_day),status: "l2",:user_id=>user)
+    approve_l3_dates = Wktime.where(begin_date: (startday..end_day),status: "l3",:user_id=>user)
+    if approve_l2_dates.present? && approve_l2_dates.count == ((end_day-startday).to_i + 1)
+      return "home_l2"
+    elsif approve_l3_dates.present? && approve_l3_dates.count == ((end_day-startday).to_i + 1)
+      return "l3"
+    end
+  end
+
   def check_l2_status_for_month_project(select_time,user,project_id,startday,end_day)
     work_days = (startday..end_day).count
     #l2_approve_count = []
@@ -1551,19 +1561,88 @@ module WktimeHelper
   end
 
   def check_project_permission(ids, l)
-    projects = Project.find(ids)
-    members = []
-    permissions = []
-    projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
-    members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
-    members.flatten.each do |rec|
-      rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
-    end
-    if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
-      return true
-    else
-      return false
-    end
+    # projects = Project.find(ids)
+    # members = []
+    # permissions = []
+    # projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
+    # members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
+    # members.flatten.each do |rec|
+    #   rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
+    # end
+    # if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
+    #   return true
+    # else
+    #   return false
+    # end
+    return true
+  end
+
+
+
+  # def check_group_permission(ids, l)
+  #   # projects = Project.find(ids)
+  #   # members = []
+  #   # permissions = []
+  #   # projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
+  #   # members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
+  #   # members.flatten.each do |rec|
+  #   #   rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
+  #   # end
+  #   # if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
+  #   #   return true
+  #   # else
+  #   #   return false
+  #   # end
+  #   return true
+  # end
+
+  def check_group_permission(ids, l)
+
+p "+++++++++++++++++++++ids +++++++++++++="
+    p ids
+    p "+++++++++++++++++++end +++++++++++++++==="
+      if ids.present?
+        @group = Group.find(ids)
+        if @group.present?
+         if @group.users.present?
+          if @group.users.map(&:id).include?(User.current.id)
+            check_permission_sql =  "select u.login,r.permissions from users u
+join members m on m.user_id=u.id
+join member_roles mr on mr.member_id = m.id
+join roles r on r.id= mr.role_id
+where u.id=#{User.current.id}  and r.permissions like '%#{l}%'"
+p "+++++++++++=check_permission_sql++++++++++++++++++"
+            p check_permission_sql
+            p "++++++++++++++++++end ++++++++++++++"
+            permission = User.find_by_sql(check_permission_sql)
+            if permission.present?
+
+              return true
+            end
+
+          end
+
+        end
+
+      end
+
+      end
+
+
+
+    # projects = Project.find(ids)
+    # members = []
+    # permissions = []
+    # projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
+    # members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
+    # members.flatten.each do |rec|
+    #   rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
+    # end
+    # if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
+    #   return true
+    # else
+    #   return false
+    # end
   end
 
   def accessable_projects(ids, l)
@@ -1718,13 +1797,18 @@ module WktimeHelper
     result2=[]
     result3=[]
     result1.present? && result1['attendance-daily'].each do |each_rec|
-      if result.select {|h| h["day"].to_date.strftime("%F") == each_rec["processdate"].to_date.strftime("%F") && h["employee_id"].to_s == each_rec["userid"].to_s}.present?
+
+
+
+       if result.select {|h| h["day"].to_date.strftime("%F") == each_rec["processdate"].to_date.strftime("%F") && h["employee_id"].to_s == each_rec["userid"].to_s}.present?
         get_result = result.select {|h| h["day"].to_date.strftime("%F") == each_rec["processdate"].to_date.strftime("%F") && h["employee_id"].to_s == each_rec["userid"].to_s}.first
         get_result["bio_hours"]= each_rec["worktime_hhmm"]
         result2 << get_result
-      else
-
+       else
+         # check_valid_emp = is_employee_id_valid?(each_rec["userid"].to_i)
+         if  check_valid_emp = is_employee_id_valid?(each_rec["userid"].to_i).present? && each_rec["userid"].to_i > 0
         s={}
+
         s["employee_id"]=each_rec["userid"].to_i
         s["day"]=each_rec["processdate"].to_date
         s["login"]=each_rec["username"]
@@ -1734,18 +1818,10 @@ module WktimeHelper
         s["department"]= get_department(each_rec["userid"].to_i)
 
         result3 << s
-
+        end
       end
 
     end
-
-
-    p "+++++++++++result3++++++++++++++++++++++++"
-    p result3
-    p "++++++++++"
-    p "++++++++++++++++result 2++++++++++"
-    p result2
-    p "++++++++++++++++++=end +++++++++++++++++"
 
     result = result3 + result2
     result= result.sort_by { |hsh| hsh["employee_id"].to_i }
@@ -1765,6 +1841,12 @@ module WktimeHelper
     spent_exced_format.set_color('blue')
     format.set_align('right')
 
+    spent_pto_format = workbook.add_format
+    spent_pto_format.set_bold
+    spent_pto_format.set_bg_color('yellow')
+    spent_pto_format.set_color('blue')
+    spent_pto_format.set_align('right')
+
     bio_format = workbook.add_format
     bio_format.set_color('red')
     bio_format.set_bold
@@ -1774,8 +1856,9 @@ module WktimeHelper
     worksheet.write(0,1,"Project Name")
     worksheet.write(0,2,"Client Name")
     worksheet.write(0,3,"Employee Id")
-    worksheet.write(0,4,"Approved Status")
-    worksheet.write(0,5,"Approved By")
+    worksheet.write(0,4,"Department")
+    worksheet.write(0,5,"Approved Status")
+    worksheet.write(0,6,"Approved By")
     # worksheet.write(0,6,"CL(Hours)")
     # worksheet.write(0,7,"PL(Hours)")
     # worksheet.write(0,8,"DL(Hours)")
@@ -1792,7 +1875,7 @@ module WktimeHelper
 
     a.sort_by{|d| m,d,y=d.to_date.strftime("%F").split("-");[y,m,d]}.each_with_index do |each_result,index |
 
-      worksheet.write(0,6+index,each_result.to_date.strftime("%d/%m/%Y"))
+      worksheet.write(0,7+index,each_result.to_date.strftime("%d/%m/%Y"))
     end
     title_format = workbook.add_format
     format.set_bold
@@ -1802,13 +1885,13 @@ module WktimeHelper
     format.set_align('right')
 
     # worksheet.write(0,1,"PTO HOURS")
-    worksheet.write(0,a.count+6,"PTO HOURS")
-    worksheet.write(0,a.count+6+1,"Non Approve Hours")
-    worksheet.write(0,a.count+6+2,"Flexi Off")
-    worksheet.write(0,a.count+6+3,"CL(Hours)")
-    worksheet.write(0,a.count+6+4,"PL(Hours)")
-    worksheet.write(0,a.count+6+5,"DL(Hours)")
-    worksheet.write(0,a.count+6+6,"Department")
+    worksheet.write(0,a.count+7,"PTO HOURS")
+    worksheet.write(0,a.count+7+1,"Non Approve Hours")
+    worksheet.write(0,a.count+7+2,"Flexi Off")
+    worksheet.write(0,a.count+7+3,"CL(Hours)")
+    worksheet.write(0,a.count+7+4,"PL(Hours)")
+    worksheet.write(0,a.count+7+5,"DL(Hours)")
+
 
 
     k=0
@@ -1825,16 +1908,17 @@ module WktimeHelper
         worksheet.write(k,1,each_rec["project_name"],title_format)
         worksheet.write(k,2,each_rec["client_name"],title_format)
         worksheet.write(k,3,each_rec["employee_id"],title_format)
-        worksheet.write(k,4,each_rec["approver_status"],title_format)
-        worksheet.write(k,5,each_rec["approved_by"],title_format)
+        worksheet.write(k,4,each_rec["department"],title_format)
+        worksheet.write(k,5,each_rec["approver_status"],title_format)
+        worksheet.write(k,6,each_rec["approved_by"],title_format)
 
-        worksheet.write(k,a.count+6,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
-        worksheet.write(k,a.count+6+6, each_rec["department"],format )
+        worksheet.write(k,a.count+7,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+7+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+7+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+7+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+7+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
+        worksheet.write(k,a.count+7+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
+        # worksheet.write(k,a.count+7+6, each_rec["department"],format )
         check_date='2016-01-01'.to_date
         a.sort_by{|d| m,d,y=d.to_date.strftime("%F").split("-");[y,m,d]}.each_with_index do |each_result,index|
 
@@ -1845,12 +1929,24 @@ module WktimeHelper
             total=(f.to_i*60+s.to_i).to_f/60.to_f
 
             if each_rec["spent_hours"].to_f > total.to_f
-              worksheet.write(k,index+6,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+             
+              if each_rec["pto_status"].present?
+               worksheet.write(k,index+7,each_rec["spent_hours"].to_f.round(2),spent_pto_format)
+               else
+               worksheet.write(k,index+7,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+
+              end
             else
-              worksheet.write(k,index+6,each_rec["spent_hours"].to_f.round(2),format)
+              if each_rec["pto_status"].present?
+                worksheet.write(k,index+7,each_rec["spent_hours"].to_f.round(2),spent_pto_format)
+              else
+                worksheet.write(k,index+7,each_rec["spent_hours"].to_f.round(2),format)
+              end
+
+              
             end
             # worksheet.write(k,index+6+1,each_rec["bio_hours"].to_f.round(2),bio_format)
-            worksheet.write(k,index+1+6,total.to_f.round(2),bio_format)
+            worksheet.write(k,index+1+7,total.to_f.round(2),bio_format)
             #
             # hrs = each_rec["bio_hours"].to_f.to_s.split(':').first
             # min = each_rec["bio_hours"].to_f.to_s.split(':').last
@@ -1874,16 +1970,17 @@ module WktimeHelper
         worksheet.write(k+1,1,each_rec["project_name"],title_format)
         worksheet.write(k+1,2,each_rec["client_name"],title_format)
         worksheet.write(k+1,3,each_rec["employee_id"],title_format)
-        worksheet.write(k+1,4,each_rec["approver_status"],title_format)
-        worksheet.write(k+1,5,each_rec["approved_by"],title_format)
+        worksheet.write(k+1,4,each_rec["department"],title_format)
+        worksheet.write(k+1,5,each_rec["approver_status"],title_format)
+        worksheet.write(k+1,6,each_rec["approved_by"],title_format)
         # worksheet.write(k+1,a.count+1,each_rec["pto_hours"])
-        worksheet.write(k+1,a.count+6,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
-        worksheet.write(k+1,a.count+6+6, each_rec["department"],format )
+        worksheet.write(k+1,a.count+7,each_rec["pto_hours"].present? ? each_rec["pto_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+7+1,each_rec["non_approve_hours"].present? ? each_rec["non_approve_hours"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+7+2,each_rec["flexi_off"].present? ? each_rec["flexi_off"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+7+3,each_rec["total_spent_of_cl"].present? ? each_rec["total_spent_of_cl"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+7+4,each_rec["total_spent_of_pl"].present? ? each_rec["total_spent_of_dl"].to_f.round(2) : "0",format )
+        worksheet.write(k+1,a.count+7+5,each_rec["total_spent_of_dl"].present? ? each_rec["total_spent_of_pl"].to_f.round(2) : "0",format )
+
 
 
         check_date='2016-01-01'.to_date
@@ -1895,15 +1992,29 @@ module WktimeHelper
             total=(f.to_i*60+s.to_i).to_f/60.to_f
 
             if each_rec["spent_hours"].to_f > total.to_f
+              if each_rec["pto_status"].present?
+               worksheet.write(k+1,index+7,each_rec["spent_hours"].to_f.round(2),spent_pto_format)
+
+             else
+                worksheet.write(k+1,index+7,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+              end
 
 
-              worksheet.write(k+1,index+6,each_rec["spent_hours"].to_f.round(2),spent_exced_format)
+              
             else
-              worksheet.write(k+1,index+6,each_rec["spent_hours"].to_f.round(2),format)
+
+              if each_rec["pto_status"].present?
+              worksheet.write(k+1,index+7,each_rec["spent_hours"].to_f.round(2),spent_pto_format)
+              else
+              worksheet.write(k+1,index+7,each_rec["spent_hours"].to_f.round(2),format)
+              end
+
+
+              
             end
             # worksheet.write(k,index+6+1,each_rec["bio_hours"].to_f.round(2),bio_format)
 
-           worksheet.write(k+1,index+1+6,total.to_f.round(2),bio_format)
+           worksheet.write(k+1,index+1+7,total.to_f.round(2),bio_format)
 
           else
 
@@ -1916,7 +2027,7 @@ module WktimeHelper
       j=each_rec["employee_id"]
     end
     if workbook.close
-    # WkMailer.send_attendance_report(start_date,end_date).deliver
+    WkMailer.send_attendance_report(start_date,end_date).deliver
     end
 
   end
@@ -1989,6 +2100,77 @@ module WktimeHelper
     else
     end
   end
+
+
+  def check_bio_permission_list_user_id_project_id1(l,user_id,project_ids,start_date)
+
+    @all_roles=[]
+
+    #user = User.find_by_id(user_id)
+    if !project_ids.present?
+      project_ids = [User.current.projects.first.id]
+    end
+    #project = Project.where(id:project_2).last
+    project_ids = Member.where(:user_id=>User.current.id).map(&:project_id)
+    if project_ids.present?
+      project_ids =Project.where(:id=>project_ids)
+
+    end
+    project_ids.each do |project_id|
+      project = Project.find_by_id(project_id)
+      p project
+      logtime_projects = User.current.roles_for_project(project)
+      if logtime_projects.present?
+        logtime_projects.each do |each_role|
+          if !@all_roles.present? && each_role.permissions.index(l.to_sym)
+
+            @all_roles << each_role.permissions
+          end
+        end
+
+      end
+    end
+
+    @all_roles = @all_roles.flatten! if @all_roles.present?
+
+
+    # if (user_id.to_i == User.current.id && (l == "l1" || l == "l2" || l == "l3" ) && Setting.plugin_redmine_wktime[:wktime_own_approval].blank? )
+    #   @all_roles =[]
+    # end
+p "+++++++++++++++++++++==@all_roles@all_roles@all_roles+++++++++++++++++++++++"
+    p @all_roles
+    p "++++++++++++++++++++++end +++++++++++++++++++++++++++++++++++++"
+    if @all_roles.present?
+      if (l == "l1") && check_expire_for_payroll(start_date)
+        check_l1 = @all_roles.include? l.to_sym
+        check_l2 = @all_roles.include? "l2".to_sym
+        if check_l1.present? && !check_l2.present?
+          return true
+        end
+      elsif(l == "l2")
+        if @all_roles.include? l.to_sym
+          return true
+        end
+      elsif(l == "l3")
+
+        if @all_roles.include? l.to_sym
+          return true
+        end
+      elsif(l == "bio_hours_display")
+
+
+        if @all_roles.include? l.to_sym
+          return true
+        end
+      end
+    else
+    end
+  end
+
+
+
+
+
 
 
   def is_l2?(user_id,project_ids)

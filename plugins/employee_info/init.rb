@@ -27,6 +27,9 @@ Rails.configuration.to_prepare do
  unless User.included_modules.include? EmployeeInfo::Patches::UserPatch
     User.send(:include, EmployeeInfo::Patches::UserPatch)
  end
+ unless Group.included_modules.include? EmployeeInfo::GroupPatch
+   Group.send(:include, EmployeeInfo::GroupPatch)
+ end
  unless Member.included_modules.include? EmployeeInfo::Patches::MemberPatch
    Member.send(:include, EmployeeInfo::Patches::MemberPatch)
  end

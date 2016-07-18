@@ -58,6 +58,7 @@
 <% if params[:project_id].present? %>
     <%= form_tag({:controller => controller.controller_name, :action => 'update'}, :method => :post, :id => 'wktime_edit') do %>
         <% l2_permission, l3_permission =  check_project_permission(params[:project_id], 'l2' ), check_project_permission(params[:project_id], 'l3' )%>
+
         <% if l3_permission || l2_permission  %>
            <% if l3_permission %>
             <h2><%= l(:label_wktime_l3) %></h2>
@@ -72,6 +73,30 @@
         <%=h hidden_field_tag('startdate', @startday) %>
         <%=h hidden_field_tag('enddate', @endday) %>
             <%= render :partial => 'edit_issues_l3', :locals => { :entries => @prev_template ? @prev_entries : @time_entries,:new_entries =>@prev_template ? @prev_entries : @new_entries, :start_dat => @startday, :end_dat => @endday }%>
+        <% end %>
+    <% end %>
+<% end %>
+
+<% if params[:group_id].present? %>
+    <%= form_tag({:controller => controller.controller_name, :action => 'update'}, :method => :post, :id => 'wktime_edit') do %>
+
+        <% l2_permission, l3_permission =  nil, check_group_permission(params[:group_id], 'l3' )%>
+
+        <% if l3_permission || l2_permission  %>
+            <% if l3_permission %>
+                <h2><%= l(:label_wktime_l3) %></h2>
+            <% elsif l2_permission %>
+                <h2><%= l(:label_wktime_home_l2) %></h2>
+            <% end %>
+         
+            <%=h hidden_field_tag('tab', "#{controller_name}") %>
+            <%=h hidden_field_tag('user_id', "#{params[:user_id]}") %>
+            <%=h hidden_field_tag('group_id', "#{params[:group_id]}") %>
+            <%=h hidden_field_tag('startday', "#{@startday}") %>
+            <%=h hidden_field_tag('l3_approve', "l3_approve") %>
+            <%=h hidden_field_tag('startdate', @startday) %>
+            <%=h hidden_field_tag('enddate', @endday) %>
+            <%= render :partial => 'edit_issues_group_l3', :locals => { :entries => @prev_template ? @prev_entries : @time_entries,:new_entries =>@prev_template ? @prev_entries : @new_entries, :start_dat => @startday, :end_dat => @endday }%>
         <% end %>
     <% end %>
 <% end %>

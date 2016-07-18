@@ -100,6 +100,18 @@ module UsersControllerPatch
        end
      end
 
+     def destroy_membership
+       # stroy_membership
+       @membership = Member.find(params[:membership_id])
+       if @membership.deletable?
+         @membership.destroy
+       end
+       respond_to do |format|
+         format.html { redirect_to edit_user_path(@user, :tab => 'memberships') }
+         format.js
+       end
+     end
+
 
   end
   end

@@ -30,7 +30,7 @@ class WktimeController < ApplicationController
       @selected_project = getSelectedProject(@manage_view_spenttime_projects)
       setgroups
     end
-   
+
     ids = nil
     if user_id.blank?
       ids = User.current.id.to_s
@@ -38,11 +38,11 @@ class WktimeController < ApplicationController
       #all users
       userList=[]
       if group_id.blank?
-      
+
         if @selected_project.descendants.present?
           @selected_projects = @selected_project.self_and_descendants
-         end 
-      
+        end
+
         userList = Principal.member_of(@selected_projects.present? ? @selected_projects : @selected_project)
       else
         userList = getMembers
@@ -93,6 +93,7 @@ class WktimeController < ApplicationController
 
     findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr,@from,@to,ids)
     if params[:project_id].present? && params[:user_id].to_i > 0
+      p 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
       @total_days=0
       params[:user_id].to_i > 0
       retrieve_date_range
@@ -130,6 +131,7 @@ class WktimeController < ApplicationController
         @user_hours =  wktime_helper.get_biometric_hours_per_month(bio_user,@startday,@endday,"from_to_end")
       end
     else if  params[:project_id].present? && params[:user_id].to_i == 0
+           p 22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
            retrieve_date_range
            params[:user_id] = User.current.id
            @prev_template = false
@@ -207,7 +209,98 @@ class WktimeController < ApplicationController
                @prev_template = true
              end
            end
+
+         else if  params[:group_id].present?
+                p "++++++++++++++++++++++++++++++++++end ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+                p 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
+                retrieve_date_range
+                params[:user_id] = User.current.id
+                @prev_template = false
+                @new_custom_field_values = getNewCustomField
+                @startday ||= @from
+                @new_entries = []
+                @user ||= User.find(params[:user_id])
+                @endday ||= @to
+                @editable = @wktime.nil? || @wktime.status == 'n' || @wktime.status == 'r'
+                # @project = Project.find(params[:project_id])
+                @group = Group.find(params[:group_id])
+                # @user_hours = []
+                wktime_helper = Object.new.extend(WktimeHelper)
+                @total_days = (@endday - @startday).to_i
+                days_count = (@startday..@endday).to_a.count
+
+                project_users = []
+
+                # if @project.descendants.present?
+                #   @projects = @project.self_and_descendants
+                # end
+
+
+                @group.users.collect do |user|
+                  time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id).group('spent_on').sum('hours')
+                  if time_entries.present?
+                    project_users << user
+                    wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
+                    l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
+                    l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
+                    l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
+                    reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
+                    lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
+                    @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+                  end
+                end
+
+
+
+
+                @new_entries = @new_entries.flatten
+                # @new_entries = @new_entries.flatten.uniq{|x| [x.project_id,x.user_id] if x.user_id.present? } if @new_entries.present?
+
+                # @project.users.collect do |user|
+                #   time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id,:project_id=>params[:project_id]).group('spent_on').sum('hours')
+                #   if time_entries.present?
+                #     project_users << user
+                #     wktime_enties = Wktime.where(:user_id => user.id, :begin_date => @startday..@endday)
+                #     l3_wktime = wktime_enties.where(:status => 'l3').map(&:begin_date)
+                #     l2_wktime = wktime_enties.where(:status => 'l2').map(&:begin_date)
+                #     l1_wktime = wktime_enties.where(:status => 'l1').map(&:begin_date)
+                #     reject_wktime = wktime_enties.where(:status => 'r').map(&:begin_date)
+                #     lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
+                #     @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
+                #   end
+                # end
+
+                #users_id_list = @project.users
+                #if users_ids.count > 100
+                user_group = []
+                @user_hours = {}
+                project_users.in_groups_of(50) {|group| user_group << group.compact }
+                user_group.each do |users_ids|
+                  bio_wk = wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"from_to_end")
+                  if days_count == 7
+                    @user_hours.merge!(bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : "")
+                  else
+                    @user_hours.merge!(bio_wk.present? ? bio_wk : {})
+                  end
+                end
+
+                if @new_entries.blank? && !params[:prev_template].blank?
+                  @prev_entries = prevTemplate(@user.id)
+                  if !@prev_entries.blank?
+                    set_project_issues(@prev_entries)
+                    @prev_template = true
+                  end
+                end
+
+
+
+              end
+
+
          end
+
+
     end
 
     respond_to do |format|
@@ -360,6 +453,7 @@ class WktimeController < ApplicationController
       wktime_helper = Object.new.extend(WktimeHelper)
       @approve_days = params[:approved_days] if params[:approved_days].present?
       if @approve_days.present?
+        p "++++++++++++++++++++++++111111111111111111111111111111111111111111111111111111111111111111111111111"
         if params[:wktime_reject].present?
           sendRejectionEmail()
         end
@@ -421,9 +515,12 @@ class WktimeController < ApplicationController
           end
         end
       elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l3',User.current.id,[params[:project_id].to_i],@startday)
+
         approve_l3
       elsif params[:user_ids].present? && wktime_helper.check_bio_permission_list_user_id_project_id('l2',User.current.id,[params[:project_id].to_i],@startday)
-        approve_home_l2
+          approve_home_l2
+      elsif params[:group_id].present?
+          approve_group_l3
       end
     end
 
@@ -492,6 +589,66 @@ class WktimeController < ApplicationController
           user = User.find(each_user)
           approve_status = wktime_helper.check_time_log_entry_for_approve(each_date,user)
           @wktime = Wktime.find_or_initialize_by_begin_date_and_user_id(:user_id=>each_user.to_i,:begin_date=>each_date.to_date,:project_id=>params[:project_id])
+          if approve_status==false && (@wktime.status !="l3") && params[:wktime_approve].present?
+            @wktime.pre_status = @wktime.status
+            @wktime.status = 'l3'
+          elsif approve_status==false && params[:wktime_unapprove].present?
+            # @wktime.status = @wktime.pre_status
+            if @wktime.pre_status.present? && @wktime.pre_status.to_s != "l3"
+              @wktime.status = @wktime.pre_status
+            else
+              @wktime.status = 'n'
+            end
+
+          elsif  approve_status==false && (@wktime.status !="l3") && params[:wktime_reject].present?
+            @wktime.status = 'r'
+            Rejection.create(:user_id => each_user, :project_id => params[:project_id], :rejected_by =>User.current.id, :rejected_role=> 'l3', :comment =>params[:wktime_notes], :date => each_date.to_date )
+            @rejected_dates << each_date
+          end
+          @wktime.user_id = each_user
+          @wktime.hours = @sum if !@wktime.hours.present?
+          @wktime.project_id = params[:project_id]
+          @wktime.statusupdate_on =Date.today
+          @wktime.statusupdater_id = User.current.id
+          @wktime.save
+        end
+      end
+      if  params[:wktime_reject].present?
+        if email_delivery_enabled?
+          sendRejectionEmail_L3_or_L2()
+        end
+      end
+    else
+    end
+
+  end
+
+
+
+
+
+  def approve_group_l3
+    @ids= params[:ids]
+    @approved_dates=[]
+    @rejected_dates=[]
+    @user_ids = params[:user_ids]
+    if @user_ids.present?
+      user_id= @user_ids.first
+      @sum='0'
+      month = params[:startday].to_date
+      deadline_date = UserUnlockEntry.dead_line_final_method
+      if params[:enddate].to_date > deadline_date
+        params[:enddate] = deadline_date
+      end
+      @approved_dates << (params[:startdate].to_date..params[:enddate].to_date).to_a
+
+      approved_dates = @approved_dates.flatten
+      @user_ids.each do |each_user|
+        approved_dates.each do |each_date|
+          wktime_helper = Object.new.extend(WktimeHelper)
+          user = User.find(each_user)
+          approve_status = wktime_helper.check_time_log_entry_for_approve(each_date,user)
+          @wktime = Wktime.find_or_initialize_by_begin_date_and_user_id(:user_id=>each_user.to_i,:begin_date=>each_date.to_date)
           if approve_status==false && (@wktime.status !="l3") && params[:wktime_approve].present?
             @wktime.pre_status = @wktime.status
             @wktime.status = 'l3'
@@ -981,7 +1138,7 @@ class WktimeController < ApplicationController
     # end
     @status1 = Wktime.where(begin_date: startday..end_day,status: "l1")
 
-  
+
 
     if @status.present? && @status.count > 5
       return true
@@ -1024,14 +1181,14 @@ class WktimeController < ApplicationController
 # to change the status to locked user to unlock
   def unlock_users
     #@@unlock_status = find_lock_users(params[:user_id])
-p 1111111111111111111111111111111111111111111111111111111111111
+    p 1111111111111111111111111111111111111111111111111111111111111
     @update_unlock_status = update_unlock_details(params)
     @lock_status = UserUnlockEntry.where(:user_id=>params[:user_id])
     if @update_unlock_status
 
     end
-  wktime_helper = Object.new.extend(WktimeHelper)
-  wktime_helper.create_nc_for_employee_within_unlock_sla(Date.today,"TEP_NC_014",params[:user_id])
+    wktime_helper = Object.new.extend(WktimeHelper)
+    wktime_helper.create_nc_for_employee_within_unlock_sla(Date.today,"TEP_NC_014",params[:user_id])
 
     respond_to do |format|
       format.html { redirect_to_settings_in_projects }
@@ -1598,7 +1755,7 @@ p 1111111111111111111111111111111111111111111111111111111111111
 
     @from, @to = @to, @from if @from && @to && @from > @to
 
-   end
+  end
 
   # show all groups and project/group members show
   def setgroups
@@ -1615,16 +1772,16 @@ p 1111111111111111111111111111111111111111111111111111111111111
       @use_group=false
       #@members=@selected_project.members.collect{|m| [ m.name, m.user_id ] }.sort
       # projmem= @selected_project.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
-      
-      projmembers=[]
-    projects = @selected_project.self_and_descendants
-    projects.each do |each_pro|
-      projmembers << each_pro.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
 
-    end
-    # projmembers.flatten.each do |m|
-    #   userStr << m.user_id.to_s() + ',' + m.name + "\n"
-    # end
+      projmembers=[]
+      projects = @selected_project.self_and_descendants
+      projects.each do |each_pro|
+        projmembers << each_pro.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
+
+      end
+      # projmembers.flatten.each do |m|
+      #   userStr << m.user_id.to_s() + ',' + m.name + "\n"
+      # end
       @members=projmembers.flatten.collect{|m| [ m.name, m.user_id ] }
     end
   end
@@ -1759,7 +1916,7 @@ p 1111111111111111111111111111111111111111111111111111111111111
     @entry_count = result[0].id
     setLimitAndOffset()
     rangeStr = formPaginationCondition()
-   
+
     collect_mondays=[]
     (from..to).each do |each_date|
       if each_date.wday == 0
@@ -1769,22 +1926,22 @@ p 1111111111111111111111111111111111111111111111111111111111111
     @entries = TimeEntry.find_by_sql(wkSelectStr + sqlStr + wkSqlStr + rangeStr)
     pluck_entries=@entries.map { |e|  [e.user_id, e.spent_on.strftime("%F")] if e.user_id.present?  }
     collect_entries_per_user=[]
-   collect_entries_per_week = []
+    collect_entries_per_week = []
 
     ids.present? && ids.split(',').each do |each_member|
       collect_mondays.each do |each_monday|
         if !pluck_entries.include?([each_member.to_i,each_monday.strftime("%F")])
           sql = "select #{each_member} as user_id,'#{each_monday}' as spent_on, 0 as hours,'not available' as status from time_entries limit 1"
           collect_entries_per_week = TimeEntry.find_by_sql(sql)
-        # collect_entries << select 1 as user_id,"2016-01-04" as spent_on, 0 as hours from time_entries
+          # collect_entries << select 1 as user_id,"2016-01-04" as spent_on, 0 as hours from time_entries
 
+        end
+        collect_entries_per_user << collect_entries_per_week if collect_entries_per_week.present?
       end
-   collect_entries_per_user << collect_entries_per_week if collect_entries_per_week.present?
-    end
 
-end
-     collect_entries_per_user = collect_entries_per_user.flatten!
-     @entries = @entries + collect_entries_per_user if collect_entries_per_user.present?
+    end
+    collect_entries_per_user = collect_entries_per_user.flatten!
+    @entries = @entries + collect_entries_per_user if collect_entries_per_user.present?
 
     @entries = @entries.uniq{|x| [x.spent_on,x.user_id] if x.user_id.present? } if @entries.present?
     #@entries = @entries.uniq{|x| x.user_id && x.spent_on } if @entries.present?
@@ -2109,8 +2266,8 @@ end
 
     if params[:wktime_approve].present?
 
-        @wktime.pre_status=@wktime.status
-        @wktime.status = role
+      @wktime.pre_status=@wktime.status
+      @wktime.status = role
 
     elsif params[:wktime_unapprove].present?
       if @wktime.pre_status.present? && @wktime.pre_status.to_s != role.to_s

@@ -21,6 +21,8 @@ module EmployeeInfo
           validate :capacity_is_grater_than_total
           # validate :validate_billable
 
+
+
           def capacity_is_less_than_total
 
             errors.add(:Utilization, "should be less than or equal to #{(100-self.other_capacity).round}") if (self.capacity*100+self.other_capacity) > 100
@@ -54,6 +56,9 @@ module EmployeeInfo
            end
           end
           def validate_with_class?
+            p "++++++++++=self.user.class.name +++++++++"
+            p self.user.class.name
+            p "++++++++++++++++end ++++++++++=="
             self.user.class.name == "User"
           end
 
@@ -73,8 +78,13 @@ module EmployeeInfo
             return available_capacity.round
           end
           def self.current_project_capacity(member)
+            p "++++++++++++++++++member ++++++++++++++++"
+            p member
+            p "++++++++++++++++end +++++++++++++"
+            if member.present?
             total_capacity =  Member.where(:user_id=>member.user_id,:project_id=>member.project_id).map(&:capacity).sum*100
             return total_capacity.round
+            end
           end
 
           def self.other_capacity(member)

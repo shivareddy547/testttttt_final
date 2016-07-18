@@ -372,28 +372,3 @@ $( document ).ready(function() {
 
 
 
-
-//
-//if(error_messages > 0)
-//{
-//    var current_capacity ="<%=  Member.current_project_capacity(@membership) %>"
-//    var billable ="<%=  @membership.billable.present? ? (@membership.billable=="true" ? "true" : "false") : "" %>"
-//    console.log(billable)
-//    $('#member-<%= @membership.id %>-roles-form').show();
-//    $('#member-<%= @membership.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", false);
-//    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").slider('enable');
-//    $('#member-<%= @membership.id %>-roles-form').parent().parent().find("#div_member_capacity_slider").show();
-//
-//
-//    $(".memberships #member-<%=@membership.id %> #user_billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
-//    $(".memberships #member-<%=@membership.id %> #billable").val("<%= params[:billable].present? ? params[:billable]=="true" ? "Billable" : "Non Billable" : "" %>")
-//
-//
-//}
-//else
-//{
-//    $('#member-<%= @membership.id %>-roles-form').hide();
-//    $('#member-<%= @membership.id %>-roles-form').parent().next().find("#user_billable").attr("disabled", true);
-//
-//
-//}
