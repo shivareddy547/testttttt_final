@@ -176,12 +176,95 @@ Rails.configuration.to_prepare do
   scheduler.cron  week_time do
     # do something every day, five minutes after midnight
     # (see "man 5 crontab" in your terminal)
-    p "==========Scheduler Started for attendance report week=========="
+    p "==========Scheduler Started for attendance report week111111111=========="
     wktime_helper = Object.new.extend(WktimeHelper)
     start_date=(Date.today-3).at_beginning_of_week
     end_date=start_date.at_end_of_week-2
     wktime_helper.get_new_attendance(start_date,end_date)
     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
+  week_time = '25 12 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report 111111111111=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+  week_time = '20 13 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report week2222222222222222=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+  week_time = '20 14 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report week333333333333333333=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
+  week_time = '20 15 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report week4444444444444444444=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
+
+  week_time = '20 15 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report week55555555555555555555=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+  end
+
+
+  week_time = '20 16 * * 2'
+  # week_time = '13 18 6 * *'
+  scheduler.cron  week_time do
+    # do something every day, five minutes after midnight
+    # (see "man 5 crontab" in your terminal)
+    Rails.logger.info "==========Scheduler Started for attendance report week66666666666666666=========="
+    wktime_helper = Object.new.extend(WktimeHelper)
+    start_date=(Date.today-3).at_beginning_of_week
+    end_date=start_date.at_end_of_week-2
+    # wktime_helper.get_new_attendance(start_date,end_date)
+    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
   end
 
 
