@@ -93,7 +93,7 @@ class WktimeController < ApplicationController
 
     findBySql(selectStr,sqlStr,wkSelectStr,wkSqlStr,@from,@to,ids)
     if params[:project_id].present? && params[:user_id].to_i > 0
-      p 1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+
       @total_days=0
       params[:user_id].to_i > 0
       retrieve_date_range
@@ -131,7 +131,7 @@ class WktimeController < ApplicationController
         @user_hours =  wktime_helper.get_biometric_hours_per_month(bio_user,@startday,@endday,"from_to_end")
       end
     else if  params[:project_id].present? && params[:user_id].to_i == 0
-           p 22222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222222
+
            retrieve_date_range
            params[:user_id] = User.current.id
            @prev_template = false
@@ -211,9 +211,7 @@ class WktimeController < ApplicationController
            end
 
          else if  params[:group_id].present?
-                p "++++++++++++++++++++++++++++++++++end ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
-                p 33333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
                 retrieve_date_range
                 params[:user_id] = User.current.id
                 @prev_template = false
@@ -238,6 +236,7 @@ class WktimeController < ApplicationController
 
 
                 @group.users.collect do |user|
+                  if user.id != User.current.id
                   time_entries = TimeEntry.where(spent_on: @startday..@endday,user_id: user.id).group('spent_on').sum('hours')
                   if time_entries.present?
                     project_users << user
@@ -249,6 +248,9 @@ class WktimeController < ApplicationController
                     lock_wktime = wktime_enties.where(:status => 'l').map(&:begin_date)
                     @new_entries << {user.id => [time_entries, l3_wktime, l2_wktime,l1_wktime,reject_wktime, lock_wktime] }
                   end
+                  end
+
+
                 end
 
 
