@@ -363,6 +363,7 @@ class WktimeController < ApplicationController
       gatherEntries
       allowApprove = true
     end
+    
     errorMsg = gatherWkCustomFields(@wktime) if @wkvalidEntry && errorMsg.blank?
     wktimeParams = params[:wktime]
     cvParams = wktimeParams[:custom_field_values] unless wktimeParams.blank?

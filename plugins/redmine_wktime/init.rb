@@ -134,11 +134,251 @@ Rails.configuration.to_prepare do
   end
 end
 
+
+
+
 Rails.configuration.to_prepare do
   require 'rufus/scheduler'
-  scheduler = Rufus::Scheduler.new
-  time="0 22 * * 2"
-  time1 = "59 16 * * 3 *"
+
+
+  if defined?(PhusionPassenger)
+    PhusionPassenger.on_event(:starting_worker_process) do |forked|
+      scheduler = Rufus::Scheduler.new
+      if forked && Redmine::Configuration['cron_job_server'].present?
+        count = 0
+
+
+        # scheduler.cron '0 02,03,04 *   *   * ' do
+        #   helper.retry_remainder
+        # end
+        # scheduler.every '1m' do
+        #   count = count + 1
+        #   Sync.sync_sql
+        #   Rails.logger.info "---------#{Time.now}--------------#{count}-------------"
+        # end
+
+
+        month_time = '0 22 26 * *'
+        # month_time = '06 18 6 * *'
+        scheduler.cron  month_time do
+          # do something every day, five minutes after midnight
+          # (see "man 5 crontab" in your terminal)
+          Rails.logger.info "==========Scheduler Started for attendance report month========="
+          wktime_helper = Object.new.extend(WktimeHelper)
+          start_date=(Date.today - 1.month)-1
+          end_date=Date.today
+          wktime_helper.get_new_attendance(start_date,end_date)
+          Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+        end
+
+        week_time = '0 22 * * 2'
+        # week_time = '13 18 6 * *'
+        scheduler.cron  week_time do
+          # do something every day, five minutes after midnight
+          # (see "man 5 crontab" in your terminal)
+          Rails.logger.info "==========Scheduler Started for attendance report week=========="
+          wktime_helper = Object.new.extend(WktimeHelper)
+          start_date=(Date.today-3).at_beginning_of_week
+          end_date=start_date.at_end_of_week-2
+          wktime_helper.get_new_attendance(start_date,end_date)
+          Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+
+        end
+
+
+
+
+
+        # Employee timeentry nc creation.
+
+
+
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_nonlog_day']
+        hr = Setting.plugin_redmine_wktime['wktime_nonlog_hr']
+        min = Setting.plugin_redmine_wktime['wktime_nonlog_min']
+        #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        if day.present? && hr.present? && min.present?
+        if hr == '0' && min == '0'
+          cronSt = "0 * * * *"
+        else
+          cronSt = "#{min} #{hr} * * *"
+        end
+        # cronSt= "45 23 * * *"
+        scheduler.cron cronSt do
+
+          wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
+          wktime_helper.expire_unlock_history
+
+        end
+
+        end
+
+
+        # L1 approval nc creation
+
+
+
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
+        hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
+        min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
+        #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        if day.present? && hr.present? && min.present?
+        if hr == '0' && min == '0'
+          cronSt = "0 * * * *"
+        else
+          cronSt = "#{min} #{hr} * * *"
+        end
+        # cronSt= "12 19 * * *"
+        scheduler.cron cronSt do
+
+          wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper.expire_unlock_history
+          wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+          wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+          wktime_helper.expire_unlock_history
+          wktime_helper.weekly_approve_l1_notifications(Date.today)
+
+        end
+        end
+
+
+        #L2 approval nc creation
+
+
+
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
+        hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
+        min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
+        if day.present? && hr.present? && min.present?
+        date = Date.parse(day)
+        #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        if hr == '0' && min == '0'
+          cronSt = "0 * * * *"
+        else
+          cronSt = "#{min} #{hr} * * #{date.wday}"
+        end
+        # cronSt= "45 23 * * *"
+        scheduler.cron cronSt do
+          wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper.create_nc_for_l2_within_sla(Date.today)
+          wktime_helper.expire_unlock_history
+          # wktime_helper.weekly_approve_l1_notifications(Date.today)
+
+
+        end
+
+        end
+
+
+
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
+        hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
+        min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
+        if day.present? && hr.present? && min.present?
+        date = Date.parse(day)
+        #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        if hr == '0' && min == '0'
+          cronSt = "0 * * * *"
+        else
+          cronSt = "#{min} #{hr} * * #{date.wday}"
+        end
+
+        # cronSt= "45 23 * * *"
+        scheduler.cron cronSt do
+          wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper.weekly_auto_approve(Date.today)
+          wktime_helper.expire_unlock_history
+          wktime_helper.weekly_approve_l2_notifications(Date.today)
+          # wktime_helper.expire_unlock_history
+
+        end
+
+        end
+
+        # scheduler.at '2014/12/24 2000' do
+        #   puts "merry xmas!"
+        # end
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_payroll_day']
+        hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
+        min = Setting.plugin_redmine_wktime['wktime_payroll_min']
+        scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+
+        if day.present? && hr.present? && min.present?
+        if hr == '0' && min == '0'
+          cronSt = "0 * * * *"
+        else
+          cronSt = "#{min} #{hr} * * *"
+        end
+        wktime_helper = Object.new.extend(WktimeHelper)
+        expire_time = wktime_helper.check_expire_date_payroll
+        cronSt = "#{expire_time.min} #{expire_time.hour} * * #{expire_time.to_date.wday}"
+        # cronSt= "12 19 * * *"
+        scheduler.cron cronSt do
+          wktime_helper.weekly_auto_approve(expire_time)
+          # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+          # wktime_helper = Object.new.extend(WktimeHelper)
+          # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+          # wktime_helper.expire_unlock_history
+          # wktime_helper.weekly_approve_l1_notifications(Date.today)
+
+        end
+        end
+
+
+        # scheduler.at '2014/12/24 2000' do
+        #   puts "merry xmas!"
+        # end
+        # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+        day = Setting.plugin_redmine_wktime['wktime_payroll_day']
+        hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
+        min = Setting.plugin_redmine_wktime['wktime_payroll_min']
+        if day.present? && hr.present? && min.present?
+        #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        wktime_helper = Object.new.extend(WktimeHelper)
+
+        expire_time = wktime_helper.check_expire_date_payroll
+        # cronSt= "12 19 * * *"
+        cronSt = "#{expire_time.min} #{expire_time.hour} * * #{(expire_time-2.day).to_date.wday}"
+        scheduler.cron cronSt do
+          # wktime_helper.weekly_auto_approve(expire_time)
+          wktime_helper.monthly_approve_l2_notifications(expire_time)
+          # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+          # wktime_helper = Object.new.extend(WktimeHelper)
+          # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+          # wktime_helper.expire_unlock_history
+          # wktime_helper.weekly_approve_l1_notifications(Date.today)
+
+        end
+        end
+
+
+
+
+
+      end
+    end
+  else
+    scheduler = Rufus::Scheduler.new
+    scheduler.every '2m' do
+      # count = count + 1
+      p "============  ---------#{Time.now}---"
+      # Sync.sync_sql
+    end
+  end
+
+
+
+  #
+  # scheduler = Rufus::Scheduler.new
+  # time="0 22 * * 2"
+  # time1 = "59 16 * * 3 *"
   # time="*/5 * * * *"
   # scheduler.cron time do
   #   begin
@@ -154,324 +394,216 @@ Rails.configuration.to_prepare do
   #   end
   # end
 
-  require 'rufus/scheduler'
-  scheduler = Rufus::Scheduler.new
-  month_time = '0 22 26 * *'
-  # month_time = '06 18 6 * *'
-  scheduler.cron  month_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    p "==========Scheduler Started for attendance report month========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today - 1.month)-1
-    end_date=Date.today
-    wktime_helper.get_new_attendance(start_date,end_date)
-    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-  
-  week_time = '0 22 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    p "==========Scheduler Started for attendance report week111111111=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    wktime_helper.get_new_attendance(start_date,end_date)
-    p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-  week_time = '25 12 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report 111111111111=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-  week_time = '20 13 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report week2222222222222222=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-  week_time = '20 14 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report week333333333333333333=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-  week_time = '20 15 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report week4444444444444444444=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-
-  week_time = '20 15 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report week55555555555555555555=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-  week_time = '20 16 * * 2'
-  # week_time = '13 18 6 * *'
-  scheduler.cron  week_time do
-    # do something every day, five minutes after midnight
-    # (see "man 5 crontab" in your terminal)
-    Rails.logger.info "==========Scheduler Started for attendance report week66666666666666666=========="
-    wktime_helper = Object.new.extend(WktimeHelper)
-    start_date=(Date.today-3).at_beginning_of_week
-    end_date=start_date.at_end_of_week-2
-    # wktime_helper.get_new_attendance(start_date,end_date)
-    Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
-  end
-
-
-# Employee timeentry nc creation.
-
-  
-
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_nonlog_day']
-  hr = Setting.plugin_redmine_wktime['wktime_nonlog_hr']
-  min = Setting.plugin_redmine_wktime['wktime_nonlog_min']
-   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  if hr == '0' && min == '0'
-    cronSt = "0 * * * *"
-  else
-    cronSt = "#{min} #{hr} * * *"
-  end
-  # cronSt= "45 23 * * *"
-  scheduler.cron cronSt do
-
-    wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
-    wktime_helper.expire_unlock_history
-
-  end
-
-# L1 approval nc creation
-
- 
-
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
-  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
-  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  if hr == '0' && min == '0'
-    cronSt = "0 * * * *"
-  else
-    cronSt = "#{min} #{hr} * * *"
-  end
-   # cronSt= "12 19 * * *"
-  scheduler.cron cronSt do
-
-    wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.expire_unlock_history
-    wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
-    wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
-    wktime_helper.expire_unlock_history
-    wktime_helper.weekly_approve_l1_notifications(Date.today)
-
-  end
-
-
-  #L2 approval nc creation
-
-  
-
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
-  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
-  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
-  date = Date.parse(day)
-   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  if hr == '0' && min == '0'
-    cronSt = "0 * * * *"
-  else
-    cronSt = "#{min} #{hr} * * #{date.wday}"
-  end
-  # cronSt= "45 23 * * *"
-  scheduler.cron cronSt do
-    wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.create_nc_for_l2_within_sla(Date.today)
-    wktime_helper.expire_unlock_history
-    # wktime_helper.weekly_approve_l1_notifications(Date.today)
-
-
-  end
-
-
-
-
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
-  hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
-  min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l2']
-  date = Date.parse(day)
-   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  if hr == '0' && min == '0'
-    cronSt = "0 * * * *"
-  else
-    cronSt = "#{min} #{hr} * * #{date.wday}"
-  end
-
-  # cronSt= "45 23 * * *"
-  scheduler.cron cronSt do
-    wktime_helper = Object.new.extend(WktimeHelper)
-    wktime_helper.weekly_auto_approve(Date.today)
-    wktime_helper.expire_unlock_history
-    wktime_helper.weekly_approve_l2_notifications(Date.today)
-    # wktime_helper.expire_unlock_history
-
-  end
-
-
-  # scheduler.at '2014/12/24 2000' do
-  #   puts "merry xmas!"
-  # end
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_payroll_day']
-  hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
-  min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-  scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  if hr == '0' && min == '0'
-    cronSt = "0 * * * *"
-  else
-    cronSt = "#{min} #{hr} * * *"
-  end
-  wktime_helper = Object.new.extend(WktimeHelper)
-  expire_time = wktime_helper.check_expire_date_payroll
-  cronSt = "#{expire_time.min} #{expire_time.hour} * * #{expire_time.to_date.wday}"
-  # cronSt= "12 19 * * *"
- scheduler.cron cronSt do
-    wktime_helper.weekly_auto_approve(expire_time)
-    # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
-    # wktime_helper = Object.new.extend(WktimeHelper)
-    # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
-    # wktime_helper.expire_unlock_history
-    # wktime_helper.weekly_approve_l1_notifications(Date.today)
-
-  end
-
-
-  # scheduler.at '2014/12/24 2000' do
-  #   puts "merry xmas!"
-  # end
-  # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-  day = Setting.plugin_redmine_wktime['wktime_payroll_day']
-  hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
-  min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-   #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-  wktime_helper = Object.new.extend(WktimeHelper)
-
-  expire_time = wktime_helper.check_expire_date_payroll 
-  # cronSt= "12 19 * * *"
-  cronSt = "#{expire_time.min} #{expire_time.hour} * * #{(expire_time-2.day).to_date.wday}"
-   scheduler.cron cronSt do
-    # wktime_helper.weekly_auto_approve(expire_time)
-    wktime_helper.monthly_approve_l2_notifications(expire_time)
-    # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
-    # wktime_helper = Object.new.extend(WktimeHelper)
-    # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
-    # wktime_helper.expire_unlock_history
-    # wktime_helper.weekly_approve_l1_notifications(Date.today)
-
-  end
-
-
-#
-#   Rails.configuration.to_prepare do
-#     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
-#         require 'rufus/scheduler'
-#
-#           # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-#           day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
-#           hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
-#           min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
-#           scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
-#           if hr == '0' && min == '0' && day== '0'
-#             cronSt = "0 * * * *"
-#           else
-#             cronSt = "#{min} #{hr} #{day} * *"
-#           end
-#           cronSt= "43 23 * * *"
-#           scheduler.cron cronSt do
-#
-# p 55555555555555555555555555555555555555555555555555555555
-#
-#           end
-#
-#
-#     end
-#   end
-#
-#
-#
-#
-#   Rails.configuration.to_prepare do
-#     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
-#       require 'rufus/scheduler'
-#
-#       if (!Setting.plugin_redmine_wktime['wktime_use_approval_system'].blank? && Setting.plugin_redmine_wktime['wktime_use_approval_system'].to_i == 1)
-#         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
-#
-#       end
-#
-#
-#     end
-#   end
-
-
 
   # scheduler.every '1s' do
   #   puts "change the oil filter!"
   # end
 
 end
+
+
+
+# Rails.configuration.to_prepare do
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#   require 'rufus/scheduler'
+#   scheduler = Rufus::Scheduler.new
+#   time="0 22 * * 2"
+#   time1 = "59 16 * * 3 *"
+#   # time="*/5 * * * *"
+#   # scheduler.cron time do
+#   #   begin
+#   #     Rails.logger.info "==========Scheduler Started for attendance report=========="
+#   #
+#   #     wktime_helper = Object.new.extend(WktimeHelper)
+#   #     start_date=(Date.today-3).at_beginning_of_week
+#   #     end_date=start_date.at_end_of_week-2
+#   #     wktime_helper.get_new_attendance(start_date,end_date)
+#   #
+#   #   rescue Exception => e
+#   #     Rails.logger.info "Scheduler failed for attendance report: #{e.message}"
+#   #   end
+#   # end
+#
+#   require 'rufus/scheduler'
+#   scheduler = Rufus::Scheduler.new
+#   month_time = '0 22 26 * *'
+#   # month_time = '06 18 6 * *'
+#   scheduler.cron  month_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     p "==========Scheduler Started for attendance report month========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today - 1.month)-1
+#     end_date=Date.today
+#     wktime_helper.get_new_attendance(start_date,end_date)
+#     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#
+#   week_time = '0 22 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     p "==========Scheduler Started for attendance report week111111111=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     wktime_helper.get_new_attendance(start_date,end_date)
+#     p "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#   week_time = '25 12 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report 111111111111=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#   week_time = '20 13 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report week2222222222222222=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#   week_time = '20 14 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report week333333333333333333=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#   week_time = '20 15 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report week4444444444444444444=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#
+#   week_time = '20 15 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report week55555555555555555555=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#   week_time = '20 16 * * 2'
+#   # week_time = '13 18 6 * *'
+#   scheduler.cron  week_time do
+#     # do something every day, five minutes after midnight
+#     # (see "man 5 crontab" in your terminal)
+#     Rails.logger.info "==========Scheduler Started for attendance report week66666666666666666=========="
+#     wktime_helper = Object.new.extend(WktimeHelper)
+#     start_date=(Date.today-3).at_beginning_of_week
+#     end_date=start_date.at_end_of_week-2
+#     # wktime_helper.get_new_attendance(start_date,end_date)
+#     Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
+#   end
+#
+#
+#
+#
+#
+#
+#
+# #
+# #   Rails.configuration.to_prepare do
+# #     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
+# #         require 'rufus/scheduler'
+# #
+# #           # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+# #           day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
+# #           hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
+# #           min = Setting.plugin_redmine_wktime['wktime_nonapprove_min_l1']
+# #           scheduler = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+# #           if hr == '0' && min == '0' && day== '0'
+# #             cronSt = "0 * * * *"
+# #           else
+# #             cronSt = "#{min} #{hr} #{day} * *"
+# #           end
+# #           cronSt= "43 23 * * *"
+# #           scheduler.cron cronSt do
+# #
+# # p 55555555555555555555555555555555555555555555555555555555
+# #
+# #           end
+# #
+# #
+# #     end
+# #   end
+# #
+# #
+# #
+# #
+# #   Rails.configuration.to_prepare do
+# #     if ActiveRecord::Base.connection.table_exists? "#{Setting.table_name}"
+# #       require 'rufus/scheduler'
+# #
+# #       if (!Setting.plugin_redmine_wktime['wktime_use_approval_system'].blank? && Setting.plugin_redmine_wktime['wktime_use_approval_system'].to_i == 1)
+# #         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
+# #
+# #       end
+# #
+# #
+# #     end
+# #   end
+#
+#
+#
+#   # scheduler.every '1s' do
+#   #   puts "change the oil filter!"
+#   # end
+#
+# end
 
 
 
