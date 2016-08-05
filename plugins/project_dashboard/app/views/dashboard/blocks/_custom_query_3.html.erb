@@ -19,7 +19,9 @@
 
 <%#= assigned_issues.issues.where(:project_id=>@project.id).inspect %>
 <div id="resource_custom_query">
+
   <%= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],:conditions=>["issues.project_id in (#{@project.id})"]) : [] } %>
+
   <%#= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:conditions=>["project_id in (#{@project.id})"]) : [] } %>
 </div>
 <div class="custom_queries_list3" style="display:none">
@@ -33,8 +35,8 @@
   <p><label for="custom query selection" id="custom_queries">
 
     <%= l(:lable_select_custom_query_list) %></label> <span class="required">*</span>
-    <%= render :partial => 'issues/list_simple', :locals => { :issues =>  assigned_issues.present? ? assigned_issues.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],:conditions=>["issues.project_id in (#{@project.id})"]) : [] } %>
-    <%#= select_tag "custom_query_id", options_from_collection_for_select(@sidebar_queries, "id", "name",:selected =>@setting_custom_query_id) %>
+
+    <%= select_tag "custom_query_id", options_from_collection_for_select(@sidebar_queries, "id", "name",:selected =>@setting_custom_query_id) %>
   </p>
 
   <!--<p><label for="status_selection" id="status_select"><%#= l(:lable_select_status) %></label> <span class="required">*</span>  <%#= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>-->

@@ -1,12 +1,11 @@
 class OverdueUnmanageTasksSetting < ActiveRecord::Base
   # unloadable
   belongs_to :project_user_preference
-  attr_protected :trackers, :statuses,:project_user_preference_id,:custom_query_id,:allocation_type
+  attr_protected :trackers, :statuses,:project_user_preference_id,:custom_query_id
   serialize :trackers,Array
   serialize :statuses,Array
   serialize :save_text_editor,Array
   serialize :custom_query_id,Array
-  serialize :allocation_type,Array
 
   def self.project_user_preference_settings(user_id,project_id,block,trackers,statuses)
     project_user_preference = ProjectUserPreference.where(:project_id=>project_id,:user_id=>user_id).last

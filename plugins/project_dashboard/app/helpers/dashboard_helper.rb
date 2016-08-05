@@ -298,23 +298,10 @@ module DashboardHelper
   def get_sql_for_filter_query(project_id)
     get_sql_for_filter_query = ""
     @find_dashboard_query = DashboardQuery.where(:project_id=>project_id,:user_id=>User.current.id)
-   
-    p "+++++++++++=end +++++++++"
     if @find_dashboard_query.present?
       get_sql_for_filter_query = @find_dashboard_query.last.statement
       if get_sql_for_filter_query.present?
-        p "=====================hhhhhhhhhhhhhhhhhhhhhh=========="
-        p get_sql_for_filter_query
-        p "===============5======5555555555555555============="
-        p @find_dashboard_query.last.project_statement
-        p 88888888888888888888888888888888
-        if @find_dashboard_query.last.project_statement.present?
-       p  get_sql_for_filter_query =  " AND " + @find_dashboard_query.last.project_statement + "AND " + get_sql_for_filter_query
-        else
-          get_sql_for_filter_query =  "AND " + get_sql_for_filter_query
-
-       end
-        p 99999999999999999999999999999999999
+        get_sql_for_filter_query = "AND " + get_sql_for_filter_query
       end
     end
     return get_sql_for_filter_query
@@ -334,21 +321,6 @@ module DashboardHelper
 
   end
 
-  def get_selected_resource_allocation_type(project_id,graph_type)
-    project_user_preference = ProjectUserPreference.where(:user_id => User.current.id,:project_id=> project_id)
-    if project_user_preference.present?
-      setting = project_user_preference.last.overdue_unmanage_tasks_settings.where(:name=>graph_type)
-      if setting.present?
-        @allocation_type = setting.last.allocation_type.present? ? setting.last.allocation_type : []
-
-        # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(setting.trackers.join(","),setting.statuses.join(","))
-      end
-    end
-    return @allocation_type
-
-  end
-
-
   def get_selected_custom_query(project_id,graph_type)
     project_user_preference = ProjectUserPreference.where(:user_id => User.current.id,:project_id=> project_id)
     if project_user_preference.present?
@@ -356,8 +328,7 @@ module DashboardHelper
       if setting.present? && setting.last.custom_query_id.present?
           @custom_query_id = setting.last.custom_query_id.last
           @custom_query_title = setting.last.custom_query_name
-           @issue_query= IssueQuery.find(@custom_query_id.to_i)
-
+           @issue_query= IssueQuery.where(:id=>@custom_query_id.to_i)
           if @issue_query.present?
 
             @issue_query = @issue_query.last
@@ -365,10 +336,6 @@ module DashboardHelper
             setting.last.delete
           end
 
-           p "++++++++++=issue_query+++++++++"
-          p setting.last.custom_query_name
-           p @issue_query
-        p @custom_query_title
             # @issues = issue_query.issues
       # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(setting.trackers.join(","),setting.statuses.join(","))
       end
@@ -439,16 +406,7 @@ end
       get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(@project.id,"issues_burndown_chart")
       get_sql_for_only_trackers = get_sql_for_only_trackers(@project.id,"issues_burndown_chart")
 
-
-      p "+++++++++++++++print end +++++++++++++++++++++++++++++++"
-      p "issues.fixed_version_id IN (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}"
-      p "====================end x++++++++++++++++++++"
-
-
-
-      @idle_issues_count =  Issue.joins(:project).where("issues.fixed_version_id IN (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}").count
-      # @idle_issues_count =  Issue.joins(:project).where("issues.fixed_version_id IN (2414)  AND projects.id IN (8,272)AND issues.fixed_version_id IN ('2414') AND issues.tracker_id IN ('30') AND issues.status_id IN (SELECT id FROM issue_statuses WHERE is_closed=0) ").count
-
+      @idle_issues_count = @project.issues.where("issues.fixed_version_id IN (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}").count
       @idle_issues_total_count = @idle_issues_count
       # idle_issues_devide = (@idle_issues_count.to_f/(total_no_of_days.to_f-1.0))
 
@@ -471,11 +429,8 @@ end
           @idle_issues_count_array << (@idle_issues_count -= idle_issues_devide).round
         end
 
-        p "++++++++++get_sql_for_filter_query+++++++++++"
-        p get_sql_for_filter_query
-        p "=========================="
         closed_status = IssueStatus.find_by_name("Closed")
-        closed_issues = Issue.joins(:project).where("fixed_version_id in (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}").where("closed_on <= ? AND status_id=?",(each_day.to_date),closed_status.id).count
+        closed_issues = @project.issues.where("fixed_version_id in (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}").where("closed_on <= ? AND status_id=?",(each_day.to_date),closed_status.id).count
 
         # @idle_issues_total_count
         issues_count = (@idle_issues_total_count.to_f-closed_issues.to_f)
@@ -486,7 +441,7 @@ end
       start_date = (Date.today-total_no_of_days)
       end_date = Date.today
       @total_dates= ((Date.today-30)..Date.today).to_a
-      @idle_issues_count = Issue.joins(:project).where("issues.created_on between '#{start_date}' and '#{end_date}'").count
+      @idle_issues_count = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").count
       @idle_issues_total_count = @idle_issues_count
       idle_issues_devide = (@idle_issues_count.to_f/total_no_of_days.to_f)
       @idle_issues_count_array=[]
@@ -498,7 +453,7 @@ end
           @idle_issues_count_array << (@idle_issues_count -= idle_issues_devide).round
         end
 
-        closed_issues = Issue.joins(:project).where("issues.created_on between '#{start_date}' and '#{end_date}'").where("issues.closed_on <= ?",Time.parse(each_day.to_date.to_s)).count
+        closed_issues = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").where("issues.closed_on <= ?",Time.parse(each_day.to_date.to_s)).count
         # @idle_issues_total_count
         issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_i-closed_issues.to_i) : 0.0
         @issues_count_array << issues_count rescue 0
@@ -537,7 +492,7 @@ end
       get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(@project.id,"work_burndown_chart")
       get_sql_for_only_trackers = get_sql_for_only_trackers(@project.id,"work_burndown_chart")
 
-      @idle_issues = Issue.joins(:project).where("issues.fixed_version_id IN
+      @idle_issues = @project.issues.where("issues.fixed_version_id IN
  (#{find_versions.map(&:id).join(',')}) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}")
       if @idle_issues.present?
        @idle_issues_hours_count =@idle_issues.map(&:estimated_hours).compact.sum
@@ -564,7 +519,7 @@ end
         else
           @idle_issues_hours_count_array << (@idle_issues_hours_count -= idle_issues_actual_devide).round
         end
-        sprint_issues = Issue.joins(:project).where("fixed_version_id IN (#{find_versions.map(&:id).join(',') }) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}")
+        sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',') }) #{get_sql_for_filter_query} #{get_sql_for_only_trackers}")
         if sprint_issues.present?
           # closed_issues = closed_issu.map(&:hours).compact.sum
           time_entries = TimeEntry.where(:spent_on=> start_date.to_date..each_day.to_date,:issue_id=>sprint_issues.map(&:id)).map(&:hours).compact.sum
@@ -580,7 +535,7 @@ end
       start_date = (Date.today-total_no_of_days)
       end_date = Date.today
       @total_dates= ((Date.today-30)..Date.today).to_a
-      @idle_issues_hours_count = Issue.joins(:project).where("issues.created_on between '#{start_date}' and '#{end_date}'").count
+      @idle_issues_hours_count = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").count
       @idle_issues_total_count = @idle_issues_hours_count
       idle_issues_devide = (@idle_issues_hours_count.to_f/total_no_of_days.to_f)
       @idle_issues_hours_count_array=[]
@@ -591,7 +546,7 @@ end
         else
           @idle_issues_hours_count_array << (@idle_issues_hours_count -= idle_issues_devide).round
         end
-        closed_issues = Issue.joins(:project).where("issues.created_on between '#{start_date}' and '#{end_date}'")
+        closed_issues = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'")
         # @idle_issues_total_count
 
         # sprint_issues = @project.issues.where("fixed_version_id IN (#{find_versions.map(&:id).join(',') })")
@@ -712,20 +667,12 @@ end
     sprint_id=''
     start_date=''
     end_date=''
-    get_allocation_type="billable,shadow,support"
 
     if query.filters["fixed_version_id"].present?
        sprint_id = query.filters["fixed_version_id"][:values].last
        find_sprint = Version.find(sprint_id)
        start_date = find_sprint.ir_start_date
        end_date = find_sprint.ir_end_date
-
-       if find_sprint.present?
-         get_allocation_type= get_selected_resource_allocation_type(find_sprint.project_id,"resource_allocation_chart")
-
-          get_allocation_type = get_allocation_type.present? ? get_allocation_type.join(',') : "billable,shadow,support"
-
-      end
     end
 
    #   find_sql='select id,client_name,project_name,offshore_count,onsite_count,billable_working_hours,(billable_working_hours-pto_hours) as
@@ -772,7 +719,7 @@ end
 # result = User.find_by_sql("call getAllocationUsersReports('','','','')")
 # ActiveRecord::Base.connection.execute("call getAllocationUsersReports('','','','')")
 #  sql="call getAllocationUsersReports('','#{sprint_id}','#{start_date}','#{end_date}')"
-    sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}','#{get_allocation_type}')"
+    sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}')"
 
  # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
    connection = ActiveRecord::Base.connection
