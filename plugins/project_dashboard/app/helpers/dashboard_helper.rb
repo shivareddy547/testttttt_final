@@ -357,6 +357,14 @@ module DashboardHelper
           @custom_query_id = setting.last.custom_query_id.last
           @custom_query_title = setting.last.custom_query_name
            @issue_query= IssueQuery.find(@custom_query_id.to_i)
+
+          if @issue_query.present?
+
+            @issue_query = @issue_query.last
+          else
+            setting.last.delete
+          end
+
            p "++++++++++=issue_query+++++++++"
           p setting.last.custom_query_name
            p @issue_query

@@ -979,6 +979,7 @@ class WktimeController < ApplicationController
     end
   end
 
+
   def getusers
     project = Project.find(params[:project_id])
     userStr =""
@@ -989,7 +990,13 @@ class WktimeController < ApplicationController
       projmembers << each_pro.members.order("#{User.table_name}.firstname ASC,#{User.table_name}.lastname ASC")
 
     end
-    projmembers.flatten.each do |m|
+    if projmembers.present?
+      projmembers = projmembers.flatten.uniq{|x| x.user_id}
+    else
+      projmembers=[]
+    end
+
+    projmembers.each do |m|
       userStr << m.user_id.to_s() + ',' + m.name + "\n"
     end
 
@@ -1764,6 +1771,7 @@ class WktimeController < ApplicationController
   def setgroups
     @groups = Group.sorted.all
     @members = Array.new
+
     if params[:projgrp_type] == '2'
       userLists=[]
       userLists = getMembers
@@ -1785,8 +1793,18 @@ class WktimeController < ApplicationController
       # projmembers.flatten.each do |m|
       #   userStr << m.user_id.to_s() + ',' + m.name + "\n"
       # end
+      if projmembers.present?
+        projmembers = projmembers.flatten.uniq{|x| x.user_id}
+      else
+        projmembers=[]
+      end
       @members=projmembers.flatten.collect{|m| [ m.name, m.user_id ] }
     end
+
+
+
+
+
   end
 
   def setup
