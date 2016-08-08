@@ -2037,7 +2037,7 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
     if user_info.present?
      return user_info.first.department
     else
-     return "Shiva"
+     return ""
     end
   end
 

@@ -361,6 +361,8 @@ class WktimeController < ApplicationController
     else
       total = params[:total].to_f
       gatherEntries
+      p "+++++++++gatherEntries+++++="
+      p
       allowApprove = true
     end
     
@@ -1415,7 +1417,10 @@ class WktimeController < ApplicationController
             end
           end
           j = 0
-          ids.each_with_index do |id, k|
+          p "++++++++++++==idsidsidsidsidsidsids+++++++++++"
+          p ids
+          p "+++++++end ++++++++++++++"
+          !ids.blank? && ids.each_with_index do |id, k|
             # if disabled[k] == "false"
             if check_time_log_entry(@startday + k, User.find(params[:user_id]))
               if(!id.blank? || !hours[j].blank?)
