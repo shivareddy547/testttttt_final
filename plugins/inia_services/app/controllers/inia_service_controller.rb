@@ -321,7 +321,7 @@ p 444444444444
       if author.present?
         @author = author.user
         if @author.present?
-          @project = Project.find_by_sql("select p.id,p.name from projects p join members m on m.project_id=p.id where m.user_id in ('#{@author.id}') and m.capacity > 0  group by project_id order by max(capacity) limit 1")
+          @project = Project.find_by_sql("select p.id,p.name from projects p join members m on m.project_id=p.id where m.user_id in ('#{@author.id}') and m.capacity > 0  group by project_id order by capacity desc limit 1")
         end
 
       else
