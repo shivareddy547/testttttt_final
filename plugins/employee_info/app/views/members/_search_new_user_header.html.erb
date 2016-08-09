@@ -1,13 +1,28 @@
 <div class="block1">
   <label for="billable">Billable / Shadow / Support<span class="required"> *</span></label>
   <%#= select_tag "billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],3),prompt: "--select--" %>
+  <% h = Object.new.extend(EmployeeInfoHelper) %>
+  <% user_dept = h.get_user_department %>
+  <% select_option = user_dept ? options_for_select([["Shadow",2]],2) : options_for_select([["Support",3]],3) %>
+
+  
+
+  <% if user_dept %>
+
+  <%= select_tag "billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]]), :billable_admin=> true %>
+
+<%else%>
   <%= select_tag "billable", options_for_select([["Support",3]],3) %>
+<%end%>
+
+
 
 </div>
 <div class="block2">
   <%= hidden_field_tag 'member_capacity', "" %>
   <label for="billable">Utilization:<span class="required"> *</span></label>
-  <div id="div_member_capacity_slider"></div>
+
+  <div id="div_member_capacity_slider" data-user-dept="<%= user_dept %>" ></div>
 </div>
 
 

@@ -48,6 +48,41 @@ $(document).on('change', '#user_billable', function(event) {
 
         $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
         $("#member_capacity_"+$(this).attr("member_id")).val(0)
+            //=======================================
+       /* Google chart options */
+        var options = {
+            width: 200,
+            height: 150,
+            backgroundColor: "#ffffdd",
+            pieHole: 0.4,
+            pieSliceText: "value",
+            text: "value",
+            tooltip: { isHtml: true },
+            tooltip: {text: "percentage"},
+            pieSliceTextStyle: {
+                color: 'black',
+                bold: true,
+                italic: true,
+                alignment: "center"
+                    },
+            colors: ['#FF9933', '#E82D2D', '#006600'],
+            legend: {
+                alignment: 'center', textStyle: {color: 'blue', fontSize: 8}
+            }
+        };
+        var current_capacity = $(this).closest('tr').find("input#current_capacity").val();
+        var available_capacity = $(this).closest('tr').find("input#available_capacity").val();
+        var other_capacity = $(this).closest('tr').find("input#other_capacity").val();
+                var data = google.visualization.arrayToDataTable([
+                    ['Type', 'Value'],
+                    ['Available',     parseInt(available_capacity) + parseInt(current_capacity) ],
+                    ['Other',     parseInt(other_capacity)],
+                    ['Assigned',     0],
+                ]);
+                var chart = new google.visualization.PieChart($("#capacity_chart_"+member_id)[0]);
+                chart.draw(data, options);
+
+       //=======================================
     }
 
     else{
@@ -66,14 +101,20 @@ $(document).on('change', '#user_billable', function(event) {
 });
 
 $(document).on('click', 'table.memberships .icon-edit', function(event) {
+    // alert('hi')
+    console.log('=====================thiyaguy1--------------')
+  
     event.stopImmediatePropagation();
     $(this).closest('tr').find("#user_billable").attr("disabled", true);
+    if ($(this).closest('tr').find('#user_billable').attr('billable_admin')){
+      $(this).closest('tr').find('#user_billable').attr('disabled', false)
+    }
     var billable_status = $(this).closest('tr').find("#member_billable_status").val();
     var capacity = $(this).closest('tr').find("input#current_capacity").val();
     var member_id = $(this).closest('tr').find("#member_billable_status").attr("member_id");
     $('#member-'+member_id+'-roles-form').find('a').attr('id', 'cancel_member');
     $('#member-'+member_id+'-roles-form').find('a').attr('member_id', member_id);
-//    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
+    //    $(this).closest('tr').find("#div_member_capacity_slider").slider('enable');
     $(this).closest('tr').find("#div_member_capacity_slider").show();
 
     if (billable_status == "billable")
@@ -120,37 +161,37 @@ $(document).on('click', '#cancel_member', function(event) {
 
 });
 
-//
-//$(document).on('change', '#billable', function(event) {
-//
-//    //$('select').on('change', function() {
-//    event.stopImmediatePropagation();
-//    var other_capacity = $("form#user_new_membership").find("input#member_total_capacity").val();
-//
-//    if($(this).val()) {
-//
-//        if($(this).val() == "3") {
-//            //alert("billable")
-////            var other_capacity = $("form#user_new_membership").find("input#member_total_capacity").val();
-//            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-////            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
-//            $("form#user_new_membership #member_capacity").val(other_capacity)
-//
-//        }
-//    }
-//    else{
-//        alert("Error:Please Select Billable Or Shadow or Support")
-//
-//        $(this).parent().parent().find("#div_member_capacity_slider").slider('value', other_capacity);
-//        $("#user_new_membership").find('[name=commit]').attr("disabled", true);
-//    }
-//
-//
-//});
 
-//$(function() {
-//    $( "#slider" ).slider();
-//});
+$(document).on('change', '#billable', function(event) {
+
+   //$('select').on('change', function() {
+   event.stopImmediatePropagation();
+   var other_capacity = $("form#user_new_membership").find("input#member_total_capacity").val();
+
+   if($(this).val()) {
+
+       if($(this).val() == "3") {
+           //alert("billable")
+//            var other_capacity = $("form#user_new_membership").find("input#member_total_capacity").val();
+           $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
+//            $(this).parent().parent().find("#div_member_capacity_slider").slider('value', 0);
+           $("form#user_new_membership #member_capacity").val(other_capacity)
+
+       }
+   }
+   else{
+       alert("Error:Please Select Billable Or Shadow or Support")
+
+       $(this).parent().parent().find("#div_member_capacity_slider").slider('value', other_capacity);
+       $("#user_new_membership").find('[name=commit]').attr("disabled", true);
+   }
+
+
+});
+
+$(function() {
+   $( "#slider" ).slider();
+});
 
 
 /* Loading chart Handile bar */
@@ -321,7 +362,10 @@ $( document ).ready(function() {
 
         }
         $(element).find("span#selected_capacity" ).text( "Selected" + $(element).find("#div_member_capacity_slider").slider( "value" )+"%" );
-        $(element).find("#div_member_capacity_slider").slider('disable');
+        // $(element).find("#div_member_capacity_slider").slider('disable');
+        if ($(element).closest('tr').find("#user_billable").attr('billbable_admin')=='false'){
+          $(element).find("#div_member_capacity_slider").slider('disable');      
+        }
 
     });
 
@@ -646,7 +690,7 @@ $( document ).ready(function() {
         $(".buttons").hide();
     }
 
-    $("form#user_new_membership #div_member_capacity_slider").slider('disable');
+    // $("form#user_new_membership #div_member_capacity_slider").slider('disable');
 // Hiding the roles
 
     $("input[name='membership[role_ids][]']").each( function () {

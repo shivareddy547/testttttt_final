@@ -44,4 +44,9 @@ return "yes"
 #       return "no"
 #     end
   end
+
+  def get_user_department
+    # User.find(User.current).user_official_info.department != "Delivery Engineering"    
+    User.current.admin
+  end
 end

@@ -2,11 +2,17 @@
 <input type="hidden" id="get_co_do_role" value="<%=  empinfo_helper.get_role(@project) %>">
 <input type="hidden" id="get_internal_role" value="<%=  empinfo_helper.get_internal_role().join(',') %>">
 
+  <% h = Object.new.extend(EmployeeInfoHelper) %>
+  <% user_dept = h.get_user_department %>
+
 <td>
+<% if user_dept %>
 
+  <%= select_tag "user_billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],member.billable.present?  ? ([:billable,:shadow,:support].index(member.billable).to_i )+1 : ""),include_blank: true,:member_id=>member.id, :billable_admin=> true, :class => 'user_billable_options' %>
 
-  <%= select_tag "user_billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],member.billable.present?  ? ([:billable,:shadow,:support].index(member.billable).to_i
-  )+1 : ""),include_blank: true,:member_id=>member.id,:disabled => true %>
+<%else%>
+  <%= select_tag "user_billable", options_for_select([["Billable",1],["Shadow",2],["Support",3]],member.billable.present?  ? ([:billable,:shadow,:support].index(member.billable).to_i  )+1 : ""),include_blank: true,:member_id=>member.id,:disabled => true, :billbale_admin=> false ,:class => 'user_billable_options'  %>
+<%end%>
   <%= hidden_field_tag 'billable_status', member.billable,:id=>"member_billable_status",:member_id=>member.id,:billable_status=>member.billable %>
 
 </td>
@@ -32,5 +38,12 @@
 </td>
 
 
+<script type="text/javascript">
+$('.user_billable_options').attr('disabled','disabled')
+  $('.icon-edit').click(function(){
+    if ($(this).closest('tr').find('#user_billable').attr('billable_admin')){
+      $(this).closest('tr').find('#user_billable').attr('disabled', false)
+    }
+  })
 
-
+</script>
