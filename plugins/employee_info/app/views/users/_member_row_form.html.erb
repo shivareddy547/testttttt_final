@@ -46,13 +46,14 @@
 
 
 
-
 <script type="text/javascript">
-$('.user_billable_options').attr('disabled','disabled')
-  $('.icon-edit').click(function(){
-    if ($(this).closest('tr').find('#user_billable').attr('billable_admin')){
-      $(this).closest('tr').find('#user_billable').attr('disabled', false)
-    }
-  })
+    $('.user_billable_options').attr('disabled','disabled')
+    $('.icon-edit').click(function(){
+        $(this).closest('tr').find('#div_member_capacity_slider').slider('disable')
+        if ($(this).closest('tr').find('#user_billable').attr('billable_admin')=='true'){
+            $(this).closest('tr').find('#user_billable').attr('disabled', false)
+            $(this).closest('tr').find('#div_member_capacity_slider').slider('enable')
+        }
+    })
 
 </script>

@@ -196,7 +196,7 @@ class WktimeController < ApplicationController
            user_group.each do |users_ids|
              bio_wk = wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"from_to_end")
              if days_count == 7
-               @user_hours.merge!(bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : "")
+               @user_hours.merge!(bio_wk.present? ? wktime_helper.get_biometric_hours_per_month(users_ids,@startday,@endday,"week") : {})
              else
                @user_hours.merge!(bio_wk.present? ? bio_wk : {})
              end
@@ -458,12 +458,12 @@ class WktimeController < ApplicationController
       wktime_helper = Object.new.extend(WktimeHelper)
       @approve_days = params[:approved_days] if params[:approved_days].present?
       if @approve_days.present?
-        p "++++++++++++++++++++++++111111111111111111111111111111111111111111111111111111111111111111111111111"
+
         if params[:wktime_reject].present?
           sendRejectionEmail()
         end
-        p "=================helo-0000000000000000000000000000"
-        p @approve_days
+
+
         @approve_days.each do |approve_day|
           @find_time_entries = TimeEntry.where(:user_id=> params[:user_id], :spent_on => approve_day.to_date)
           if @find_time_entries.present?
@@ -489,10 +489,10 @@ class WktimeController < ApplicationController
                       if permissions.flatten.present? && permissions.flatten.include?(:l3)
                         p 777777777777777777777777777777777777777777777777777777777777777777777777777777777
                         update_l1_or_l2_record(params, approve_day, project,'l3')
-                      elsif  permissions.flatten.present? && permissions.flatten.include?(:l2)
+                      elsif  permissions.flatten.present? && permissions.flatten.include?(:l2) && !permissions.flatten.present? && permissions.flatten.include?(:l3)
                         p 6666666666666666666666666666666666666666666
                         update_l1_or_l2_record(params, approve_day, project,'l2')
-                      elsif permissions.flatten.include?(:l1)
+                      elsif permissions.flatten.include?(:l1) && !permissions.flatten.present? && permissions.flatten.include?(:l2) && !permissions.flatten.present? && permissions.flatten.include?(:l3)
                         update_l1_record(params, approve_day, project)
                       end
                     end
@@ -2291,8 +2291,10 @@ class WktimeController < ApplicationController
 
 
     if params[:wktime_approve].present?
-
-      @wktime.pre_status=@wktime.status
+p "+++++++@wktime.status+++++++@wktime.status+++++l3++++++++++"
+p @wktime.status
+p "++++++++end +++++++++++"
+      @wktime.pre_status=@wktime.status.present? ? @wktime.status : "n"
       @wktime.status = role
 
     elsif params[:wktime_unapprove].present?
