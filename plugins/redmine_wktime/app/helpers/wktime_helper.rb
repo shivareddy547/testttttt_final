@@ -1561,20 +1561,19 @@ module WktimeHelper
   end
 
   def check_project_permission(ids, l)
-    # projects = Project.find(ids)
-    # members = []
-    # permissions = []
-    # projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
-    # members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
-    # members.flatten.each do |rec|
-    #   rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
-    # end
-    # if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
-    #   return true
-    # else
-    #   return false
-    # end
-    return true
+    projects = Project.find(ids)
+    members = []
+    permissions = []
+    projects.each { |rec| members << rec.member_principals.find_by_user_id(User.current.id)  } if projects.kind_of?(Array)
+    members << projects.member_principals.find_by_user_id(User.current.id) if !projects.kind_of?(Array)
+    members.flatten.each do |rec|
+      rec.member_roles.each { |rec| permissions << rec.role.permissions } if rec.present?
+    end
+    if permissions.flatten.present? && (permissions.flatten.include?(l.to_sym) || permissions.flatten.include?(l.to_sym))
+      return true
+    else
+      return false
+    end
   end
 
 
@@ -1723,6 +1722,10 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
       end_date = (date + 6).to_date.strftime('%Y-%m-%d')
     end
 
+    user_array = user_emp_code.split(',')
+    my_arrays = {}
+    result =[]
+    # {}
     if user_emp_code.present?
       key = Redmine::Configuration['iserv_api_key']
       url = Redmine::Configuration['iserv_base_url']
@@ -2457,21 +2460,50 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
     find_entries.map{|entry| entry.delete } if find_entries.present?
   end
 
-
   def set_approved_color(value, th, user_id)
-    if value[1].present? && value[1].include?(th.to_date)
+# p "++++++++++++++++++++++++++++++vvvvvvvvvvvvvcolerr+++++++++"
+# p value
+# p "+++++++++++++++++++++end ++++++++++++++++++++"
+
+
+    if Wktime.where(:user_id=>user_id,:begin_date=>th,:status=>'l3').present?
       'l3_approved'
-    elsif value[2].present? && value[2].include?(th.to_date)
+
+    elsif Wktime.where(:user_id=>user_id,:begin_date=>th,:status=>'l2').present?
       'l2_approved'
-    elsif value[3].present? && value[3].include?(th.to_date)
+    elsif Wktime.where(:user_id=>user_id,:begin_date=>th,:status=>'l1').present?
       'l1_approved'
-    elsif value[4].present? && value[4].include?(th.to_date)
+    elsif Wktime.where(:user_id=>user_id,:begin_date=>th,:status=>'r').present?
       'reject_approval'
-    #elsif !check_time_log_entry(th.to_date,User.find(user_id))
-     # 'lock_entry'
     end
 
+#     if value[1].present? && value[1].include?(th.to_date)
+#       'l3_approved'
+#     elsif value[2].present? && value[2].include?(th.to_date)
+#       'l2_approved'
+#     elsif value[3].present? && value[3].include?(th.to_date)
+#       'l1_approved'
+#     elsif value[4].present? && value[4].include?(th.to_date)
+#       'reject_approval'
+#     #elsif !check_time_log_entry(th.to_date,User.find(user_id))
+#      # 'lock_entry'
+#     end
+
   end
+  # def set_approved_color(value, th, user_id)
+  #   if value[1].present? && value[1].include?(th.to_date)
+  #     'l3_approved'
+  #   elsif value[2].present? && value[2].include?(th.to_date)
+  #     'l2_approved'
+  #   elsif value[3].present? && value[3].include?(th.to_date)
+  #     'l1_approved'
+  #   elsif value[4].present? && value[4].include?(th.to_date)
+  #     'reject_approval'
+  #   #elsif !check_time_log_entry(th.to_date,User.find(user_id))
+  #    # 'lock_entry'
+  #   end
+  #
+  # end
 
 
   def is_pto_activity_edit_issues2(entry)
@@ -3021,16 +3053,15 @@ ax(capacity) DESC').limit(1);
 
   def weekly_approve_l2_notifications(date)
 
-    start_date=(Date.today-3).at_beginning_of_week
+    start_date=(Date.today-5).at_beginning_of_week
     end_date=start_date.at_end_of_week
 
     User.active.each do |each_user|
 
-      find_l1_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
-      if !find_l1_entries.present?
+      find_l2_entries = Wktime.where(:user_id=>each_user.id,:begin_date=>start_date..end_date,:status=>'l2')
+      if !find_l2_entries.present?
         p 111111111111111
-        p find_user_project = Member.where(:user_id=>each_user.id).order('m
-ax(capacity) DESC').limit(1)
+        p find_user_project = Member.where(:user_id=>each_user.id).order('capacity DESC').limit(1)
         # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
         l3_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
@@ -3042,7 +3073,7 @@ ax(capacity) DESC').limit(1)
         # end
         if l3_user_id.present?
           p "++++++++++l2 user ++++++"
-          p User.find(l1_user_id)
+          p User.find(l3_user_id)
           p "============="
           WkMailer.send_l2_notification(l3_user_id,each_user.id,start_date,end_date).deliver
         end
@@ -3056,10 +3087,10 @@ ax(capacity) DESC').limit(1)
 
   def weekly_auto_approve(date)
 
-    # start_date = (date.to_date-4).at_beginning_of_week
-    # end_date = start_date.at_end_of_week
-    start_date = (date.to_date).at_beginning_of_week
-    end_date = date.to_date
+     start_date = (date.to_date-5).at_beginning_of_week
+     end_date = start_date.at_end_of_week
+    # start_date = (date.to_date).at_beginning_of_week
+    # end_date = date.to_date
     # if date.to_date < Date.today
     #
     #   start_date = (date.to_date).at_beginning_of_week

@@ -22,6 +22,22 @@ module EmployeeInfo
           # validate :validate_billable
 
 
+          after_save :set_member_utilization
+
+          def set_member_utilization
+            mem = MemberHistory.find_or_initialize_by_user_id_and_project_id(self.user_id,self.project_id)
+            mem.capacity = self.capacity
+            mem.billable = self.billable
+            mem.start_date = Date.today
+            mem.end_date =   Date.today.end_of_year
+            # mem.created_by = each_member.user_id
+            mem.member_id=self.id
+            mem.save
+
+            # mem.created_by = each_member.user_id
+          end
+
+
 
           def capacity_is_less_than_total
 

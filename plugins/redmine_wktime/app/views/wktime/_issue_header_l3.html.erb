@@ -1,6 +1,6 @@
 
 
-
+<%#= check_bio_permission_list_user_id_project_id('l2',User.current.id,[params[:project_id].to_i],@startday).inspect %>
 <% if check_bio_permission_list_user_id_project_id('l3',User.current.id,[params[:project_id].to_i],@startday)  %>
 <th align="left"><input type="checkbox" id="selectall_l3"></th>
 <% elsif check_bio_permission_list_user_id_project_id('l2',User.current.id,[params[:project_id].to_i],@startday)  %>
