@@ -3113,8 +3113,9 @@ ax(capacity) DESC').limit(1);
 
         find_l2_entries = Wktime.where(:user_id=>each_user,:begin_date=>start_date..end_date,:status=>'l2')
         if !find_l2_entries.present? || (find_l2_entries.count < (start_date..end_date).to_a.count)
-          find_user_project = Member.find_by_sql("select * from members where user_id=#{each_user.id} order by capacity DESC limit 1")
+          find_user_project = Member.find_by_sql("select m.user_id,m.project_id from members m where m.user_id=#{each_user.id} and m.project_id is not null order by m.capacity DESC limit 1 ")
 
+          if find_user_project.present?
           # l2_user_id = get_perm_for_project(find_user_project.first.project,'l2')
           # l1_user_id = get_perm_for_project(find_user_project.first.project,'l3')
 
@@ -3127,10 +3128,12 @@ ax(capacity) DESC').limit(1);
           end
           find_tracker = Tracker.where(:name=>'support')
           if find_tracker.present?
+
             @find_tracker_id = find_tracker.first.id
           else
             errors << "Unable apply for Leave, PTO Activity Not Found .!"
           end
+
           find_issue = Issue.where(:project_id=>find_user_project.first.project_id,:tracker_id=>@find_tracker_id,:subject=>'PTO')
           if find_issue.present?
             @find_issue_id = find_issue.first.id
@@ -3141,6 +3144,7 @@ ax(capacity) DESC').limit(1);
             end
             # errors << "Unable create the Leave, PTO Issue Not Found for #{@project.first.name}.!"
           end
+
           (start_date..end_date).to_a.each do |each_date|
 
             @time_entry =  TimeEntry.find_or_initialize_by_project_id_and_user_id_and_activity_id_and_spent_on_and_issue_id(find_user_project.first.project_id,each_user.id,@find_activity_id,each_date,@find_issue_id)
@@ -3166,7 +3170,7 @@ ax(capacity) DESC').limit(1);
             #   find_time_entry_hours = TimeEntry.find_by_sql("select sum(hours) as hours from time_entries where spent_on in ('#{each_date}') and user_id in (#{each_user.id})")
 
 
-
+end
             #   # url = Redmine::Configuration['iserv_base_url']
             #   # key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
             #   # url1 = "#{url}/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
