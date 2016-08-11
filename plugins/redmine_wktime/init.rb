@@ -292,7 +292,7 @@ Rails.configuration.to_prepare do
         # cronSt= "45 23 * * *"
         scheduler.cron cronSt do
           wktime_helper = Object.new.extend(WktimeHelper)
-          wktime_helper.weekly_auto_approve(Date.today)
+          # wktime_helper.weekly_auto_approve(Date.today)
           wktime_helper.expire_unlock_history
           # wktime_helper.weekly_approve_l2_notifications(Date.today)
           # wktime_helper.expire_unlock_history
@@ -321,7 +321,7 @@ Rails.configuration.to_prepare do
         cronSt = "#{expire_time.min} #{expire_time.hour} * * #{expire_time.to_date.wday}"
         # cronSt= "12 19 * * *"
         scheduler.cron cronSt do
-          wktime_helper.weekly_auto_approve(expire_time)
+          # wktime_helper.weekly_auto_approve(expire_time)
           # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
           # wktime_helper = Object.new.extend(WktimeHelper)
           # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
