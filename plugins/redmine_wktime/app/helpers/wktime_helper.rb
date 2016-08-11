@@ -1729,36 +1729,36 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
     user_array = user_emp_code.split(',')
     my_arrays = {}
     result =[]
-    {}
-    # if user_emp_code.present?
-    #   key = Redmine::Configuration['iserv_api_key']
-    #   url = Redmine::Configuration['iserv_base_url']
-    #   # key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
-    #   url1 = "#{url}/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
-    #   response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute
-    #
-    #   # raise
-    #   user_array = user_emp_code.split(',')
-    #   my_arrays = {}
-    #   result =[]
-    #   if !response.include?('failed') && !response.include?('No records found') && response.present?
-    #     data = JSON.parse(response)
-    #     user_array.each_with_index { |name, index| my_arrays[name] = {}   }
-    #     if data['attendance-daily'].count > 1
-    #       user_array.each_with_index  do |id, index|
-    #         data['attendance-daily'].each do |rec|
-    #           if rec['userid'] == id
-    #             my_arrays[id].merge!(rec['processdate'] => rec['worktime_hhmm'])
-    #           end
-    #         end
-    #       end
-    #       p my_arrays
-    #       return my_arrays
-    #     else
-    #       {}
-    #     end
-    #   end
-    # end
+
+    if user_emp_code.present?
+      key = Redmine::Configuration['iserv_api_key']
+      url = Redmine::Configuration['iserv_base_url']
+      # key = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCFiVDf51RLOjpa8Vdz3MBjV0xvvo-pVb0rh4Rz5TKMO_nIQJ0kMUDgp5GbgKeyy0cQLy3rZX4QTRfHaDzc_YRR4sa1hEEReUNrzkfx3SZRs2hm_S1HO9ozt1Pflygy0DxRj0_DCs7eau3Q7cxx6wKziXUjzwvdRoRE4g2Rmnl2IwIDAQAB"
+      url1 = "#{url}/services/employees/dailyattendance/#{user_emp_code}?fromDate=#{start_date}&toDate=#{end_date}"
+      response = RestClient::Request.new(:method => :get,:url => url1, :headers => {:"Auth-key" => key},:verify_ssl => false).execute
+
+      # raise
+      user_array = user_emp_code.split(',')
+      my_arrays = {}
+      result =[]
+      if !response.include?('failed') && !response.include?('No records found') && response.present?
+        data = JSON.parse(response)
+        user_array.each_with_index { |name, index| my_arrays[name] = {}   }
+        if data['attendance-daily'].count > 1
+          user_array.each_with_index  do |id, index|
+            data['attendance-daily'].each do |rec|
+              if rec['userid'] == id
+                my_arrays[id].merge!(rec['processdate'] => rec['worktime_hhmm'])
+              end
+            end
+          end
+          p my_arrays
+          return my_arrays
+        else
+          {}
+        end
+      end
+    end
   end
 
 

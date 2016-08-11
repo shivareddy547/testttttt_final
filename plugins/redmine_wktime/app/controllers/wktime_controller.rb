@@ -487,10 +487,8 @@ class WktimeController < ApplicationController
                     approve_status = wktime_helper.check_time_log_entry_for_approve(approve_day,user)
                     if approve_status==false
                       if permissions.flatten.present? && permissions.flatten.include?(:l3)
-                        p 777777777777777777777777777777777777777777777777777777777777777777777777777777777
                         update_l1_or_l2_record(params, approve_day, project,'l3')
                       elsif  permissions.flatten.present? && permissions.flatten.include?(:l2) && !permissions.flatten.present? && permissions.flatten.include?(:l3)
-                        p 6666666666666666666666666666666666666666666
                         update_l1_or_l2_record(params, approve_day, project,'l2')
                       elsif permissions.flatten.include?(:l1) && !permissions.flatten.present? && permissions.flatten.include?(:l2) && !permissions.flatten.present? && permissions.flatten.include?(:l3)
                         update_l1_record(params, approve_day, project)
