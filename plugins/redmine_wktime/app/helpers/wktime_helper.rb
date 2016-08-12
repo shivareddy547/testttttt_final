@@ -2083,14 +2083,17 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
       if (l == "l1") && check_expire_for_payroll(start_date)
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
-        if check_l1.present? && !check_l2.present?
+        # if check_l1.present? && !check_l2.present?
+        if check_l1.present?
           return true
         end
-      elsif(l == "l2")  && check_expire_for_payroll(start_date)==true && check_expire_for_l2(start_date)==true
+      # elsif(l == "l2")  && check_expire_for_payroll(start_date)==true && check_expire_for_l2(start_date)==true
+      elsif(l == "l2")
         if @all_roles.include? l.to_sym
           return true
         end
-      elsif(l == "l3") && is_l2?(user_id,project_ids) && check_expire_for_l3(start_date) &&  check_expire_for_payroll(start_date)
+      # elsif(l == "l3") && is_l2?(user_id,project_ids) && check_expire_for_l3(start_date) &&  check_expire_for_payroll(start_date)
+      elsif(l == "l3") && is_l2?(user_id,project_ids)
 
         if @all_roles.include? l.to_sym
           return true
