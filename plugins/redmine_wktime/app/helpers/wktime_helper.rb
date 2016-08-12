@@ -2093,7 +2093,7 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
           return true
         end
       # elsif(l == "l3") && is_l2?(user_id,project_ids) && check_expire_for_l3(start_date) &&  check_expire_for_payroll(start_date)
-      elsif(l == "l3") && is_l2?(user_id,project_ids)
+      elsif(l == "l3")
 
         if @all_roles.include? l.to_sym
           return true
