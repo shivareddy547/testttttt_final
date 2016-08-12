@@ -1094,9 +1094,7 @@ module WktimeHelper
       deadline_date = deadline_date.to_date.strftime('%Y-%m-%d').to_date
     end
 
-    p "++++++++++++select_time++++++++"
-    p deadline_date
-    p "+++++++++++end +++++++="
+
 
     if ((select_time.to_date > deadline_date.to_date ) )
 
@@ -2144,9 +2142,7 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
     # if (user_id.to_i == User.current.id && (l == "l1" || l == "l2" || l == "l3" ) && Setting.plugin_redmine_wktime[:wktime_own_approval].blank? )
     #   @all_roles =[]
     # end
-p "+++++++++++++++++++++==@all_roles@all_roles@all_roles+++++++++++++++++++++++"
-    p @all_roles
-    p "++++++++++++++++++++++end +++++++++++++++++++++++++++++++++++++"
+
     if @all_roles.present?
       if (l == "l1") && check_expire_for_payroll(start_date)
         check_l1 = @all_roles.include? l.to_sym
@@ -2248,7 +2244,7 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
     current_start_date=Date.today.at_beginning_of_week
     current_end_date=Date.today.at_end_of_week
     if check_time_log_entry_l2(Date.today) == true || (current_start_date..current_end_date).to_a.include?(date.to_date+1)
-      pre_start_date=(Date.today-4).at_beginning_of_week
+      pre_start_date=(Date.today-6).at_beginning_of_week
       pre_end_date=Date.today
       current_start_date=Date.today.at_beginning_of_week
       current_end_date=Date.today.at_end_of_week
