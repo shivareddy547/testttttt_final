@@ -2080,7 +2080,8 @@ p "+++++++++++=check_permission_sql++++++++++++++++++"
     end
 
     if @all_roles.present?
-      if (l == "l1") && check_expire_for_payroll(start_date)
+      # if (l == "l1") && check_expire_for_payroll(start_date)
+      if (l == "l1") 
         check_l1 = @all_roles.include? l.to_sym
         check_l2 = @all_roles.include? "l2".to_sym
         # if check_l1.present? && !check_l2.present?
