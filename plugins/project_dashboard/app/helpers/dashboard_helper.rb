@@ -744,6 +744,147 @@ end
     end
   end
 
+def get_goal_value(goal,project_id)
+
+  find_goal = ProjectGoal.where(:name=>goal,:active=>1,:project_id=>project_id)
+  if find_goal.present?
+    return find_goal.first.expected_goal
+  end
+end
+
+  def get_goal_name(goal)
+   @name=""
+    if goal=="commitment_index"
+      @name="CommitMent Index"
+    elsif goal=="efficient_varient"
+      @name="Effort Varience"
+    elsif goal=="unittest_result"
+      @name="Unit Test Result"
+    elsif goal=="code_review_result"
+      @name="Code Review Result"
+    end
+  end
+
+  def get_goal_active(goal,project_id)
+
+    find_goal = ProjectGoal.where(:name=>goal,:active=>1,:project_id=>project_id)
+    if find_goal.present?
+      return true
+    end
+  end
+def get_achived_goal_value(goal,project_id,query)
+@total=0
+  # find_goal = ProjectGoal.where(:name=>goal,:active=>1,:project_id=>project_id)
+  # if find_goal.present?
+  #   return find_goal.first.expected_goal
+  # end
+
+  if goal =="commitment_index"
+
+    if query.filters["fixed_version_id"].present?
+      sprint_id = query.filters["fixed_version_id"][:values].last
+      find_sprint = Version.find(sprint_id)
+      start_date = find_sprint.ir_start_date
+      end_date = find_sprint.ir_end_date
+      @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+      @statuses = IssueStatus.where(:name=>["Resolved","Closed"])
+      find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
+      toltal_issues_count = find_issues.count
+      if find_issues.present?
+        p "status_id not in (#{@statuses.map(&:id).join(',')}"
+        find_done_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers).where("status_id  in (#{@statuses.map(&:id).join(',')})")
+        find_done_issues_count = find_done_issues.count
+
+        @total =  find_done_issues_count*100/toltal_issues_count.to_i
+
+      end
+    end
+
+  elsif goal =="efficient_varient"
+
+
+
+
+    @total=0
+  elsif goal =="unittest_result"
+
+
+    if query.filters["fixed_version_id"].present?
+      sprint_id = query.filters["fixed_version_id"][:values].last
+      find_sprint = Version.find(sprint_id)
+      start_date = find_sprint.ir_start_date
+      end_date = find_sprint.ir_end_date
+      @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+      @statuses = IssueStatus.where(:name=>["Resolved","Closed","Ready For Code Review"])
+      find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
+      toltal_issues_count = find_issues.count
+      if find_issues.present?
+
+        find_done_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers).where("status_id  in (#{@statuses.map(&:id).join(',')})")
+        if find_done_issues.count > 0
+          find_done_issues_count = find_done_issues.count
+
+          fine_code_review_count = Issue.find_by_sql("select count(cv.id) as issue_count from custom_values cv where cv.customized_type='Issue' and custom_field_id in(select id from custom_fields where name='Unit test result'
+) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value is not null")
+          p "+++++++++fine_code_review_countfine_code_review_count++++++"
+          p fine_code_review_count.first.issue_count
+          p "+++++++end +_++++"
+          if fine_code_review_count.first.issue_count.to_i > 0
+            @total = fine_code_review_count.first.issue_count.to_i*100/toltal_issues_count.to_i
+
+          end
+
+        end
+
+
+        # @total = (100 - find_open_issues_count*100/toltal_issues_count.to_i)
+
+      end
+    end
+
+
+
+    @total=0
+  elsif goal =="code_review_result"
+
+
+        if query.filters["fixed_version_id"].present?
+          sprint_id = query.filters["fixed_version_id"][:values].last
+          find_sprint = Version.find(sprint_id)
+          start_date = find_sprint.ir_start_date
+          end_date = find_sprint.ir_end_date
+          @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+          @statuses = IssueStatus.where(:name=>["Resolved","Closed"])
+          find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
+          toltal_issues_count = find_issues.count
+          if find_issues.present?
+
+            find_done_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers).where("status_id  in (#{@statuses.map(&:id).join(',')})")
+            if find_done_issues.count > 0
+            find_done_issues_count = find_done_issues.count
+
+          fine_code_review_count = Issue.find_by_sql("select count(cv.id) issue_count from custom_values cv where cv.customized_type='Issue' and custom_field_id in(select id from custom_fields where name='Code review result'
+) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value is not null")
+      if fine_code_review_count.first.issue_count.to_i > 0
+        @total = fine_code_review_count.first.issue_count.to_i*100/toltal_issues_count.to_i
+
+      end
+
+      end
+
+
+            # @total = (100 - find_open_issues_count*100/toltal_issues_count.to_i)
+
+          end
+        end
+
+
+
+
+  end
+
+return @total
+end
 
 
 end

@@ -1,3 +1,4 @@
+require 'project_dashboard/projectgoal_hooks'
 require_dependency 'attachments_controller_patch'
 require_dependency 'projects_controller_patch'
 require_dependency 'previews_controller_patch'

@@ -42,6 +42,7 @@ class DashboardController < ApplicationController
              'custom_query_2' => :label_custom_query_2,
              'custom_query_3' => :label_custom_query_3,
              'custom_query_4' => :label_custom_query_4,
+             'project_goal' => :label_project_goal,
 
              'texteditor' => :label_texteditor
   }.freeze
@@ -279,5 +280,25 @@ class DashboardController < ApplicationController
     @project_preference = ProjectUserPreference.project_user_preference(User.current.id,@project.id)
     @description = (params[:text_editor_block] ? params[:text_editor_block] : "He llo guys")
     render :layout => false
+  end
+
+
+  def project_goals
+
+    @project=Project.find(params[:project_id])
+    project_goals = Dashboard.project_goals
+    project_goals.each do |each_goal|
+      if params["active"]["#{each_goal}"].present? && params["active"]["#{each_goal}"]=="yes"
+      find_goal = ProjectGoal.where(:name=>"#{each_goal}",:project_id=>@project.id).first_or_initialize
+      find_goal.active=1
+      find_goal.expected_goal=params["expected_goal"]["#{each_goal}"]
+      find_goal.save
+
+        end
+
+    end
+    flash[:notice]="Goals Successfully Updaed."
+    redirect_to settings_project_path(@project, :tab => 'project_goal')
+# redirect_to
   end
 end

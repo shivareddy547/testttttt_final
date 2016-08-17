@@ -54,4 +54,10 @@ class Dashboard < ActiveRecord::Base
 
     filters_clauses.any? ? filters_clauses.join(' AND ') : nil
   end
+
+  def self.project_goals
+
+    ["commitment_index","efficient_varient","unittest_result","code_review_result"]
+
+  end
 end

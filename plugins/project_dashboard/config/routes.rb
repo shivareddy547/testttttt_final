@@ -14,4 +14,6 @@ get '/dashboard/filter_query', to: 'dashboard#filter_query'
 get '/dashboard/save_text_editor', to: 'dashboard#save_text_editor'
 get '/dashboard/custom_queries_settings', to: 'dashboard#custom_queries_settings'
 
+post '/dashboard/project_goals', to: 'dashboard#project_goals'
+
 match '/dashboard/editor/preview/new/:project_id', :to => 'dashboard#preview_text_editor', :as => 'dashboard_preview_text_editor', :via => [:get, :post, :put]

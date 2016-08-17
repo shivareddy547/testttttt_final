@@ -1,0 +1,44 @@
+
+<% project_dashboard_helper = Object.new.extend(DashboardHelper) %>
+<%= form_tag('/dashboard/project_goals', method: :post) do %>
+  <table style="width:100%">
+    <tr>
+      <th>Goal Name</th>
+      <th> Active </th>
+      <th>Expected Goal(%)</th>
+
+    </tr>
+
+  <% Dashboard.project_goals.each do |each_goal|%>
+  <tr>
+    <%= hidden_field_tag "project_id",@project.id %>
+
+    <td><%= project_dashboard_helper.get_goal_name(each_goal) %></td>
+    <td><%= check_box_tag "active[#{each_goal}]",'yes', project_dashboard_helper.get_goal_active(each_goal,@project) %></td>
+    <td><%= text_field_tag "expected_goal[#{each_goal}]",project_dashboard_helper.get_goal_value(each_goal,@project) %></td>
+
+
+  </tr>
+  <% end %>
+
+
+
+</table>
+<div style="width:100%;float: left;">
+  <input name="commit" type="submit" value="Update Goals" style="
+  float: right;
+          margin-top: 20px;
+  ">
+</div>
+<% end %>
+
+
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 15px;
+    }
+</style>

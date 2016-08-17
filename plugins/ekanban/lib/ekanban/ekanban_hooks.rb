@@ -3,7 +3,7 @@ module EKanban
   	class KanbanSettingHook  < Redmine::Hook::ViewListener
       	def helper_projects_settings_tabs(context = {})
           #if User.current.allowed_to?(:new_tab_action, context[:project])
-              context[:tabs].push({ :name    => 'Kanban',
+              context[:tabs].push({ :name    => 'ProjectGoal',
                                     :action  => :setup,
                                     :partial => 'kanbans/setup',
                                     :label   => :label_kanban})
