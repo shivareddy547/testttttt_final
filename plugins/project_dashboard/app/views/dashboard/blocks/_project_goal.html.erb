@@ -1,50 +1,46 @@
-<%= link_to  l(:label_project_goal),"#" %>
+
+<h3>
+  <%= link_to  l(:label_project_goal),"#" %>
+</h3>
 
 <% project_dashboard_helper = Object.new.extend(DashboardHelper) %>
 <% @available_golas= ProjectGoal.where(:project_id=>@project.id) %>
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-      table#project_goal,table#project_goal th,table#project_goal td {
-          border: 1px solid black;
-          border-collapse: collapse;
-      }
-      table#project_goal, table#project_goal th,  table#project_goal td {
-          padding: 15px;
-      }
-  </style>
-</head>
-<body>
-
-<table style="width:100%" id="project_goal">
-    <tr>
-      <th>Goal Name</th>
-      <th>Expected Goal(%)</th>
-      <th>Achived Goal(%)</th>
-      <th>Goal Status</th>
 
 
+<% if @available_golas && @available_golas.any? %>
+    <%= form_tag({}) do %>
+        <table class="list issues">
+          <thead><tr>
 
-    </tr>
+            <th><%=l(:field_goal_name)%></th>
+            <th><%=l(:field_expected_goal)%></th>
+            <th><%=l(:field_achieved_goal)%></th>
+            <th><%=l(:field_goal_status)%></th>
+          </tr></thead>
+          <tbody>
 
-      <% @available_golas && @available_golas.each do |each_goal|%>
-          <tr>
-            <%= hidden_field_tag "project_id",@project.id %>
-            <td><%= project_dashboard_helper.get_goal_name(each_goal.name) %></td>
-            <td><%= project_dashboard_helper.get_goal_value(each_goal.name,@project) %></td>
-            <td><%= project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) %></td>
-            <td class="<%=  project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) >= each_goal.expected_goal ? "green" : "red"  %>"></td>
+          <% for each_goal in @available_golas %>
 
-          </tr>
+              <tr id="issue" class="hascontextmenu <%= cycle('odd', 'even') %> ">
+                <td><%= project_dashboard_helper.get_goal_name(each_goal.name) %></td>
+                <td><%= project_dashboard_helper.get_goal_value(each_goal.name,@project) %></td>
+                <td><%= project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) %></td>
+                <td class="<%=  project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) >= each_goal.expected_goal ? "green" : "red"  %>"></td>
 
-  <% end %>
-</table>
+              </tr>
 
 
 
-</body>
-</html>
+          <% end %>
+          </tbody>
+        </table>
+    <% end %>
+<% else %>
+    <p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
+
+
+
 
 <style>
   .red{

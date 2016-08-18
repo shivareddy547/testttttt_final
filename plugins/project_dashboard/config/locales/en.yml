@@ -79,4 +79,8 @@ en:
     label_custom_query_4: "Custom Query 4"
     lable_custom_query_title: "Title"
     label_project_goal: Project Goal
+    field_goal_name: Goal Name
+    field_expected_goal: Expected Goal
+    field_achieved_goal: Achieved Goal
+    field_goal_status: Goal Status
 
