@@ -23,10 +23,16 @@
 
               <tr id="issue" class="hascontextmenu <%= cycle('odd', 'even') %> ">
                 <td><%= project_dashboard_helper.get_goal_name(each_goal.name) %></td>
-                <td><%= project_dashboard_helper.get_goal_value(each_goal.name,@project) %></td>
-                <td><%= project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) %></td>
-                <td class="<%=  project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query) >= each_goal.expected_goal ? "green" : "red"  %>"></td>
+                <td><%= project_dashboard_helper.get_goal_value(each_goal.name,@project).round(2) %></td>
+                <td><%= project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query).round(2) %></td>
 
+                <% if (each_goal.name=="efficient_varient" ||  each_goal.name=="resource_burndown") %>
+                <%#= 111111111111111 %>
+                    <td class="<%=  project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query).abs <= each_goal.expected_goal ? "green" : "red"  %>"></td>
+                  <% else %>
+                    <td class="<%=  project_dashboard_helper.get_achived_goal_value(each_goal.name,@project,@query).abs >= each_goal.expected_goal ? "green" : "red"  %>"></td>
+
+              <% end %>
               </tr>
 
 

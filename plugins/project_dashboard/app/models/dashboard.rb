@@ -57,7 +57,7 @@ class Dashboard < ActiveRecord::Base
 
   def self.project_goals
 
-    ["commitment_index","efficient_varient","unittest_result","code_review_result"]
+    ["commitment_index","efficient_varient","unittest_result","code_review_result","resource_burndown"]
 
   end
 end

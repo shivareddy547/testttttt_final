@@ -762,12 +762,13 @@ end
       @name="Unit Test Result"
     elsif goal=="code_review_result"
       @name="Code Review Result"
+    elsif goal=="resource_burndown"
+      @name="Resource Burn Down"
     end
   end
 
   def get_goal_active(goal,project_id)
-
-    find_goal = ProjectGoal.where(:name=>goal,:active=>1,:project_id=>project_id)
+   find_goal = ProjectGoal.where(:name=>goal,:active=>1,:project_id=>project_id)
     if find_goal.present?
       return true
     end
@@ -778,7 +779,8 @@ def get_achived_goal_value(goal,project_id,query)
   # if find_goal.present?
   #   return find_goal.first.expected_goal
   # end
-
+p "++++++++++goal +++++++++++"
+p goal
   if goal =="commitment_index"
 
     if query.filters["fixed_version_id"].present?
@@ -816,45 +818,13 @@ def get_achived_goal_value(goal,project_id,query)
 
 
       if find_issues.present?
-
         spent_time_for_issues = TimeEntry.where(:issue_id=>find_issues.map(&:id)).sum(:hours)
         estimated_time_for_issues= find_issues.sum(:estimated_hours)
-p "++++++++++++spent_time_for_issues++++"
-        p spent_time_for_issues
-        p "++++++++estimated_time_for_issues+++++++++"
-        p estimated_time_for_issues
         @total  = (spent_time_for_issues.to_f-estimated_time_for_issues.to_f)/estimated_time_for_issues*100
-
-#         find_done_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers).where("status_id  in (#{@statuses.map(&:id).join(',')})")
-#         if find_done_issues.count > 0
-#           find_done_issues_count = find_done_issues.count
-#
-#
-#           fine_code_review_count = Issue.find_by_sql("select count(cv.id) as issue_count from custom_values cv where cv.customized_type='Issue' and custom_field_id in(select id from custom_fields where name='Unit test result'
-# ) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value != '' ")
-#           p "+toltal_issues_count++"
-#           p toltal_issues_count
-#           p fine_code_review_count.first.issue_count
-#           p "+++++++end ++++"
-#           if fine_code_review_count.first.issue_count.to_i > 0
-#             @total = fine_code_review_count.first.issue_count.to_i*100/toltal_issues_count.to_i
-#
-#           end
-#
-#         end
-
-
-        # @total = (100 - find_open_issues_count*100/toltal_issues_count.to_i)
-
-      end
+     end
     end
-
-
-
-    # @total=0
+  # @total=0
   elsif goal =="unittest_result"
-
-
     if query.filters["fixed_version_id"].present?
       sprint_id = query.filters["fixed_version_id"][:values].last
       find_sprint = Version.find(sprint_id)
@@ -866,11 +836,9 @@ p "++++++++++++spent_time_for_issues++++"
       find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
       toltal_issues_count = find_issues.count
       if find_issues.present?
-
         find_done_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers).where("status_id  in (#{@statuses.map(&:id).join(',')})")
         if find_done_issues.count > 0
           find_done_issues_count = find_done_issues.count
-
 
           fine_code_review_count = Issue.find_by_sql("select count(cv.id) as issue_count from custom_values cv where cv.customized_type='Issue' and custom_field_id in(select id from custom_fields where name='Unit test result'
 ) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value != '' ")
@@ -917,10 +885,6 @@ p "++++++++++++spent_time_for_issues++++"
 ) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value != '' ")
 
 
-            p "+toltal_issuescococoocococ_count++"
-            p toltal_issues_count
-            p fine_code_review_count.first.issue_count
-            p "+++++++end ++++"
 
       if fine_code_review_count.first.issue_count.to_i > 0
         @total = fine_code_review_count.first.issue_count.to_i*100/toltal_issues_count.to_i
@@ -933,9 +897,51 @@ p "++++++++++++spent_time_for_issues++++"
             # @total = (100 - find_open_issues_count*100/toltal_issues_count.to_i)
 
           end
+
+
+
+
+
+          # @total=0
+
         end
 
+  elsif goal =="resource_burndown"
+    p 111111111111111111111111111111111111111111111
 
+    if query.filters["fixed_version_id"].present?
+      sprint_id = query.filters["fixed_version_id"][:values].last
+      find_sprint = Version.find(sprint_id)
+      start_date = find_sprint.ir_start_date
+      end_date = find_sprint.ir_end_date
+      # @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+      @trackers = Tracker.where(:name=>["Feature","Bug","Support"])
+      # @statuses = IssueStatus.where(:name=>["Resolved","Closed"])
+      find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
+      toltal_issues_count = find_issues.count
+      sprint_dates = (start_date..end_date).to_a
+      public_holydays = Wktime.find_by_sql("select ph.date from public_holydays ph where ph.date between '2016-08-01' and '2016-08-19'").map(&:date)
+      sprint_dates_count = (sprint_dates-public_holydays).count
+      productive_hours = Project.find_by_sql("select count(cv.value) productive_hours from custom_values cv where cv.customized_type='Project' and custom_field_id in(select id from custom_fields where name='ProductiveHours'
+) and cv.customized_id in (#{find_sprint.project_id}) ")
+      project_members_count = Member.find_by_sql("select count(m.id) as members_count from members m where m.project_id in (#{find_sprint.project_id}) and m.capacity > 0 ")
+
+      if find_issues.present?
+        spent_time_for_issues = TimeEntry.where(:issue_id=>find_issues.map(&:id)).sum(:hours)
+        p "++++sprint_dates_countsprint_dates_countsprint_dates_count+++++++++"
+        p sprint_dates_count
+        p productive_hours.first.productive_hours.to_f
+        p project_members_count.first.members_count
+        p "+++++++++++++end ++++++++++++++++=="
+        resource_effort = sprint_dates_count.to_i*(productive_hours.present? ? productive_hours.first.productive_hours.to_f : 8)*(project_members_count.first.members_count).to_i
+        p '++++resource_effortresource_effort+++++++++++'
+        p resource_effort
+        p spent_time_for_issues
+        p "+++++sdjkfdsjkf+++++"
+        # estimated_time_for_issues= find_issues.sum(:estimated_hours)
+        @total  = (spent_time_for_issues.to_f-resource_effort.to_f)/resource_effort*100
+      end
+    end
 
 
   end
