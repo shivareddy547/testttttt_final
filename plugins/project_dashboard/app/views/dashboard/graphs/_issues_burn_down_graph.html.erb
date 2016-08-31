@@ -13,6 +13,8 @@
     var total_dates=[<%= @total_dates.join(", ") %>]
     $(function () {
         $('#issues_burn_down_chart').highcharts({
+
+
             title: {
                 text: '',
                 x: -20 //center
@@ -28,6 +30,21 @@
                 },
                 tooltip: {
                     hideDelay: 200
+                },
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function (e) {
+//                                alert("yes")
+                                var url      = window.location.href + "/kanbans";
+                                window.location = url;
+                            }
+                        }
+                    },
+                    marker: {
+                        lineWidth: 1
+                    }
                 }
             },
             subtitle: {

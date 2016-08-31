@@ -1,0 +1,70 @@
+<%  dashboard_helper = Object.new.extend(DashboardHelper) %>
+<% @priorities,@bug_classifications = dashboard_helper.get_defect_chart(@query,@project) %>
+<%= @priorities.inspect %>
+<div id="container" style="min-width: 310px; max-width: 800px; height: 400px; margin: 0 auto"></div>
+
+
+<script>
+    var array = [];
+    array = "<%= @priorities %>";
+var clasification_values = '<%= @bug_classifications.join(',') %>'
+var data_values = '<%= @priorities %>'
+//var my_objects =JSON.parse('#{raw(data_values.to_json)}');
+console.log(data_values);
+    $(function () {
+        $('#container').highcharts({
+
+            chart: {
+                type: 'column'
+            },
+
+            title: {
+                text: 'Total fruit consumtion, grouped by gender'
+            },
+
+            xAxis: {
+                offset:-41,
+                labels:{
+                    y:40
+                },
+                categories: clasification_values.split(',')
+            },
+
+            yAxis: {
+                allowDecimals: false,
+                min: -1.9,
+                startOnTick:false,
+                title: {
+                    text: 'Number of fruits'
+                },
+                stackLabels: {
+                    verticalAlign:"bottom",
+                    y:20,
+                    enabled: true,
+                    formatter: function() {
+                        return  this.stack;
+                    }
+                }
+            },
+
+            tooltip: {
+                formatter: function() {
+                    return '<b>'+ this.x +'</b><br/>'+
+                            this.series.name +': '+ this.y +'<br/>'+
+                            'Total: '+ this.point.stackTotal;
+                }
+            },
+
+            plotOptions: {
+                column: {
+                    stacking: 'normal'
+                }
+            },
+
+            series: data_values.split(',')
+        });
+    });
+
+
+
+</script>
