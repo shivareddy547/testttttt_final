@@ -6,6 +6,7 @@ class OverdueUnmanageTasksSetting < ActiveRecord::Base
   serialize :statuses,Array
   serialize :save_text_editor,Array
   serialize :custom_query_id,Array
+  serialize :allocation_type,Array
 
   def self.project_user_preference_settings(user_id,project_id,block,trackers,statuses)
     project_user_preference = ProjectUserPreference.where(:project_id=>project_id,:user_id=>user_id).last

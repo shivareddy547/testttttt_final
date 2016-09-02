@@ -667,73 +667,169 @@ end
     sprint_id=''
     start_date=''
     end_date=''
+    get_allocation_type="billable,shadow,support"
 
     if query.filters["fixed_version_id"].present?
-       sprint_id = query.filters["fixed_version_id"][:values].last
-       find_sprint = Version.find(sprint_id)
-       start_date = find_sprint.ir_start_date
-       end_date = find_sprint.ir_end_date
+      sprint_id = query.filters["fixed_version_id"][:values].last
+      find_sprint = Version.find(sprint_id)
+      start_date = find_sprint.ir_start_date
+      end_date = find_sprint.ir_end_date
+
+      if find_sprint.present?
+        get_allocation_type= get_selected_resource_allocation_type(find_sprint.project_id,"resource_allocation_chart")
+
+        get_allocation_type = get_allocation_type.present? ? get_allocation_type.join(',') : "billable,shadow,support"
+
+      end
     end
 
-   #   find_sql='select id,client_name,project_name,offshore_count,onsite_count,billable_working_hours,(billable_working_hours-pto_hours) as
-# available_hours,allocated_hours from ((
-# select x.id,x.client_name,x.project_name,x.offshore offshore_count,x.onsite as onsite_count,
-# IFNULL(cv.value,0) productive_hours,IFNULL((cv.value*offshore*(select count(*) from (
-#  (select (CASE weekday(selected_date) WHEN 5 THEN NULL
-#           WHEN 6 THEN NULL ELSE selected_date END) as selected_date  from 
-#  (select adddate(''1970-01-01'',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
-#   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
-#   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
-#   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
-#   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
-#   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
-#  where selected_date between ''2016-04-20'' and ''2016-04-28''  ) ) as a where   IFNULL(a.selected_date,''AA'') <> ''AA''  
-# and a.selected_date 
-# NOT IN (select date as selected_date  from public_holydays where selected_date between ''2016-04-20'' and ''2016-04-28''  )
-# )) 
-# ,0) as billable_working_hours,
-# IFNULL((select sum(i1.estimated_hours) from issues i1 
-# inner join time_entries te1 on te1.project_id=i1.project_id  
-# where i1.project_id=x.id and i1.created_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'') 
-# and name !=''PTO'')  
-# ),0) as allocated_hours,
-# IFNULL((select sum(te1.hours) from time_entries te1  
-# where te1.project_id=x.id   and te1.spent_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'') 
-# and name = ''PTO'')  
-# ),0) as pto_hours,
-# v.id as version_id
-#  from (
-# (select p.id,p.name as project_name,cp.name as client_name,SUM(if(uo.location_type="offshore" && m.capacity >0,1,0)) as offshore,
-# SUM(if(uo.location_type="onsite" && m.capacity >0,1,0)) as onsite from projects p
-# join members m on m.project_id=p.id
-# join users u on u.id=m.user_id
-# join user_official_infos uo on uo.user_id=u.id 
-# join projects cp on (cp.lft < p.lft and p.rgt < cp.rgt) 
-# where p.status=1 and cp.parent_id is null and p.parent_id is not null group by p.id order by cp.name) as x
-# ) 
-# INNER JOIN  custom_values cv on cv.customized_id=x.id and cv.customized_type=''project''
-# INNER JOIN  custom_fields cf on cv.custom_field_id=cf.id and cf.type=''ProjectCustomField'' and cf.name =''ProductiveHours''
-# left join versions v on v.project_id = x.id where x.id is not null ) as y )
-# group by id'
+    #   find_sql='select id,client_name,project_name,offshore_count,onsite_count,billable_working_hours,(billable_working_hours-pto_hours) as
+    # available_hours,allocated_hours from ((
+    # select x.id,x.client_name,x.project_name,x.offshore offshore_count,x.onsite as onsite_count,
+    # IFNULL(cv.value,0) productive_hours,IFNULL((cv.value*offshore*(select count(*) from (
+    #  (select (CASE weekday(selected_date) WHEN 5 THEN NULL
+    #           WHEN 6 THEN NULL ELSE selected_date END) as selected_date  from
+    #  (select adddate(''1970-01-01'',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+    #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+    #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+    #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+    #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+    #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+    #  where selected_date between ''2016-04-20'' and ''2016-04-28''  ) ) as a where   IFNULL(a.selected_date,''AA'') <> ''AA''
+    # and a.selected_date
+    # NOT IN (select date as selected_date  from public_holydays where selected_date between ''2016-04-20'' and ''2016-04-28''  )
+    # ))
+    # ,0) as billable_working_hours,
+    # IFNULL((select sum(i1.estimated_hours) from issues i1
+    # inner join time_entries te1 on te1.project_id=i1.project_id
+    # where i1.project_id=x.id and i1.created_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'')
+    # and name !=''PTO'')
+    # ),0) as allocated_hours,
+    # IFNULL((select sum(te1.hours) from time_entries te1
+    # where te1.project_id=x.id   and te1.spent_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'')
+    # and name = ''PTO'')
+    # ),0) as pto_hours,
+    # v.id as version_id
+    #  from (
+    # (select p.id,p.name as project_name,cp.name as client_name,SUM(if(uo.location_type="offshore" && m.capacity >0,1,0)) as offshore,
+    # SUM(if(uo.location_type="onsite" && m.capacity >0,1,0)) as onsite from projects p
+    # join members m on m.project_id=p.id
+    # join users u on u.id=m.user_id
+    # join user_official_infos uo on uo.user_id=u.id
+    # join projects cp on (cp.lft < p.lft and p.rgt < cp.rgt)
+    # where p.status=1 and cp.parent_id is null and p.parent_id is not null group by p.id order by cp.name) as x
+    # )
+    # INNER JOIN  custom_values cv on cv.customized_id=x.id and cv.customized_type=''project''
+    # INNER JOIN  custom_fields cf on cv.custom_field_id=cf.id and cf.type=''ProjectCustomField'' and cf.name =''ProductiveHours''
+    # left join versions v on v.project_id = x.id where x.id is not null ) as y )
+    # group by id'
 
-# result = User.find_by_sql("call getAllocationUsersReports('','','','')")
-# ActiveRecord::Base.connection.execute("call getAllocationUsersReports('','','','')")
-#  sql="call getAllocationUsersReports('','#{sprint_id}','#{start_date}','#{end_date}')"
-    sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}')"
+    # result = User.find_by_sql("call getAllocationUsersReports('','','','')")
+    # ActiveRecord::Base.connection.execute("call getAllocationUsersReports('','','','')")
+    #  sql="call getAllocationUsersReports('','#{sprint_id}','#{start_date}','#{end_date}')"
+    sql="call getAllocationUsersReports1('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}','#{get_allocation_type}')"
 
- # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
-   connection = ActiveRecord::Base.connection
-      begin
-       result = connection.select_all(sql)
-      rescue NoMethodError
-      ensure
-        connection.reconnect! unless connection.active?
-      end
+    # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
+    connection = ActiveRecord::Base.connection
+    begin
+      result = connection.select_all(sql)
+    rescue NoMethodError
+    ensure
+      connection.reconnect! unless connection.active?
+    end
 
     p "++++++++result++++++++++++"
     p result
     p "==============end +++++++++"
-   return result
+    return result
+
+  end
+#   def get_resource_allocation(project,query)
+#     sprint_id=''
+#     start_date=''
+#     end_date=''
+#
+#     if query.filters["fixed_version_id"].present?
+#        sprint_id = query.filters["fixed_version_id"][:values].last
+#        find_sprint = Version.find(sprint_id)
+#        start_date = find_sprint.ir_start_date
+#        end_date = find_sprint.ir_end_date
+#     end
+#
+#    #   find_sql='select id,client_name,project_name,offshore_count,onsite_count,billable_working_hours,(billable_working_hours-pto_hours) as
+# # available_hours,allocated_hours from ((
+# # select x.id,x.client_name,x.project_name,x.offshore offshore_count,x.onsite as onsite_count,
+# # IFNULL(cv.value,0) productive_hours,IFNULL((cv.value*offshore*(select count(*) from (
+# #  (select (CASE weekday(selected_date) WHEN 5 THEN NULL
+# #           WHEN 6 THEN NULL ELSE selected_date END) as selected_date  from
+# #  (select adddate(''1970-01-01'',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+# #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+# #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+# #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+# #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+# #   (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+# #  where selected_date between ''2016-04-20'' and ''2016-04-28''  ) ) as a where   IFNULL(a.selected_date,''AA'') <> ''AA''
+# # and a.selected_date
+# # NOT IN (select date as selected_date  from public_holydays where selected_date between ''2016-04-20'' and ''2016-04-28''  )
+# # ))
+# # ,0) as billable_working_hours,
+# # IFNULL((select sum(i1.estimated_hours) from issues i1
+# # inner join time_entries te1 on te1.project_id=i1.project_id
+# # where i1.project_id=x.id and i1.created_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'')
+# # and name !=''PTO'')
+# # ),0) as allocated_hours,
+# # IFNULL((select sum(te1.hours) from time_entries te1
+# # where te1.project_id=x.id   and te1.spent_on BETWEEN ''2016-04-20'' AND ''2016-04-28'' and te1.activity_id in (SELECT id  FROM enumerations WHERE enumerations.type IN (''TimeEntryActivity'')
+# # and name = ''PTO'')
+# # ),0) as pto_hours,
+# # v.id as version_id
+# #  from (
+# # (select p.id,p.name as project_name,cp.name as client_name,SUM(if(uo.location_type="offshore" && m.capacity >0,1,0)) as offshore,
+# # SUM(if(uo.location_type="onsite" && m.capacity >0,1,0)) as onsite from projects p
+# # join members m on m.project_id=p.id
+# # join users u on u.id=m.user_id
+# # join user_official_infos uo on uo.user_id=u.id
+# # join projects cp on (cp.lft < p.lft and p.rgt < cp.rgt)
+# # where p.status=1 and cp.parent_id is null and p.parent_id is not null group by p.id order by cp.name) as x
+# # )
+# # INNER JOIN  custom_values cv on cv.customized_id=x.id and cv.customized_type=''project''
+# # INNER JOIN  custom_fields cf on cv.custom_field_id=cf.id and cf.type=''ProjectCustomField'' and cf.name =''ProductiveHours''
+# # left join versions v on v.project_id = x.id where x.id is not null ) as y )
+# # group by id'
+#
+# # result = User.find_by_sql("call getAllocationUsersReports('','','','')")
+# # ActiveRecord::Base.connection.execute("call getAllocationUsersReports('','','','')")
+# #  sql="call getAllocationUsersReports('','#{sprint_id}','#{start_date}','#{end_date}')"
+#     sql="call getAllocationUsersReports('#{find_sprint.project_id rescue 1}','#{sprint_id}','#{start_date}','#{end_date}')"
+#
+#  # sql="call getAllocationUsersReports('181','2056','2016-02-17','2016-03-01')"
+#    connection = ActiveRecord::Base.connection
+#       begin
+#        result = connection.select_all(sql)
+#       rescue NoMethodError
+#       ensure
+#         connection.reconnect! unless connection.active?
+#       end
+#
+#     p "++++++++result++++++++++++"
+#     p result
+#     p "==============end +++++++++"
+#    return result
+#
+#   end
+
+
+  def get_selected_resource_allocation_type(project_id,graph_type)
+    project_user_preference = ProjectUserPreference.where(:user_id => User.current.id,:project_id=> project_id)
+    if project_user_preference.present?
+      setting = project_user_preference.last.overdue_unmanage_tasks_settings.where(:name=>graph_type)
+      if setting.present?
+        @allocation_type = setting.last.allocation_type.present? ? setting.last.allocation_type : []
+
+        # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(setting.trackers.join(","),setting.statuses.join(","))
+      end
+    end
+    return @allocation_type
 
   end
 
