@@ -1389,6 +1389,7 @@ class WktimeController < ApplicationController
   end
 
 
+
   def gatherEntries
     entryHash = params[:time_entry]
     @entries ||= Array.new
@@ -1402,6 +1403,11 @@ class WktimeController < ApplicationController
     @teEntrydisabled=false
     unless entryHash.nil?
       entryHash.each_with_index do |entry, i|
+
+        p "+++++++++++++PPPPPPPPP ENTRY ++++++++++++++"
+        p entry
+        p "+++++++++++end +_+++++++++++++++++++++"
+
         if !entry['project_id'].blank?
           hours = params['hours' + (i+1).to_s()]
           ids = params['ids' + (i+1).to_s()]
@@ -1415,61 +1421,116 @@ class WktimeController < ApplicationController
             end
           end
           j = 0
-          p "++++++++++++==idsidsidsidsidsidsids+++++++++++"
-          p ids
-          p "+++++++end ++++++++++++++"
-          !ids.blank? && ids.each_with_index do |id, k|
-            # if disabled[k] == "false"
-            if check_time_log_entry(@startday + k, User.find(params[:user_id]))
-              if(!id.blank? || !hours[j].blank?)
-                teEntry = nil
-                teEntry = getTEEntry(id)
-                teEntry.attributes = entry
-                p '=================================================================== 4 ========================'
-                p entry
-                p '=--'
-                # since project_id and user_id is protected
-                teEntry.project_id = entry['project_id']
-                teEntry.work_location = entry['work_location']
-                teEntry.flexioff_reason, = entry['flexioff_reason']
-                teEntry.user_id = @user.id
-                teEntry.spent_on = @startday + k
-                #for one comment, it will be automatically loaded into the object
-                # for different comments, load it separately
-                unless comments.blank?
-                  teEntry.comments = comments[k].blank? ? nil : comments[k]
-                end
-                #timeEntry.hours = hours[j].blank? ? nil : hours[j].to_f
-                #to allow for internationalization on decimal separator
-                setValueForSpField(teEntry,hours[j],decimal_separator,entry)
+          ids.each_with_index do |id, k|
+            if (check_time_log_entry((@startday + k).to_date,User.current).present? && check_time_log_entry((@startday + k).to_date,User.current) == true ) && (!id.blank? || !hours[j].blank?) || (get_entry_status((@startday + k).to_date).present? && get_entry_status((@startday + k).to_date)==true )
+              if disabled[k] == "false"
 
-                unless custom_fields.blank?
-                  teEntry.custom_field_values.each do |custom_value|
-                    custom_field = custom_value.custom_field
+                if (check_time_log_entry((@startday + k).to_date,User.current).present? && check_time_log_entry((@startday + k).to_date,User.current) == true ) && (!id.blank? || !hours[j].blank?) || (get_entry_status((@startday + k).to_date).present? && get_entry_status((@startday + k).to_date)==true )
+                  teEntry = nil
+                  teEntry = getTEEntry(id)
+                  teEntry.attributes = entry
+                  # since project_id and user_id is protected
+                  teEntry.project_id = entry['project_id']
+                  teEntry.work_location = entry['work_location']
+                  teEntry.flexioff_reason, = entry['flexioff_reason']
+                  teEntry.user_id = @user.id
+                  teEntry.spent_on = @startday + k
+                  #for one comment, it will be automatically loaded into the object
+                  # for different comments, load it separately
+                  unless comments.blank?
+                    teEntry.comments = comments[k].blank? ? nil : comments[k]
+                  end
+                  #timeEntry.hours = hours[j].blank? ? nil : hours[j].to_f
+                  #to allow for internationalization on decimal separator
+                  setValueForSpField(teEntry,hours[j],decimal_separator,entry)
 
-                    #if it is from the row, it should be automatically loaded
-                    if !((!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].blank? &&
-                        Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].to_i == custom_field.id) ||
-                        (!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].blank? &&
-                            Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].to_i == custom_field.id))
-                      if use_detail_popup
-                        cvs = custom_values[custom_field.id]
-                        custom_value.value = cvs[k].blank? ? nil :
-                            custom_field.multiple? ? cvs[k].split(',') : cvs[k]
+                  unless custom_fields.blank?
+                    teEntry.custom_field_values.each do |custom_value|
+                      custom_field = custom_value.custom_field
+
+                      #if it is from the row, it should be automatically loaded
+                      if !((!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].blank? &&
+                          Setting.plugin_redmine_wktime['wktime_enter_cf_in_row1'].to_i == custom_field.id) ||
+                          (!Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].blank? &&
+                              Setting.plugin_redmine_wktime['wktime_enter_cf_in_row2'].to_i == custom_field.id))
+                        if use_detail_popup
+                          cvs = custom_values[custom_field.id]
+                          custom_value.value = cvs[k].blank? ? nil :
+                              custom_field.multiple? ? cvs[k].split(',') : cvs[k]
+                        end
                       end
                     end
                   end
+                  @entries << teEntry
+
+                  # p 'teEntry.spent_on'
+                  # p teEntry.spent_on
+                  # p 'tttttttttteeeeeeeeeeeeeeentry'
+                  # if check_time_log_entry(teEntry.spent_on,User.current) ==true
+                  #@entries << teEntry
+                  # else
+                  #   p 555555555555555555555555555555555555555
+                  #   p teEntry
+                  #   p @wktime = Wktime.where(:user_id=>User.current.id,:begin_date=>teEntry.spent_on)
+                  #    teEntry
+
+                  # @wktime = Wktime.where(:user_id=>User.current.id,:begin_date=>teEntry.spent_on,:status=>'r')
+
+                  #   if @wktime.present?
+                  #     @entries << teEntry
+                  #      # @entries << teEntry unless @wktime.first.status != "r"
+                  # end
+                  # @entries << teEntry
+                  #end
+                  #   if (teEntry.id.present? && get_entry_status(teEntry)) ==true
+                  #   @entries << teEntry
+                  # end
                 end
-                @entries << teEntry
+                j += 1
+              else
+                @teEntrydisabled=true
               end
-              j += 1
-            else
-              @teEntrydisabled=true
             end
           end
         end
       end
     end
+  end
+
+
+  def get_entry_status(date)
+    if date.present?
+      p 'chek wktime'
+      #p @wktim =Wktime.find_by_sql("select wk.status from wktimes wk where wk.user_id=#{User.current.id} and wk.begin_date=#{date} ")
+      @wktim= Wktime.where(:begin_date=>date,:user_id=>User.current.id,:status=>'r' )
+      p 'check wktime end'
+      if @wktim.present?
+        p 'sssssssuuuuuuuuuuuucccccccccccccccccceeeeeeeeeeesssssssssssssssssss'
+        return true
+      else
+        p 'FAILED'
+        return false
+      end
+    else
+      return false
+    end
+
+
+    # if date.present?
+    #   p "+++++++++++++jdskffsfsdjkfhjdfgfdg+++++++++"
+    #   p  @wktime= Wktime.where(:begin_date=>date,:user_id=>User.current.id )
+    #   p "++++++++++++end _++++++"
+    #   if @wktime.present?
+    #     return true
+    #     p 'ffffffffffffffffffffffffffffffffffffffffffffffff'
+    #   else
+    #     p 'gggggggggggggggggggggggggggggggggggggggggggggg'
+    #     return false
+    #   end
+    # else
+    #   p 'hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh'
+    #   return false
+    # end
   end
 
   def gatherWkCustomFields(wktime)
