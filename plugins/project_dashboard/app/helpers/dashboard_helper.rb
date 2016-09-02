@@ -830,7 +830,7 @@ p goal
       find_sprint = Version.find(sprint_id)
       start_date = find_sprint.ir_start_date
       end_date = find_sprint.ir_end_date
-      @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+      @trackers = Tracker.where(:name=>["Bug","Task"])
       # @trackers = Tracker.where(:name=>["Feature","Bug","Support"])
       @statuses = IssueStatus.where(:name=>["Resolved","Closed","Ready For Code Review"])
       find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
@@ -871,7 +871,7 @@ p goal
           start_date = find_sprint.ir_start_date
           end_date = find_sprint.ir_end_date
           # @trackers = Tracker.where(:name=>["Feature","Bug","Support"])
-          @trackers = Tracker.where(:name=>["Story","Bug","Task"])
+          @trackers = Tracker.where(:name=>["Bug","Task"])
           @statuses = IssueStatus.where(:name=>["Resolved","Closed"])
           find_issues = Issue.where(:fixed_version_id => sprint_id,tracker_id: @trackers.map(&:id))
           toltal_issues_count = find_issues.count
@@ -883,8 +883,6 @@ p goal
 
           fine_code_review_count = Issue.find_by_sql("select count(cv.id) issue_count from custom_values cv where cv.customized_type='Issue' and custom_field_id in(select id from custom_fields where name='Code review result'
 ) and cv.customized_id in (#{find_done_issues.map(&:id).join(',')}) and cv.value != '' ")
-
-
 
       if fine_code_review_count.first.issue_count.to_i > 0
         @total = fine_code_review_count.first.issue_count.to_i*100/toltal_issues_count.to_i
@@ -962,5 +960,108 @@ collect_capacity_per_day = []
 return @total
 end
 
+
+
+  def get_defect_chart(query,project)
+
+    get_sql_for_filter_query = get_sql_for_filter_query(project.id)
+
+    @project= project
+    dash_board_query = DashboardQuery.where(:project_id=>@project.id,:user_id=>User.current.id)
+    if dash_board_query.present?
+      @query = dash_board_query.first
+    else
+      @query = query
+    end
+    if @query.present? && @query.filters.present? && @query.filters["fixed_version_id"].present?
+      find_fixed_version_ids= @query.filters["fixed_version_id"].values.last
+      find_versions = Version.where(:id=>find_fixed_version_ids)
+
+      start_date = find_versions.sort_by(&:ir_start_date).first.ir_start_date.present? ? find_versions.sort_by(&:ir_start_date).first.ir_start_date : Date.today
+      end_date = find_versions.sort_by(&:ir_end_date).last.ir_end_date.present? ? find_versions.sort_by(&:ir_end_date).last.ir_end_date : (Date.today-30)
+      # start_date = find_version.ir_start_date
+      # end_date = find_version.ir_end_date
+      total_no_of_days = (start_date.to_date..end_date.to_date).to_a.count
+      @total_dates= (start_date.to_date..end_date.to_date).to_a
+      @priorities = IssuePriority.active
+      @issues = @project.issues.where("issues.fixed_version_id IN (#{find_versions.map(&:id).join(',')}) ")
+     @priorities_collect =[]
+      # @priorities_collect=[]
+         @priorities.each do |each_priority|
+         # @project.issues.where(:priority_id=>each_priority.id)
+            bug_classifications = CustomField.where(:name=>"Bug Classification")
+            @bug_classifications = CustomField.where(:name=>"Bug Classification")
+            bug_types = CustomField.where(:name=>"Bug Type")
+
+          if bug_classifications.present?
+collect_values = []
+collect_values1 = []
+
+
+if @issues.present?
+bug_classifications.first.possible_values.each do |each_value|
+
+  issue_count_internal = Issue.find_by_sql("select count(i.id) count_issues from custom_values cv
+join issues i on i.id=cv.customized_id
+join custom_values cv_type on cv_type.customized_id=i.id
+where cv.customized_type='Issue' and
+cv.custom_field_id in(select id from custom_fields where name='Bug Classification'
+) and cv_type.custom_field_id in(select id from custom_fields where name='Bug Type')  and i.priority_id in (#{each_priority.id}) and cv.value='#{each_value}' and cv_type.value='Internal' and cv.customized_id in (#{@issues.map(&:id).join(',')})")
+
+  collect_values<< issue_count_internal.first.count_issues
+
+
+end
+
+            bug_classifications.first.possible_values.each do |each_value|
+
+              issue_count_internal = Issue.find_by_sql("select count(i.id) count_issues from custom_values cv
+join issues i on i.id=cv.customized_id
+join custom_values cv_type on cv_type.customized_id=i.id
+where cv.customized_type='Issue' and
+cv.custom_field_id in(select id from custom_fields where name='Bug Classification'
+) and cv_type.custom_field_id in(select id from custom_fields where name='Bug Type')  and i.priority_id in (#{each_priority.id}) and cv.value='#{each_value}' and cv_type.value='Client' and cv.customized_id in (#{@issues.map(&:id).join(',')}) ")
+  collect_values1<< issue_count_internal.first.count_issues
+
+
+            end
+
+end
+@priorities_collect <<  {:name=>"#{each_priority.name}", :data=>collect_values, :stack=>"Internal"}
+@priorities_collect <<  {:name=>"#{each_priority.name}", :data=>collect_values1, :stack=>"Client"}
+          end
+
+        end
+
+
+      # dashboard_helper = Object.new.extend(DashboardHelper)
+      # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(@project.id,"work_burndown_chart")
+
+    else
+      # total_no_of_days= 30
+      # start_date = (Date.today-total_no_of_days)
+      # end_date = Date.today
+      # @total_dates= ((Date.today-30)..Date.today).to_a
+      # @idle_issues_count = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").count
+      # @idle_issues_total_count = @idle_issues_count
+      # idle_issues_devide = (@idle_issues_count.to_f/total_no_of_days.to_f)
+      # @idle_issues_count_array=[]
+      # @issues_count_array=[]
+      # (start_date.to_date..end_date.to_date).to_a.each_with_index do |each_day,index|
+      #   if index.to_i ==0
+      #     @idle_issues_count_array << @idle_issues_count
+      #   else
+      #     @idle_issues_count_array << (@idle_issues_count -= idle_issues_devide).round
+      #   end
+      #
+      #   closed_issues = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").where("issues.closed_on <= ?",Time.parse(each_day.to_date.to_s)).count
+      #   # @idle_issues_total_count
+      #   issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_i-closed_issues.to_i) : 0.0
+      #   @issues_count_array << issues_count rescue 0
+      # end
+    end
+    return @priorities_collect,@bug_classifications.present? ? @bug_classifications.first.possible_values.map(&:to_s) : []
+
+  end
 
 end

@@ -70,7 +70,7 @@ en:
     label_work_burn_down_chart: "Work Burn Down Chart"
     label_work_burndown_chart: "Work Burn Down Chart"
     label_story_burndown_chart: "Story Burn down chart"
-    label_resource_allocation_chart: "Resource Utilization chart"
+    label_resource_allocation_chart: "Resource allocation chart"
     label_risk_issues_chart: "Risk Issues Chart"
     lable_select_custom_query_list: "Select Custom Query"
     label_custom_query_1: "Custom Query 1"
@@ -83,5 +83,5 @@ en:
     field_expected_goal: Expected Goal(%)
     field_achieved_goal: Achieved Goal(%)
     field_goal_status: Goal Status
-    lable_defect_chart: Defect Chart
+    label_defect_chart: Defect Chart
 

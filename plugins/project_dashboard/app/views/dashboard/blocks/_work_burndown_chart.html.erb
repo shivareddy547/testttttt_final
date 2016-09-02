@@ -21,7 +21,7 @@
 
 <div class="work_burn_down_trackers_statuses" style="display:none">
   <p><label for="tracker selection" id="tracker_select"><%= l(:lable_select_tracker) %></label> <span class="required">*</span>   <%= select_tag "tracker_id", options_from_collection_for_select(@project.trackers, "id", "name",:selected =>@setting_work_burn_down_trackers),:multiple => true %></p>
-  <!--<p><label for="status_selection" id="status_select"><%#= l(:lable_select_status) %></label> <span class="required">*</span>  <%#= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>-->
+  <p><label for="status_selection" id="status_select"><%= l(:lable_select_status) %></label> <span class="required">*</span>  <%= select_tag "status_id", options_from_collection_for_select(IssueStatus.all, "id", "name",:selected =>@setting_work_burn_down_statuses),:multiple => true %></p>
 </div>
 
 <%= render :partial => 'dashboard/graphs/work_burn_down_graph' %>

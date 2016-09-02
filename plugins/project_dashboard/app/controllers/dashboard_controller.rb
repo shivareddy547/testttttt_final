@@ -43,7 +43,7 @@ class DashboardController < ApplicationController
              'custom_query_3' => :label_custom_query_3,
              'custom_query_4' => :label_custom_query_4,
              'project_goal' => :label_project_goal,
-
+             'defect_chart' => :lable_defect_chart,
              'texteditor' => :label_texteditor
   }.freeze
 
