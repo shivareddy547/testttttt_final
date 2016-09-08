@@ -43,7 +43,7 @@ class DmsfFilesController < ApplicationController
       access.revision = @revision
       access.action = DmsfFileRevisionAccess::DownloadAction      
       access.save!
-      send_file(@revision.disk_filename,
+      send_file(@revision.disk_file,
         :filename => filename_for_content_disposition(@revision.name),
         :type => @revision.detect_content_type,
         :disposition => 'inline')

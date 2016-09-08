@@ -84,4 +84,5 @@ en:
     field_achieved_goal: Achieved Goal(%)
     field_goal_status: Goal Status
     label_defect_chart: Defect Chart
+    label_project_goal: Project Goal
 
