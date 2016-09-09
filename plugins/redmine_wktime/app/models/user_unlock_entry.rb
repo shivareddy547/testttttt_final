@@ -317,6 +317,165 @@ class UserUnlockEntry < ActiveRecord::Base
   end
 
 
+  def self.pay_roll_notification
+    array_days = []
+    days = 0
+    collect_dates=[]
+    if Setting.plugin_redmine_wktime['wktime_public_holiday'].present?
+      cureent_user_timezone = (User.current.time_zone.present? && User.current.time_zone.name.present?) ? User.current.time_zone.name.to_s.delete(' ') : "Chennai"
+      Setting.plugin_redmine_wktime['wktime_public_holiday'].each do |public_holiday|
+        if public_holiday.delete(' ').include?(cureent_user_timezone)
+          collect_dates << public_holiday.split('|')[0].strip
+        end
+      end
+    end
+
+    setting_hr= Setting.plugin_redmine_wktime['wktime_payroll_hr'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_payroll_min'].to_i
+    wktime_helper = Object.new.extend(WktimeHelper)
+    # current_time = wktime_helper.set_time_zone(Time.now)
+    # week_current_time = wktime_helper.set_time_zone(Time.now)
+    # week_day = DateTime.parse(Setting.plugin_redmine_wktime['wktime_payroll_day'])
+    week_day = Date.new(Date.today.year,Date.today.month,Setting.plugin_redmine_wktime['wktime_payroll_day'].to_i)
+
+    # week_expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+
+    expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+
+
+    wktime_helper = Object.new.extend(WktimeHelper)
+
+    # expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+    current_time = wktime_helper.set_time_zone(expire_time)
+    dead_line = (current_time.to_date)
+    array_size = 0
+    i = 0
+    while i <= array_size.to_i do
+      if check_public(dead_line)
+        array_size +=1
+        dead_line = (dead_line-1)
+      else
+        array_days << dead_line
+        dead_line = (dead_line-1)
+      end
+      break if array_days.size > 0
+      i += 1
+    end
+    if array_days.present?
+      return array_days.last
+    end
+  end
+
+  def self.pay_roll_deadline
+    array_days = []
+    days = 0
+    collect_dates=[]
+    if Setting.plugin_redmine_wktime['wktime_public_holiday'].present?
+      cureent_user_timezone = (User.current.time_zone.present? && User.current.time_zone.name.present?) ? User.current.time_zone.name.to_s.delete(' ') : "Chennai"
+      Setting.plugin_redmine_wktime['wktime_public_holiday'].each do |public_holiday|
+        if public_holiday.delete(' ').include?(cureent_user_timezone)
+          collect_dates << public_holiday.split('|')[0].strip
+        end
+      end
+    end
+
+    setting_hr= Setting.plugin_redmine_wktime['wktime_payroll_hr'].to_i
+    setting_min = Setting.plugin_redmine_wktime['wktime_payroll_min'].to_i
+    wktime_helper = Object.new.extend(WktimeHelper)
+    # current_time = wktime_helper.set_time_zone(Time.now)
+    # week_current_time = wktime_helper.set_time_zone(Time.now)
+    # week_day = DateTime.parse(Setting.plugin_redmine_wktime['wktime_payroll_day'])
+    week_day = Date.new(Date.today.year,Date.today.month,Setting.plugin_redmine_wktime['wktime_payroll_day'].to_i)
+
+    # week_expire_time = wktime_helper.return_time_zone.parse("#{current_time.year}-#{current_time.month}-#{current_time.day} #{setting_hr}:#{setting_min}")
+
+    expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+
+
+    wktime_helper = Object.new.extend(WktimeHelper)
+
+    # expire_time = wktime_helper.return_time_zone.parse("#{week_day.year}-#{week_day.month}-#{week_day.day} #{setting_hr}:#{setting_min}")
+    current_time = wktime_helper.set_time_zone(expire_time)
+    dead_line = (current_time.to_date)
+    array_size = 0
+    i = 0
+    while i <= array_size.to_i do
+      if check_public(dead_line)
+        array_size +=1
+        dead_line = (dead_line+1)
+      else
+        array_days << dead_line
+        dead_line = (dead_line+1)
+      end
+      break if array_days.size > 0
+      i += 1
+    end
+    if array_days.present?
+      return array_days.last
+    end
+  end
+
+
+
+  def self.pay_roll_deadline_final
+
+    array_days = []
+
+    dead_line = (self.pay_roll_deadline)
+    array_size = 2
+    i = 0
+    while i <= array_size.to_i do
+      if check_public(dead_line)
+        array_size +=1
+        dead_line = (dead_line+1)
+      else
+        array_days << dead_line
+        dead_line = (dead_line+1)
+      end
+      # break if array_days.size > 2
+      i += 1
+    end
+    p "+++++==array_days++++++"
+    p array_days
+    p "++++++++end ++++++++="
+    if array_days.present?
+      return array_days.last
+    end
+
+
+  end
+
+
+  def self.pay_roll_notification_final
+
+    array_days = []
+
+    dead_line = (self.pay_roll_deadline)
+    array_size = 2
+    i = 0
+    while i <= array_size.to_i do
+      if check_public(dead_line)
+        array_size +=1
+        dead_line = (dead_line-1)
+      else
+        array_days << dead_line
+        dead_line = (dead_line-1)
+      end
+      # break if array_days.size > 2
+      i += 1
+    end
+    p "+++++==array_days++++++"
+    p array_days
+    p "++++++++end ++++++++="
+    if array_days.present?
+      return array_days.last
+    end
+
+
+  end
+
+
+
   def self.dead_line_final_method
     array_days = []
     days = Setting.plugin_redmine_wktime['wktime_nonlog_day'].to_i

@@ -107,18 +107,33 @@
      end
   %>
 
+    <%
+       hr1 = []
+       for i in 0..59
+         if i < 10
+           hr << ['0' + i.to_s,i]
+         else
+           hr << [i,i]
+         end
+       end
+    %>
+
   <%= l(:field_day) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_day_l2]', options_for_select(["MON", "TUE", "WED", "THU","FRI","SAT","SUN"], :selected => @settings['wktime_nonapprove_day_l2'].blank? ? 2 : @settings['wktime_nonapprove_day_l2']))%>
-  <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_hr_l2]', options_for_select(hr, :selected => @settings['wktime_nonapprove_hr_l2'].blank? ? 23 : @settings['wktime_nonapprove_hr_l2']))%>
-  <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_min_l2]', options_for_select([['00',0],
+  <%= l(:field_hours) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_hr_l2]', options_for_select(hr, :selected => @settings['wktime_nonapprove_hr_l2'].blank? ? 59 : @settings['wktime_nonapprove_hr_l2']))%>
+  <%#= l(:label_wk_minutes) %>&nbsp;<%#= select_tag('settings[wktime_nonapprove_min_l2]', options_for_select([['00',0],
                                                                                                             [15, 15],
                                                                                                             [30, 30],
                                                                                                             [45, 45]], :selected => @settings['wktime_nonapprove_min_l2'].blank? ? 0 : @settings['wktime_nonapprove_min_l2']))%>
+
+    <%= l(:label_wk_minutes) %>&nbsp;<%= select_tag('settings[wktime_nonapprove_min_l2]',  options_for_select(hr, :selected => @settings['wktime_nonapprove_min_l2'].blank? ? 59 : @settings['wktime_nonapprove_min_l2']))%>
+
+
   </p>
 <p>
   <label><%= l(:label_wk_l3_approve_deadline) %></label>
   <%
      hr = []
-     for i in 0..23
+     for i in 0..59
        if i < 10
          hr << ['0' + i.to_s,i]
        else

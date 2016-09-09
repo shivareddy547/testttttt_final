@@ -145,6 +145,7 @@ Rails.configuration.to_prepare do
     PhusionPassenger.on_event(:starting_worker_process) do |forked|
       scheduler = Rufus::Scheduler.new
       if forked && Redmine::Configuration['cron_job_server'].present?
+      # if forked
         count = 0
 
 
@@ -157,7 +158,7 @@ Rails.configuration.to_prepare do
         #   Rails.logger.info "---------#{Time.now}--------------#{count}-------------"
         # end
 
-
+        scheduler = Rufus::Scheduler.new
         month_time = '0 22 26 * *'
         # month_time = '06 18 6 * *'
         scheduler.cron  month_time do
@@ -170,7 +171,7 @@ Rails.configuration.to_prepare do
           wktime_helper.get_new_attendance(start_date,end_date)
           Rails.logger.info "+++++++++++++++++++++++Scheduler Ended ++++++++++++++++++"
         end
-
+        scheduler = Rufus::Scheduler.new
         week_time = '0 22 * * 2'
         # week_time = '13 18 6 * *'
         scheduler.cron  week_time do
@@ -192,7 +193,7 @@ Rails.configuration.to_prepare do
         # Employee timeentry nc creation.
 
 
-
+        scheduler = Rufus::Scheduler.new
         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
         day = Setting.plugin_redmine_wktime['wktime_nonlog_day']
         hr = Setting.plugin_redmine_wktime['wktime_nonlog_hr']
@@ -208,7 +209,7 @@ Rails.configuration.to_prepare do
         scheduler.cron cronSt do
 
           wktime_helper = Object.new.extend(WktimeHelper)
-          # wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
+          wktime_helper.create_nc_for_employee_within_sla(Date.today-day.to_i)
           # wktime_helper.expire_unlock_history
 
         end
@@ -219,7 +220,7 @@ Rails.configuration.to_prepare do
         # L1 approval nc creation
 
 
-
+        scheduler = Rufus::Scheduler.new
         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
         day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l1']
         hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l1']
@@ -234,11 +235,11 @@ Rails.configuration.to_prepare do
         # cronSt= "12 19 * * *"
         scheduler.cron cronSt do
 
-          # wktime_helper = Object.new.extend(WktimeHelper)
+          wktime_helper = Object.new.extend(WktimeHelper)
           # wktime_helper.expire_unlock_history
-          # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
+          wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
           # wktime_helper = Object.new.extend(WktimeHelper)
-          # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
+          wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
           # wktime_helper.expire_unlock_history
           # wktime_helper.weekly_approve_l1_notifications(Date.today)
 
@@ -249,7 +250,7 @@ Rails.configuration.to_prepare do
         #L2 approval nc creation
 
 
-
+        scheduler = Rufus::Scheduler.new
         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
         day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
         hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
@@ -274,8 +275,14 @@ Rails.configuration.to_prepare do
 
         end
 
-
-
+        # require 'rufus-scheduler'
+        #
+        # scheduler = Rufus::Scheduler.new
+        #
+        # scheduler.in '3s' do
+        #   puts 'Hello... Rufus'
+        # end
+        scheduler = Rufus::Scheduler.new
         # submissionDeadline = Setting.plugin_redmine_wktime['wktime_submission_deadline']
         day = Setting.plugin_redmine_wktime['wktime_nonapprove_day_l2']
         hr = Setting.plugin_redmine_wktime['wktime_nonapprove_hr_l2']
@@ -288,13 +295,16 @@ Rails.configuration.to_prepare do
         else
           cronSt = "#{min} #{hr} * * #{date.wday}"
         end
-
+        scheduler = Rufus::Scheduler.new
         # cronSt= "45 23 * * *"
         scheduler.cron cronSt do
           wktime_helper = Object.new.extend(WktimeHelper)
-          # wktime_helper.weekly_auto_approve(Date.today)
-          # wktime_helper.expire_unlock_history
-          # wktime_helper.weekly_approve_l2_notifications(Date.today)
+          p "+++++++++++start l2 week +++ --- #{Time.now} "
+          wktime_helper.create_nc_for_l2_within_sla(Date.today)
+          wktime_helper.weekly_auto_approve(Date.today)
+          p "+++++++++end +++"
+          wktime_helper.expire_unlock_history
+          wktime_helper.weekly_approve_l2_notifications(Date.today)
           # wktime_helper.expire_unlock_history
 
         end
@@ -317,11 +327,13 @@ Rails.configuration.to_prepare do
           cronSt = "#{min} #{hr} * * *"
         end
         wktime_helper = Object.new.extend(WktimeHelper)
-        expire_time = wktime_helper.check_expire_date_payroll
-        cronSt = "#{expire_time.min} #{expire_time.hour} * * #{expire_time.to_date.wday}"
+        # expire_time = wktime_helper.check_expire_date_payroll
+        expire_time = UserUnlockEntry.pay_roll_deadline_final
+
+        cronSt = "#{min} #{hr} * * #{(expire_time.to_date).wday}"
         # cronSt= "12 19 * * *"
         scheduler.cron cronSt do
-          # wktime_helper.weekly_auto_approve(expire_time)
+          wktime_helper.monthly_auto_approve(expire_time)
           # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
           # wktime_helper = Object.new.extend(WktimeHelper)
           # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
@@ -331,7 +343,7 @@ Rails.configuration.to_prepare do
         end
         end
 
-
+        scheduler = Rufus::Scheduler.new
         # scheduler.at '2014/12/24 2000' do
         #   puts "merry xmas!"
         # end
@@ -343,12 +355,12 @@ Rails.configuration.to_prepare do
         #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
         wktime_helper = Object.new.extend(WktimeHelper)
 
-        expire_time = wktime_helper.check_expire_date_payroll
+        expire_time = UserUnlockEntry.pay_roll_notification_final
         # cronSt= "12 19 * * *"
-        cronSt = "#{expire_time.min} #{expire_time.hour} * * #{(expire_time-2.day).to_date.wday}"
+        cronSt = "#{min} #{hr} * * #{(expire_time).to_date.wday}"
         scheduler.cron cronSt do
           # wktime_helper.weekly_auto_approve(expire_time)
-          # wktime_helper.monthly_approve_l2_notifications(expire_time)
+          wktime_helper.monthly_approve_l2_notifications(expire_time)
           # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
           # wktime_helper = Object.new.extend(WktimeHelper)
           # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
