@@ -333,7 +333,9 @@ Rails.configuration.to_prepare do
         cronSt = "#{min} #{hr} * * #{(expire_time.to_date).wday}"
         # cronSt= "12 19 * * *"
         scheduler.cron cronSt do
-          wktime_helper.monthly_auto_approve(expire_time)
+
+          date_for_approve =  Date.new(Date.today.year, day.to_i, Date.today.month,day.to_i )
+          wktime_helper.monthly_auto_approve(date_for_approve)
           # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
           # wktime_helper = Object.new.extend(WktimeHelper)
           # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
@@ -369,10 +371,6 @@ Rails.configuration.to_prepare do
 
         end
         end
-
-
-
-
 
       end
     end

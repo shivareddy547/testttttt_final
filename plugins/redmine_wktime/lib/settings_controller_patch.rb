@@ -155,6 +155,7 @@ module SettingsControllerPatch
 
         end
 
+
         # scheduler.at '2014/12/24 2000' do
         #   puts "merry xmas!"
         # end
@@ -162,7 +163,7 @@ module SettingsControllerPatch
         day = Setting.plugin_redmine_wktime['wktime_payroll_day']
         hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
         min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-        scheduler5 = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        schedule5r = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
 
         if day.present? && hr.present? && min.present?
           if hr == '0' && min == '0'
@@ -172,18 +173,20 @@ module SettingsControllerPatch
           end
           wktime_helper = Object.new.extend(WktimeHelper)
           # expire_time = wktime_helper.check_expire_date_payroll
-          expire_time = UserUnlockEntry.pay_roll_deadline
+          expire_time = UserUnlockEntry.pay_roll_deadline_final
 
-          cronSt = "#{min} #{hr} * * #{(expire_time.to_date+1).wday}"
+          cronSt = "#{min} #{hr} * * #{(expire_time.to_date).wday}"
           # cronSt= "12 19 * * *"
           scheduler5.cron cronSt do
-            wktime_helper.monthly_auto_approve(expire_time)
+p "+++++monthly Payroll Approve start +++++++++++++++++"
+            date_for_approve =  Date.new(Date.today.year, day.to_i, Date.today.month,day.to_i )
+            wktime_helper.monthly_auto_approve(date_for_approve)
             # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
             # wktime_helper = Object.new.extend(WktimeHelper)
             # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
             # wktime_helper.expire_unlock_history
             # wktime_helper.weekly_approve_l1_notifications(Date.today)
-
+p "+++++++++++end ++++++++++++++++++"
           end
         end
 
@@ -199,10 +202,11 @@ module SettingsControllerPatch
           #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
           wktime_helper = Object.new.extend(WktimeHelper)
 
-          expire_time = UserUnlockEntry.pay_roll_notification
+          expire_time = UserUnlockEntry.pay_roll_notification_final
           # cronSt= "12 19 * * *"
-          cronSt = "#{min} #{hr} * * #{(expire_time-2.day).to_date.wday}"
+          cronSt = "#{min} #{hr} * * #{(expire_time).to_date.wday}"
           scheduler6.cron cronSt do
+            p "++++++++++++++monthly parill notification +++++++++++++++++++"
             # wktime_helper.weekly_auto_approve(expire_time)
             wktime_helper.monthly_approve_l2_notifications(expire_time)
             # wktime_helper.create_nc_for_l1_within_sla(Date.today-day.to_i)
@@ -210,10 +214,10 @@ module SettingsControllerPatch
             # wktime_helper.create_nc_for_l1_within_unlock_sla(Date.today-day.to_i)
             # wktime_helper.expire_unlock_history
             # wktime_helper.weekly_approve_l1_notifications(Date.today)
+            p "++++++++++++++++++++monthly payroll notification ended ++++++++++++"
 
           end
         end
-
 
 
       end
