@@ -1488,6 +1488,29 @@ class WktimeController < ApplicationController
     end
   end
 
+
+
+  def get_entry_status(date)
+    if date.present?
+      p 'chek wktime'
+      #p @wktim =Wktime.find_by_sql("select wk.status from wktimes wk where wk.user_id=#{User.current.id} and wk.begin_date=#{date} ")
+      @wktim= Wktime.where(:begin_date=>date,:user_id=>User.current.id,:status=>'r' )
+      p 'check wktime end'
+      if @wktim.present?
+        p 'sssssssuuuuuuuuuuuucccccccccccccccccceeeeeeeeeeesssssssssssssssssss'
+        return true
+      else
+        p 'FAILED'
+        return false
+      end
+    else
+      return false
+    end
+  end
+  
+
+
+
   def gatherWkCustomFields(wktime)
     errorMsg = nil
     cvParams = nil
