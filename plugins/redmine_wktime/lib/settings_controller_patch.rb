@@ -163,7 +163,7 @@ module SettingsControllerPatch
         day = Setting.plugin_redmine_wktime['wktime_payroll_day']
         hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
         min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-        schedule5 = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        scheduler5 = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
 
         if day.present? && hr.present? && min.present?
           if hr == '0' && min == '0'
