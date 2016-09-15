@@ -17,9 +17,9 @@
       <div class="box tabular">
       <lable>Select Reports: </lable>
       <% if User.current.admin? %>
-      <%= select_tag "role_for_xl","<option>Manager</option><option>Senior Manager</option><option>Inia Observation</option><option>Resource Measurements</option>".html_safe %>
+      <%= select_tag "role_for_xl","<option>DO(Manager)</option><option>CO(Senior Manager)</option><option>Inia Observation</option><option>Resource Measurements</option>".html_safe %>
       <% else %>
-          <%= select_tag "role_for_xl","<option>Manager</option><option>Senior Manager</option><option>Resource Measurements</option>".html_safe %>
+          <%= select_tag "role_for_xl","<option>DO(Manager)</option><option>CO(Senior Manager)</option><option>Resource Measurements</option>".html_safe %>
        <% end %>
         </div>
           <div id="query_form_content">

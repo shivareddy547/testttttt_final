@@ -53,7 +53,7 @@ class Metric < ActiveRecord::Base
 
 
 
-    if role_for_xl == "Manager"
+    if role_for_xl == "DO(Manager)"
       path  = File.join(Rails.root, "/plugins/project_metrics/download/manager/#{project_identifier}.xlsx")
       # path  = File.join(Rails.root, '/plugins/project_metrics/download/index1.xlsx')
       # path1  = File.join(Rails.root, '/plugins/project_metrics/download/metrics3.xlsx')
@@ -63,7 +63,7 @@ class Metric < ActiveRecord::Base
         path  = File.join(Rails.root, "/plugins/project_metrics/download/manager/metrics.xlsx")
         workbook = RubyXL::Parser.parse(path)
       end
-    elsif role_for_xl == "Senior Manager"
+    elsif role_for_xl == "CO(Senior Manager)"
 
       path  = File.join(Rails.root, "/plugins/project_metrics/download/smanager/#{project_identifier}.xlsx")
       begin

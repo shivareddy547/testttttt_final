@@ -163,7 +163,7 @@ module SettingsControllerPatch
         day = Setting.plugin_redmine_wktime['wktime_payroll_day']
         hr = Setting.plugin_redmine_wktime['wktime_payroll_hr']
         min = Setting.plugin_redmine_wktime['wktime_payroll_min']
-        schedule5r = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
+        schedule5 = Rufus::Scheduler.new #changed from start_new to new to make compatible with latest version rufus scheduler 3.0.3
 
         if day.present? && hr.present? && min.present?
           if hr == '0' && min == '0'
@@ -190,7 +190,7 @@ p "+++++++++++end ++++++++++++++++++"
           end
         end
 
-        scheduler6 = Rufus::Scheduler.new
+        scheduler6 = Rufus::Scheduler.newdead_line
         # scheduler.at '2014/12/24 2000' do
         #   puts "merry xmas!"
         # end
