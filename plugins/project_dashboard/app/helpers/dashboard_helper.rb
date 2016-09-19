@@ -1039,12 +1039,19 @@ collect_capacity_per_day = []
 
       end
 
-
+p "++++++++==project_members_user_ids+++++++++++"
+      p project_members_user_ids
+      p "+++++++++++++++++++++end ++++++++++++++="
       if find_issues.present?
         spent_time_for_issues = TimeEntry.where(:issue_id=>find_issues.map(&:id),:user_id=>project_members_user_ids.map(&:user_id)).sum(:hours)
         # resource_effort = sprint_dates_count.to_i*(productive_hours.present? ? productive_hours.first.productive_hours.to_f : 8)*(project_members_count.first.members_count).to_i
         resource_effort = collect_capacity_per_day.sum*sprint_dates_count
          # estimated_time_for_issues= find_issues.sum(:estimated_hours)
+        p "+++++++++++spent_time_for_issuesspent_time_for_issuesspent_time_for_issues+++++"
+        p spent_time_for_issues
+        p sprint_dates_count
+        p resource_effort
+        p "++++++++++end ++++++++++++"
         @total  = (spent_time_for_issues.to_f-resource_effort.to_f)/resource_effort*100
 
       end
@@ -1105,12 +1112,8 @@ cv.custom_field_id in(select id from custom_fields where name='Bug Classificatio
 ) and cv_type.custom_field_id in(select id from custom_fields where name='Bug Type')  and i.priority_id in (#{each_priority.id}) and cv.value='#{each_value}' and cv_type.value='Internal' and cv.customized_id in (#{@issues.map(&:id).join(',')})")
 
   collect_values<< issue_count_internal.first.count_issues
-
-
 end
-
-            bug_classifications.first.possible_values.each do |each_value|
-
+           bug_classifications.first.possible_values.each do |each_value|
               issue_count_internal = Issue.find_by_sql("select count(i.id) count_issues from custom_values cv
 join issues i on i.id=cv.customized_id
 join custom_values cv_type on cv_type.customized_id=i.id
@@ -1118,11 +1121,10 @@ where cv.customized_type='Issue' and
 cv.custom_field_id in(select id from custom_fields where name='Bug Classification'
 ) and cv_type.custom_field_id in(select id from custom_fields where name='Bug Type')  and i.priority_id in (#{each_priority.id}) and cv.value='#{each_value}' and cv_type.value='Client' and cv.customized_id in (#{@issues.map(&:id).join(',')}) ")
   collect_values1<< issue_count_internal.first.count_issues
-
-
             end
 
 end
+
 @priorities_collect <<  {:name=>"#{each_priority.name}", :data=>collect_values, :stack=>"Internal"}
 @priorities_collect <<  {:name=>"#{each_priority.name}", :data=>collect_values1, :stack=>"Client"}
           end
@@ -1134,27 +1136,7 @@ end
       # get_sql_for_trackers_and_statuses = get_sql_for_trackers_and_statuses(@project.id,"work_burndown_chart")
 
     else
-      # total_no_of_days= 30
-      # start_date = (Date.today-total_no_of_days)
-      # end_date = Date.today
-      # @total_dates= ((Date.today-30)..Date.today).to_a
-      # @idle_issues_count = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").count
-      # @idle_issues_total_count = @idle_issues_count
-      # idle_issues_devide = (@idle_issues_count.to_f/total_no_of_days.to_f)
-      # @idle_issues_count_array=[]
-      # @issues_count_array=[]
-      # (start_date.to_date..end_date.to_date).to_a.each_with_index do |each_day,index|
-      #   if index.to_i ==0
-      #     @idle_issues_count_array << @idle_issues_count
-      #   else
-      #     @idle_issues_count_array << (@idle_issues_count -= idle_issues_devide).round
-      #   end
-      #
-      #   closed_issues = @project.issues.where("issues.created_on between '#{start_date}' and '#{end_date}'").where("issues.closed_on <= ?",Time.parse(each_day.to_date.to_s)).count
-      #   # @idle_issues_total_count
-      #   issues_count = @idle_issues_total_count > 0 ? (@idle_issues_total_count.to_i-closed_issues.to_i) : 0.0
-      #   @issues_count_array << issues_count rescue 0
-      # end
+
     end
     return @priorities_collect,@bug_classifications.present? ? @bug_classifications.first.possible_values.map(&:to_s) : []
 

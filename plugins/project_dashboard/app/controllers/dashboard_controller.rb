@@ -37,14 +37,13 @@ class DashboardController < ApplicationController
              'work_burndown_chart' => :label_work_burndown_chart,
              'story_burndown_chart' => :label_story_burndown_chart,
              'resource_allocation_chart' => :label_resource_allocation_chart,
-             'risk_issue_chart' => :label_risk_issues_chart,
              'custom_query_1' => :label_custom_query_1,
              'custom_query_2' => :label_custom_query_2,
              'custom_query_3' => :label_custom_query_3,
              'custom_query_4' => :label_custom_query_4,
              'project_goal' => :label_project_goal,
-             'defect_chart' => :lable_defect_chart,
-             'texteditor' => :label_texteditor
+             'defect_chart' => :lable_defect_chart1,
+
   }.freeze
 
   # BLOCKS = { 'issuesassignedtome' => :label_assigned_to_me_issues,
@@ -317,10 +316,10 @@ class DashboardController < ApplicationController
     @project=Project.find(params[:project_id])
     project_goals = Dashboard.project_goals
     project_goals.each do |each_goal|
-      if params["active"]["#{each_goal}"].present? && params["active"]["#{each_goal}"]=="yes"
+      if params["active"].present? && params["active"]["#{each_goal}"].present? && params["active"]["#{each_goal}"]=="yes"
       find_goal = ProjectGoal.where(:name=>"#{each_goal}",:project_id=>@project.id).first_or_initialize
       find_goal.active=1
-      find_goal.expected_goal=params["expected_goal"]["#{each_goal}"]
+      find_goal.expected_goal=params["expected_goal"].present? && params["expected_goal"]["#{each_goal}"].present? ? params["expected_goal"]["#{each_goal}"] : 0.0
       find_goal.save
 
         end
