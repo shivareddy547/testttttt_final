@@ -54,7 +54,7 @@ module UsersControllerPatch
         # TODO: Similar to My#account
         @user.pref.attributes = params[:pref]
         if @user.present?
-          UserOfficialInfo.build(@user.id,params[:user_official_info].to_i)
+          UserOfficialInfo.build(@user.id,params[:user_official_info].to_i) if params[:user_official_info].to_i > 0
         end
         if @user.save
           @user.pref.save
