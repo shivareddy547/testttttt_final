@@ -266,6 +266,19 @@
             }else{
                 $('#check_flexi_visible').hide()
             }
-        })
+        });
+
+        $(document).keydown(function(e){
+            if(e.which === 123){
+                return false;
+            }
+        });
+
+
+        $(document).bind('contextmenu', function(e) {
+            return false;
+        });
+
+
 
 </script>

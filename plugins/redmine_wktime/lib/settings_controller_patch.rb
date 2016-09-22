@@ -190,7 +190,7 @@ p "+++++++++++end ++++++++++++++++++"
           end
         end
 
-        scheduler6 = Rufus::Scheduler.newdead_line
+        scheduler6 = Rufus::Scheduler.new
         # scheduler.at '2014/12/24 2000' do
         #   puts "merry xmas!"
         # end
