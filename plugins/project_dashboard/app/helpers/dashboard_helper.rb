@@ -1061,7 +1061,7 @@ collect_capacity_per_day = []
 
   end
 
-return @total
+return @total.to_f
 end
 
 
