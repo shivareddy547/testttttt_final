@@ -899,7 +899,7 @@ p goal
     end
 
   elsif goal =="efficient_varient"
-
+    @total=0
     if query.filters["fixed_version_id"].present?
       sprint_id = query.filters["fixed_version_id"][:values].last
       find_sprint = Version.find(sprint_id)
@@ -1060,8 +1060,10 @@ collect_capacity_per_day = []
 
 
   end
-
-return @total.to_f
+p "+++++++++==@total@total@total+++++++++++"
+p @total
+p "+++++++++++++++end +_+++++++++++++++++++++="
+return @total.to_s.to_f
 end
 
 
