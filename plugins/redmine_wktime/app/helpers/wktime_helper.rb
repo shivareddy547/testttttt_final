@@ -2198,10 +2198,11 @@ join roles r on r.id=mr.role_id where m.user_id in (#{user_id}) and r.permission
   end
 
   def check_expire_for_l1(user_id,date)
-    # if check_time_log_entry_l1(date) == false
-    #      return true
-    # end
-    return false
+    p "+++++++++++++++++l111111111111111+++++++++++++++=="
+    if check_time_log_entry_l1(date) == false
+         return true
+    end
+    # return false
 
   end
 
